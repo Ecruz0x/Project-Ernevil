@@ -12,13 +12,17 @@ locations: list[dict] = []
 def getComputers():
     return computers
 
+@app.get("/api/computer/{computer_id}", response_model = ComputerWithID)
+def getComputer(computer_id: int):
+    return computers[computer_id-1]
+
 
 @app.get("/api/locations", response_model = list[Location])
 def getLocations():
     return locations
 
 
-@app.get("/api/computer/{computer_id}", response_model = ComputerWithID)
+
 
 
 @app.post("/api/computers", response_model = ComputerWithID, status_code = status.HTTP_201_CREATED)
