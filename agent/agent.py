@@ -1,9 +1,4 @@
 import psutil, ifaddr, ipaddress, datetime, requests, os, json
-from schemas import CreateComputer
-from pydantic import ValidationError
-
-
-
 
 class Computer:
 
@@ -130,15 +125,33 @@ data = {
 }
 
 
-jsonData = json.dumps(data)
-
-
-def sendData(json):
-	url = "http://127.0.0.1:8000/api/computers"
+def sendData(json: dict, url: str) -> dict:
 	res = requests.post(url, json = json)
 	if res.status_code == 201:
-		return True
+		return res.json()
 	else:
-		raise "Adding Error"
+		print(res.status_code)
+		raise ValueError("Sending Error")
+	
 
-response = sendData(data)
+def addComputer(data: dict) -> int:
+	data["is_alive"] = True
+	url = "http://127.0.0.1:8000/api/add_computer"
+	r = sendData(json = data, url = url)
+	computerId = r["computer_id"]
+	return computerId
+
+def refreshComputer(data: dict, computerId: int):
+	urlC = "http://127.0.0.1:8000/api/refresh"
+	res = requests.get(url)
+	for i in res.json():
+		if i["computer_id"] == computerId:
+			data["computer_id"] = computerId
+			sendData(data, url = "http://127.0.0.1:8000/api/refresh")
+			return True
+	else:
+		raise ValueError("Refresh Error: Computer not found")
+
+
+computerId = addComputer(data)
+

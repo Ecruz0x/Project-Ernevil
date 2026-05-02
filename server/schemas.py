@@ -1,4 +1,6 @@
 from pydantic import BaseModel, ConfigDict
+from typing import Optional
+
 
 class Computer(BaseModel):
 	is_unix: bool
@@ -16,9 +18,29 @@ class Computer(BaseModel):
 	processes_count: int
 	processes: list
 	boot_time: str
+	is_alive: bool
 
 class CreateComputer(Computer):
 	pass
+
+class RefreshComputer(BaseModel):
+	computer_id: int
+	is_unix: Optional[bool]
+	computer_name: Optional[str]
+	location: Optional[str]
+	users_count: Optional[int]
+	users: Optional[list]
+	cpu_count: Optional[int]
+	cpu_usage: Optional[float]
+	memory: Optional[dict]
+	disk_count: Optional[int]
+	disks: Optional[dict]
+	ifcount: Optional[int]
+	ip_addr: Optional[dict]
+	processes_count: Optional[int]
+	processes: Optional[list]
+	boot_time: Optional[str]
+	is_alive: Optional[bool]
 
 
 class ComputerWithID(Computer):
