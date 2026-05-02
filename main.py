@@ -2,7 +2,6 @@
 from fastapi import FastAPI, Request, HTTPException, status
 from server.schemas import ComputerWithID, Location, CreateComputer
 
-
 app = FastAPI()
 
 computers: list[dict] = []
@@ -20,9 +19,6 @@ def getComputer(computer_id: int):
 @app.get("/api/locations", response_model = list[Location])
 def getLocations():
     return locations
-
-
-
 
 
 @app.post("/api/computers", response_model = ComputerWithID, status_code = status.HTTP_201_CREATED)
@@ -48,3 +44,4 @@ def createComputer(computer: CreateComputer):
     }
     computers.append(new_computer)
     return  new_computer
+

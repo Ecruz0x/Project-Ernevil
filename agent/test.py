@@ -1,7 +1,9 @@
-import psutil, datetime
+import psutil, datetime, ipaddress, ifaddr
 
-unix_boottime = psutil.boot_time()
+def getActiveUsers() -> set[str]:
+		activeUsers = []
+		for user in psutil.users():
+			activeUsers.append(user[0])
+		return activeUsers
 
-boot_time = datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
-
-print(type(boot_time))
+print(getActiveUsers())

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
 class Computer(BaseModel):
-	is_unix: bool
+	is_unix: bool = False
 	computer_name: str
 	location: str
 	users_count: int

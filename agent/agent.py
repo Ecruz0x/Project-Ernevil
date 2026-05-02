@@ -1,36 +1,40 @@
-import psutil, pwd, ifaddr, datetime
+import psutil, ifaddr, ipaddress, datetime, requests, os, json
+from schemas import CreateComputer
+from pydantic import ValidationError
 
 
 
 
 class Computer:
 
-	def __init__(self, computer_id: int, computer_name: str, computer_location: str, is_unix: bool):
-		self.computer_id = computer_id
+	def __init__(self, computer_name: str, computer_location: str):
 		self.computer_name = computer_name
 		self.computer_location = computer_location
-		self.is_unix = is_unix
+		if os.name == 'posix':
+			self.is_unix = True
+		else:
+			self.is_unix = False
 
 	@staticmethod
 	def getActiveUsersCount() -> int:
-		return count = len(psutil.users())
+		return len(psutil.users())
 
 	@staticmethod
-	def getActiveUsers() -> set[str]:
+	def getActiveUsers() -> list[str]:
 		activeUsers = []
 		for user in psutil.users():
-			activeUsers = user[0]
-		return set(activeUsers)
+			activeUsers.append(user[0])
+		return activeUsers
 
 
 	@staticmethod
-	def getCpuCount() -> cpu_count:
+	def getCpuCount() -> int:
 		cpu_count = psutil.cpu_count()
-		return cpu_count
+		return int(cpu_count)
 
 	@staticmethod
 	def getCpuUsage() -> float:
-		return psutil.cpu_percent(interval=1)
+		return float(psutil.cpu_percent(interval=1))
 
 
 	@staticmethod
@@ -51,12 +55,12 @@ class Computer:
 		if self.is_unix:
 			x = 0
 			for i in diskPartitions:
-				d[f"disk {x}"] = {"device": i[0], "mountpoint": "", "fstype": i[2]}
+				disks[f"disk {x}"] = {"device": i[0], "mountpoint": "", "fstype": i[2]}
 				x += 1
 		else:
 			x = 0
 			for i in diskPartitions:
-				d[f"disk {x}"] = {"device": i[0], "mountpoint": i[1], "fstype": i[2]}
+				disks[f"disk {x}"] = {"device": i[0], "mountpoint": i[1], "fstype": i[2]}
 				x += 1
 
 		return disks
@@ -102,3 +106,39 @@ class Computer:
 		unix_boottime = psutil.boot_time()
 		boot_time = datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
 		return boot_time
+
+
+localComputer = Computer("PC1", "Salle1")
+
+
+data = {
+	"is_unix": localComputer.is_unix,
+	"computer_name": localComputer.computer_name,
+	"location": localComputer.computer_location,
+	"users_count": localComputer.getActiveUsersCount(),
+	"users": localComputer.getActiveUsers(),
+	"cpu_count": localComputer.getCpuCount(),
+	"cpu_usage": localComputer.getCpuUsage(),
+	"memory": localComputer.getMemoryInfo(),
+	"disk_count": localComputer.getDiskCount(),
+	"disks": localComputer.getAvailablePartitions(),
+	"ifcount": localComputer.getNetIfCount(),
+	"ip_addr": localComputer.getIfAddr(),
+	"processes_count": localComputer.getProcessesCount(),
+	"processes": localComputer.getProcesses(),
+	"boot_time": localComputer.getBootTime()
+}
+
+
+jsonData = json.dumps(data)
+
+
+def sendData(json):
+	url = "http://127.0.0.1:8000/api/computers"
+	res = requests.post(url, json = json)
+	if res.status_code == 201:
+		return True
+	else:
+		raise "Adding Error"
+
+response = sendData(data)
