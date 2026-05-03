@@ -1,4 +1,7 @@
-import psutil, ifaddr, ipaddress, datetime, requests, os, json
+import psutil, ifaddr, ipaddress, requests, os, json
+from datetime import datetime
+
+
 
 class Computer:
 
@@ -99,7 +102,7 @@ class Computer:
 	@staticmethod
 	def getBootTime() -> str:
 		unix_boottime = psutil.boot_time()
-		boot_time = datetime.datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
+		boot_time = datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
 		return boot_time
 
 
@@ -121,7 +124,7 @@ data = {
 	"ip_addr": localComputer.getIfAddr(),
 	"processes_count": localComputer.getProcessesCount(),
 	"processes": localComputer.getProcesses(),
-	"boot_time": localComputer.getBootTime()
+	"boot_time": localComputer.getBootTime(),
 }
 
 
@@ -142,16 +145,9 @@ def addComputer(data: dict) -> int:
 	return computerId
 
 def refreshComputer(data: dict, computerId: int):
-	urlC = "http://127.0.0.1:8000/api/refresh"
-	res = requests.get(url)
-	for i in res.json():
-		if i["computer_id"] == computerId:
-			data["computer_id"] = computerId
-			sendData(data, url = "http://127.0.0.1:8000/api/refresh")
-			return True
-	else:
-		raise ValueError("Refresh Error: Computer not found")
-
-
-computerId = addComputer(data)
+	data["computer_id"] = computerId
+	data["last_refresh"] = str(datetime.now())
+	data = dict(data)
+	r = sendData(data, url = "http://127.0.0.1:8000/api/refresh")
+	return True
 

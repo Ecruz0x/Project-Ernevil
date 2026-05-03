@@ -50,15 +50,14 @@ def createComputer(computer: CreateComputer):
     else:
         return False
 
-@app.post("/api/refresh", response_model = ComputerWithID, status_code = status.HTTP_201_CREATED)
+@app.post("/api/refresh", response_model = int, status_code = status.HTTP_201_CREATED)
 def refreshComputer(data: RefreshComputer):
     id = data.computer_id
+    update_data = data.dict(exclude_unset=True)
     for computer in computers:
-        if computer.computer_id == id:
-            for x in data.keys():
-                for j in computer.keys():
-                    if x == j:
-                        computer[j] = data[x]
+        if computer['computer_id'] == id:
+            for k, v in update_data.items():
+                computer[k] = v
     return id
 
 
