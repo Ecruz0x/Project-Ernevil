@@ -48,14 +48,3 @@ def refreshComputer(data: dict, computerId: int):
 	data = dict(data)
 	r = sendData(data, url = "http://127.0.0.1:8000/api/refresh")
 	return True
-
-datax = {
-	"is_unix": localComputer.is_unix,
-	"computer_name": localComputer.computer_name,
-	"location": localComputer.computer_location,
-	"users_count": localComputer.getActiveUsersCount(),
-	"users": localComputer.getActiveUsers(),
-	"cpu_count": localComputer.getCpuCount(),
-	"cpu_usage": localComputer.getCpuUsage(),
-	"memory": localComputer.getMemoryInfo(),
-}
