@@ -55,4 +55,3 @@ class Location(BaseModel):
 	location_name: str
 	severity: str
 	computers: list[Computer] = []
-
