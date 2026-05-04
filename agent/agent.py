@@ -5,7 +5,7 @@ import requests, sys, multiprocessing, time, logging
 logger = logging.getLogger(__name__)
 
 
-
+serverAgent = "http://127.0.0.1:8000"
 localComputer = Computer("PC1", "Salle1")
 
 
@@ -38,23 +38,19 @@ def sendData(json: dict, url: str) -> dict:
 
 def addComputer(data: dict) -> int:
 	data["is_alive"] = True
-	url = "http://127.0.0.1:8000/api/add_computer"
+	url = f"{serverAgent}/api/add_computer"
 	r = sendData(json = data, url = url)
 	computerId = r["computer_id"]
 	return computerId
+
 
 def refreshComputer(data: dict, computerId: int):
 	data["computer_id"] = computerId
 	data["last_refresh"] = str(datetime.now())
 	data = dict(data)
-	r = sendData(data, url = "http://127.0.0.1:8000/api/refresh")
+	r = sendData(data, url = f"{serverAgent}/api/refresh")
 	return True
 
-
-def sendHeartBeat(computer_id: int):
-	url = "http://127.0.0.1:8000/api/heartbeat"
-	res = requests.post(url, json = computer_id)
-	time.sleep(30)
 
 def sendRefresh(computer_id: int) -> bool:
 	logging.basicConfig(filename='log/changes.log', level=logging.INFO)
@@ -82,8 +78,16 @@ def sendRefresh(computer_id: int) -> bool:
 				new_data[k] = data_check[k]
 				data[k] = data_check[k]
 				logger.info(f"{datetime.now()} - Changes Detected : {k}")
-				
 		refreshComputer(new_data, computer_id)
+		time.sleep(180)
+
+
+def sendHeartBeat(computer_id: int):
+	url = f"{serverAgent}/api/heartbeat"
+	while True:
+		res = requests.post(url, json = {"id": computer_id})
+		print(res.text)
+		time.sleep(30)
 
 
 def main():
@@ -94,11 +98,7 @@ def main():
 		sendHB.start()
 		sendRef.start()
 	except KeyboardInterrupt:
-		sendHB.join()
-		sendRef.join()
 		exit(1)
-
-
 
 if __name__ == "__main__":
     sys.exit(main())

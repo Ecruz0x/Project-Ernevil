@@ -2,6 +2,7 @@
 from fastapi import FastAPI, Request, HTTPException, status
 from server.schemas import ComputerWithID, Location, CreateComputer, RefreshComputer
 import time
+from datetime import datetime
 
 app = FastAPI()
 
@@ -9,8 +10,13 @@ computers: list[dict] = []
 locations: list[dict] = []
 
 @app.get("/api/computers", response_model = list[ComputerWithID])
-def getComputers():
-    return computers
+def getLiveComputers():
+    liveComputers = []
+    for computer in computers:
+        if computer["is_alive"]:
+            liveComputers.append(computer)
+    return liveComputers
+
 
 @app.get("/api/computer/{computer_id}", response_model = ComputerWithID)
 def getComputer(computer_id: int):
@@ -42,7 +48,8 @@ def createComputer(computer: CreateComputer):
         "processes_count": computer.processes_count,
         "processes": computer.processes,
         "boot_time": computer.boot_time,
-        "is_alive": True
+        "is_alive": True,
+        "lastHB": datetime.now()
     }
     if new_computer not in computers:
         computers.append(new_computer)
@@ -61,15 +68,21 @@ def refreshComputer(data: RefreshComputer):
     return id
 
 
-
-@app.post("/api/heartbeat", response_model = bool)
-def handleHeartBeat(computer_id: int):
-    for k in computers.keys():
-        if k["computer_id"] == computer_id:
+@app.post("/api/heartbeat", response_model = bool, status_code = 200)
+def handleHeartBeat(computer_id: dict):
+    for k in computers:
+        if k["computer_id"] == computer_id["id"]:
+            k["lastHB"] = datetime.now()
             k["is_alive"] = True
             return True
         else:
             return False
 
 
-
+@app.get("/api/expired")
+def expireHB():
+    for k in computers:
+        duration = datetime.now() - k["lastHB"]
+        if duration.total_seconds() >= 150:
+            k["is_alive"] = False
+            return k["computer_id"]

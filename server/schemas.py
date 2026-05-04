@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
+from datetime import datetime
 
 
 
@@ -49,6 +50,7 @@ class RefreshComputer(BaseModel):
 class ComputerWithID(Computer):
 	model_config = ConfigDict(from_attributes = True)
 	computer_id: int
+	lastHB: datetime
 
 
 class Location(BaseModel):
