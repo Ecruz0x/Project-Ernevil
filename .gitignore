@@ -11,3 +11,6 @@ wheels/
 
 #test files
 test.py
+
+#uv lock
+uv.lock
