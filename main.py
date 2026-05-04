@@ -70,6 +70,15 @@ def handleHeartBeat(computer_id: int):
             return True
         else:
             return False
+
+def expireHeartBeat(computer_id: int):
+    for k in computers.keys():
+        if k["computer_id"] == computer_id:
+            k["is_alive"] = True
+            return True
+        else:
+            return False
+
     
 """
 def checkExpiredHeartBeat():

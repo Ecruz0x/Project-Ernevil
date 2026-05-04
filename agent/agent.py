@@ -1,7 +1,8 @@
 from computerinfo import Computer
 from datetime import datetime
-import requests
+import requests, sys, multiprocessing, time, logging
 
+logger = logging.getLogger(__name__)
 
 
 
@@ -15,7 +16,7 @@ data = {
 	"users_count": localComputer.getActiveUsersCount(),
 	"users": localComputer.getActiveUsers(),
 	"cpu_count": localComputer.getCpuCount(),
-	"cpu_usage": localComputer.getCpuUsage(),
+	"cpu_usage": round(localComputer.getCpuUsage(), 2),
 	"memory": localComputer.getMemoryInfo(),
 	"disk_count": localComputer.getDiskCount(),
 	"disks": localComputer.getAvailablePartitions(),
@@ -48,3 +49,56 @@ def refreshComputer(data: dict, computerId: int):
 	data = dict(data)
 	r = sendData(data, url = "http://127.0.0.1:8000/api/refresh")
 	return True
+
+
+def sendHeartBeat(computer_id: int):
+	url = "http://127.0.0.1:8000/api/heartbeat"
+	res = requests.post(url, json = computer_id)
+	time.sleep(30)
+
+def sendRefresh(computer_id: int) -> bool:
+	logging.basicConfig(filename='log/changes.log', level=logging.INFO)
+	while True:
+		data_check = {
+		"is_unix": localComputer.is_unix,
+		"computer_name": localComputer.computer_name,
+		"location": localComputer.computer_location,
+		"users_count": localComputer.getActiveUsersCount(),
+		"users": localComputer.getActiveUsers(),
+		"cpu_count": localComputer.getCpuCount(),
+		"cpu_usage": round(localComputer.getCpuUsage(), 2),
+		"memory": localComputer.getMemoryInfo(),
+		"disk_count": localComputer.getDiskCount(),
+		"disks": localComputer.getAvailablePartitions(),
+		"ifcount": localComputer.getNetIfCount(),
+		"ip_addr": localComputer.getIfAddr(),
+		"processes_count": localComputer.getProcessesCount(),
+		"processes": localComputer.getProcesses(),
+		"boot_time": localComputer.getBootTime(),
+		}
+		new_data = {}
+		for k in data.keys():
+			if data[k] != data_check[k]:
+				new_data[k] = data_check[k]
+				data[k] = data_check[k]
+				logger.info(f"{datetime.now()} - Changes Detected : {k}")
+				
+		refreshComputer(new_data, computer_id)
+
+
+def main():
+	computerId = addComputer(data)
+	sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))
+	sendRef = multiprocessing.Process(target=sendRefresh, args = (computerId,))
+	try:
+		sendHB.start()
+		sendRef.start()
+	except KeyboardInterrupt:
+		sendHB.join()
+		sendRef.join()
+		exit(1)
+
+
+
+if __name__ == "__main__":
+    sys.exit(main())
