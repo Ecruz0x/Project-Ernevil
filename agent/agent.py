@@ -1,6 +1,6 @@
 from computerinfo import Computer
 from datetime import datetime
-import requests, sys, multiprocessing, time, logging
+import requests, sys, multiprocessing, time, logging, asyncio
 
 logger = logging.getLogger(__name__)
 

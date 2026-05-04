@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, Request, HTTPException, status
 from server.schemas import ComputerWithID, Location, CreateComputer, RefreshComputer
-import time
+import time, asyncio
 from datetime import datetime
 
 app = FastAPI()
@@ -80,9 +80,22 @@ def handleHeartBeat(computer_id: dict):
 
 
 @app.get("/api/expired")
-def expireHB():
+def expiredComputers():
+    expired_computers = {}
     for k in computers:
-        duration = datetime.now() - k["lastHB"]
-        if duration.total_seconds() >= 150:
-            k["is_alive"] = False
-            return k["computer_id"]
+        if k["is_alive"] == False:
+            expired_computers[k["computer_id"]] = k["lastHB"]
+    return expired_computers
+
+
+async def expireHeartBeat():
+    while True:
+        for k in computers:
+            duration = datetime.now() - k["lastHB"]
+            if duration.total_seconds() >= 150:
+                k["is_alive"] = False
+        await asyncio.sleep(50)
+
+@app.on_event("startup")
+async def startExpiringHBs():
+    asyncio.create_task(expireHeartBeat())
