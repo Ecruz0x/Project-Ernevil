@@ -4,3 +4,7 @@ INFO:__mp_main__:2026-05-04 18:36:48.371812 - Changes Detected : memory
 =======
 
 >>>>>>> e5476e77af63dd946edc725009d444123d199a71
+INFO:__main__:2026-05-05 21:59:03.305330 - Changes Detected : cpu_usage
+INFO:__main__:2026-05-05 21:59:03.308494 - Changes Detected : memory
+INFO:__main__:2026-05-05 21:59:03.308615 - Changes Detected : processes_count
+INFO:__main__:2026-05-05 21:59:03.308799 - Changes Detected : processes
