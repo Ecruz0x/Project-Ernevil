@@ -7,7 +7,10 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi[standard]>=0.136.1",
     "ifaddr>=0.2.0",
+    "npm>=0.1.1",
+    "npx>=0.1.8",
     "psutil>=7.2.2",
     "requests>=2.33.1",
     "streamlit>=1.57.0",
+    "streamlit-shadcn-ui>=0.1.19",
 ]

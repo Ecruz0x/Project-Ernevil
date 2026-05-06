@@ -1,4 +1,4 @@
-from computerinfo import Computer
+from collectors.computer_info import Computer
 from datetime import datetime
 import requests, sys, multiprocessing, time, logging, asyncio
 
@@ -37,9 +37,10 @@ def sendData(json: dict, url: str) -> dict:
 	
 
 def addComputer(data: dict) -> int:
-	data["is_alive"] = True
+	computer_data = data
+	computer_data["is_alive"] = True
 	url = f"{serverAgent}/api/add_computer"
-	r = sendData(json = data, url = url)
+	r = sendData(json = computer_data, url = url)
 	computerId = r["computer_id"]
 	return computerId
 
@@ -74,10 +75,13 @@ def sendRefresh(computer_id: int) -> bool:
 		}
 		new_data = {}
 		for k in data.keys():
-			if data[k] != data_check[k]:
-				new_data[k] = data_check[k]
-				data[k] = data_check[k]
-				logger.info(f"{datetime.now()} - Changes Detected : {k}")
+			try:
+				if data[k] != data_check[k]:
+					new_data[k] = data_check[k]
+					data[k] = data_check[k]
+					logger.info(f"{datetime.now()} - Changes Detected : {k}")
+			except KeyError:
+				pass
 		refreshComputer(new_data, computer_id)
 		time.sleep(180)
 

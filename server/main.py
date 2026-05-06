@@ -1,6 +1,7 @@
 
 from fastapi import FastAPI, Request, HTTPException, status
-from server.schemas import ComputerWithID, Location, CreateComputer, RefreshComputer
+from .schemas.computer import ComputerWithID, CreateComputer, RefreshComputer
+from .schemas.locations import Location
 import time, asyncio
 from datetime import datetime
 
