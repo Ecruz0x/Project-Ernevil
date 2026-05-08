@@ -17,14 +17,19 @@ st.header("How To Use")
 selected = card_selector(
     [
         dict(
-            icon=":material/hub:",
-            title="Agents",
-            description="Deploy the agent software to your computers",
-        ),
-        dict(
             icon=":material/computer:",
             title="Server",
             description="Run the server's software on the administration machine",
+        ),
+        dict(
+            icon=":material/security:",
+            title="Account",
+            description="Create your administration account",
+        ),
+        dict(
+            icon=":material/hub:",
+            title="Agents",
+            description="Deploy the agent software to your computers and login using your administration account",
         ),
         dict(
             icon=":material/dns:",

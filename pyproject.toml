@@ -1,5 +1,5 @@
 [project]
-name = "distributed-ids"
+name = "Ernevil"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -7,10 +7,7 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi[standard]>=0.136.1",
     "ifaddr>=0.2.0",
-    "npm>=0.1.1",
-    "npx>=0.1.8",
     "psutil>=7.2.2",
-    "reflex>=0.9.2",
     "requests>=2.33.1",
     "st-pages>=1.0.1",
     "streamlit>=1.57.0",

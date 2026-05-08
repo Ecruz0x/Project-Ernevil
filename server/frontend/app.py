@@ -1,33 +1,42 @@
 import streamlit as st
 
 
+st.set_page_config(
+    page_title="Ernevil",
+    page_icon=":material/info:",
+    layout="wide",
+)
 
 
 overviewPage = st.Page(
-	"pages/overview_page.py", title="Overview", default=True, icon=":material/dashboard:"
+	"pages/overviewpage.py", title="Overview", default=True, icon=":material/dashboard:"
 )
 
 
 AvComputersPage = st.Page(
-    "pages/monitor_computers.py", title="Monitor Computers", icon=":material/devices:"
+    "pages/listcomputers.py", title="Available Computers", icon=":material/devices:"
+)
+
+monitorComputersPage = st.Page(
+    "pages/monitorcomputers.py", title="Monitor Computers", icon=":material/check_circle:"
 )
 
 blacklistComputersPage = st.Page(
-    "pages/blacklist_computers.py", title="Blacklist Computers", icon=":material/dangerous:"
+    "pages/blacklist.py", title="Blacklist Computers", icon=":material/dangerous:"
 )
 
 
 locations = st.Page(
-    "pages/list_locations.py", title="Locations", icon=":material/home_pin:"
+    "pages/listlocations.py", title="Locations", icon=":material/home_pin:"
 )
 
 
 addLocations = st.Page(
-    "pages/add_locations.py", title="Add Locations", icon=":material/add_location:"
+    "pages/addlocations.py", title="Add Locations", icon=":material/add_location:"
 )
 
 generateComputerReports = st.Page(
-    "pages/c_reports.py", title="Computer Report", icon=":material/description:"
+    "pages/reports.py", title="Computer Report", icon=":material/description:"
 )
 
 networkAlerts = st.Page(
@@ -40,8 +49,8 @@ pg = st.navigation(
 
     {
     	"": [overviewPage],
-        "Computers & Reports": [AvComputersPage, blacklistComputersPage, generateComputerReports],
-        "Locations": [locations, addLocations],
+        "Computers & Reports": [AvComputersPage, monitorComputersPage, blacklistComputersPage, generateComputerReports],
+        "Locations": [locations, addLocations], 
         "Alerts": [networkAlerts]
     }
     
