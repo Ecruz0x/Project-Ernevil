@@ -9,7 +9,7 @@ overviewPage = st.Page(
 
 
 AvComputersPage = st.Page(
-    "pages/list_computers.py", title="Available Computers", icon=":material/devices:"
+    "pages/monitor_computers.py", title="Monitor Computers", icon=":material/devices:"
 )
 
 blacklistComputersPage = st.Page(
