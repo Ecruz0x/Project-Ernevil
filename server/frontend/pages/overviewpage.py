@@ -19,17 +19,17 @@ selected = card_selector(
         dict(
             icon=":material/computer:",
             title="Server",
-            description="Run the server's software on the administration machine",
+            description="Deploy the server's software on the administration machine",
         ),
         dict(
             icon=":material/security:",
             title="Account",
-            description="Create your administration account",
+            description="Create your administrator account",
         ),
         dict(
             icon=":material/hub:",
             title="Agents",
-            description="Deploy the agent software to your computers and login using your administration account",
+            description="Deploy the agent software to your computers or servers and login using your administration credentials",
         ),
         dict(
             icon=":material/dns:",
