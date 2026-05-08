@@ -6,7 +6,7 @@ import streamlit_shadcn_ui as ui
 
 st.header("General Overview")
 st.text("""
-Ernevil is an open-source monitoring platform designed to help administrators manage and monitor computers across a Local Area Network, with cloud support planned for future releases. It focuses on simplicity, automation, and centralized system management while remaining fully transparent and community-driven.""")
+Ernevil is an open-source monitoring platform designed to help administrators manage and monitor devices across a Local Area Network, with cloud support planned for future releases. It focuses on simplicity, automation, and centralized system management while remaining fully transparent and community-driven.""")
 
 
 ui.link_button(text="Github", url="https://github.com/Ecruz0x/Project-Ernevil/", key="link_btn")
@@ -46,11 +46,11 @@ v = 30
 
 cols = st.columns(3)
 with cols[0]:
-    ui.metric_card(title="Devices", content=v, description="Detected computers", key="computers")
+    ui.metric_card(title="Devices", content=v, description="Detected devices", key="devices")
 with cols[1]:
     ui.metric_card(title="Locations", content=v, description="Available locations", key="locations")
 with cols[2]:
-    ui.metric_card(title="Last Device", content=v, description="Last added computer", key="lacomputer")
+    ui.metric_card(title="Last added Device", content=v, description="Last added device", key="ladev")
 
 nxtcols = st.columns(1)
 with nxtcols[0]:

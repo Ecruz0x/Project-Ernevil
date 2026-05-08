@@ -257,6 +257,7 @@ dependencies = [
     { name = "requests" },
     { name = "st-pages" },
     { name = "streamlit" },
+    { name = "streamlit-code-editor" },
     { name = "streamlit-extras" },
     { name = "streamlit-shadcn-ui" },
 ]
@@ -269,6 +270,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.33.1" },
     { name = "st-pages", specifier = ">=1.0.1" },
     { name = "streamlit", specifier = ">=1.57.0" },
+    { name = "streamlit-code-editor", specifier = ">=0.1.22" },
     { name = "streamlit-extras", specifier = ">=1.5.0" },
     { name = "streamlit-shadcn-ui", specifier = ">=0.1.19" },
 ]
@@ -1953,6 +1955,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/5d/f8/b2daf7a5f8ae15527daf94406e771bb6075e958a01c3dde9eba79dc3c9a3/streamlit-1.57.0.tar.gz", hash = "sha256:0b028d305c1a1a757071b2c9504966787602842fc8af6e873795ca58d2b4d12f", size = 8678859, upload-time = "2026-04-28T22:13:32.238Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d8/1a/3ca2293d8552bacea3e67e9600d2d1df7df4a325059769ad83d91c279595/streamlit-1.57.0-py3-none-any.whl", hash = "sha256:0d1d41972aeade5637dbb0e7f0eefa5312272f85304923d240a1b1f0475249c8", size = 9194216, upload-time = "2026-04-28T22:13:29.624Z" },
+]
+
+[[package]]
+name = "streamlit-code-editor"
+version = "0.1.22"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/67/6f/fc455957652d0f42124dbc3090fe58b8919ad5bcba575a36669499ded952/streamlit-code-editor-0.1.22.tar.gz", hash = "sha256:93e6ecb4060614bce99eaf758b4cb5c8ce2accc0eb5140cbbb23c05cb4e9d7f6", size = 3788010, upload-time = "2024-12-29T22:30:22.441Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/43/53/298050f856bfdd7dd47fbcd998af92ec47479a4c0fc1a89ff90c4f27a74a/streamlit_code_editor-0.1.22-py3-none-any.whl", hash = "sha256:31abe12a94abde64123f71049741c248cd52c9de7869decd32a8a5a96695fcf4", size = 4036058, upload-time = "2024-12-29T22:30:18.897Z" },
 ]
 
 [[package]]

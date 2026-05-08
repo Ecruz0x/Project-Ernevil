@@ -14,15 +14,15 @@ overviewPage = st.Page(
 
 
 AvComputersPage = st.Page(
-    "pages/listcomputers.py", title="Available Computers", icon=":material/devices:"
+    "pages/listdev.py", title="Available Devices", icon=":material/devices:"
 )
 
 monitorComputersPage = st.Page(
-    "pages/monitorcomputers.py", title="Monitor Computers", icon=":material/check_circle:"
+    "pages/monitor.py", title="Monitor Devices", icon=":material/check_circle:"
 )
 
 blacklistComputersPage = st.Page(
-    "pages/blacklist.py", title="Blacklist Computers", icon=":material/dangerous:"
+    "pages/blacklist.py", title="Blacklist Devices", icon=":material/dangerous:"
 )
 
 
