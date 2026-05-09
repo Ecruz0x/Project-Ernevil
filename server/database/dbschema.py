@@ -63,6 +63,7 @@ class processesInfo(Base):
 class disksInfo(Base):
 	__tablename__ = "disksinfo"
 
+	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
 	processes_count: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
 	partitionname: Mapped[str] = mapped_column(String(50), unique=False, nullable=False)
 	mountpoint: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
