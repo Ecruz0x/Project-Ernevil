@@ -25,9 +25,45 @@ class Locations(Base):
 class ComputerInfo(Base):
 	__tablename__ = "computerInfo"
 
-	computerid: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+	computerid: Mapped[str] = mapped_column(Integer, primary_key=True, index=True)
 	computername: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 	is_unix: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
+	location: Mapped[str] = mapped_column(ForeignKey("locations.name"), nullable=True, unique=False)
 	os: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)  ## TODO : Fix this (nullable=False)
-	location: Mapped[str] = mapped_column(ForeignKey("locations.name"), nullable=True)
+	boottime: Mapped[datetime] = mapped_column(DateTime, unique = False, nullable=False)
 	is_alive: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
+	node_machineid: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+
+
+class MemoryInfo(Base):
+	__tablename__ = "memoryinfo"
+
+	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
+	totalMemory: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
+	available_memory: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
+
+class networkingInfo(Base):
+	__tablename__ = "netinfo"
+
+	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
+	ifcount: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
+	ifname: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
+	ipaddr: Mapped[str] = mapped_column(String(135), unique=False, nullable=False)
+	
+
+class processesInfo(Base):
+	__tablename__ = "processesinfo"
+
+	process_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
+	processes_count: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
+	pid: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
+	process_name: Mapped[str] = mapped_column(String(20), unique=False, nullable=False)
+
+class disksInfo(Base):
+	__tablename__ = "disksinfo"
+
+	processes_count: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
+	partitionname: Mapped[str] = mapped_column(String(50), unique=False, nullable=False)
+	mountpoint: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
+	fstype: Mapped[str] = mapped_column(String(10), unique=False, nullable=False)
