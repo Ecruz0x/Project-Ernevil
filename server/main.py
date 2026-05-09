@@ -2,21 +2,28 @@
 from fastapi import FastAPI, Request, HTTPException, status
 from .schemas.computer import ComputerWithID, CreateComputer, RefreshComputer
 from .schemas.locations import Location
-import time, asyncio
+import time, asyncio, json
 from datetime import datetime
+from .utils import fingerprint as fp
 
 app = FastAPI()
 
-computers: list[dict] = []
-locations: list[dict] = []
+computers: list[ComputerWithID] = []
+locations: list[Location] = []
+
 
 @app.get("/api/computers", response_model = list[ComputerWithID])
+def getComputers():
+    return computers
+
+@app.get("/api/livecomputers", response_model = list[ComputerWithID])
 def getLiveComputers():
     liveComputers = []
     for computer in computers:
         if computer["is_alive"]:
             liveComputers.append(computer)
     return liveComputers
+
 
 
 @app.get("/api/computer/{computer_id}", response_model = ComputerWithID)
@@ -31,9 +38,9 @@ def getLocations():
 
 @app.post("/api/add_computer", response_model = ComputerWithID, status_code = status.HTTP_201_CREATED)
 def createComputer(computer: CreateComputer):
-    id = len(computers) + 1
     new_computer = {
-        "computer_id": id,
+        "computer_id": computer.computer_id,
+        "fingerprint": fp.fingerprint(computer.computer_id, computer.node_machineid),
         "is_unix": computer.is_unix,
         "computer_name": computer.computer_name,
         "location": computer.location,
@@ -50,13 +57,14 @@ def createComputer(computer: CreateComputer):
         "processes": computer.processes,
         "boot_time": computer.boot_time,
         "is_alive": True,
-        "lastHB": datetime.now()
+        "lastHB": str(datetime.now()),
+        "node_machineid": computer.node_machineid
     }
-    if new_computer not in computers:
-        computers.append(new_computer)
-        return  new_computer
-    else:
-        return False
+    computers.append(new_computer)
+    return new_computer
+
+
+
 
 @app.post("/api/refresh", response_model = int, status_code = status.HTTP_201_CREATED)
 def refreshComputer(data: RefreshComputer):

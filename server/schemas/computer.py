@@ -5,9 +5,11 @@ from datetime import datetime
 
 
 class Computer(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	computer_id: str
 	is_unix: bool
 	computer_name: str
-	location: str
+	location: Optional[str] = None
 	users_count: int
 	users: list
 	cpu_count: int
@@ -21,6 +23,7 @@ class Computer(BaseModel):
 	processes: list
 	boot_time: str
 	is_alive: bool
+	node_machineid: str
 
 
 class CreateComputer(Computer):
@@ -43,13 +46,14 @@ class RefreshComputer(BaseModel):
 	processes_count: Optional[int] = None
 	processes: Optional[list] = None
 	boot_time: Optional[str] = None
-	computer_id: int
+	computer_id: str
 	last_refresh: str
 
 
 class ComputerWithID(Computer):
 	model_config = ConfigDict(from_attributes = True)
-	computer_id: int
+	computer_id: str
+	fingerprint: str
 	lastHB: datetime
 
 

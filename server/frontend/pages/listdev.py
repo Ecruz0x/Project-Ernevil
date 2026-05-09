@@ -19,7 +19,7 @@ df = pd.DataFrame(data)
 ui.table(data=df, maxHeight=200)
 
 if st.button("Monitor your devices"):
-	st.switch_page("pages/monitorcomputers.py")
+	st.switch_page("pages/monitor.py")
 
 
 

@@ -6,10 +6,11 @@ logger = logging.getLogger(__name__)
 
 
 serverAgent = "http://127.0.0.1:8000"
-localComputer = Computer("PC1", "Salle1")
+localComputer = Computer()
 
 
 data = {
+	"computer_id": localComputer.computer_id,
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
 	"location": localComputer.computer_location,
@@ -25,7 +26,9 @@ data = {
 	"processes_count": localComputer.getProcessesCount(),
 	"processes": localComputer.getProcesses(),
 	"boot_time": localComputer.getBootTime(),
+	"node_machineid": localComputer.getMachineId()
 }
+
 
 def sendData(json: dict, url: str) -> dict:
 	res = requests.post(url, json = json)
@@ -57,7 +60,7 @@ def sendRefresh(computer_id: int) -> bool:
 	logging.basicConfig(filename='log/changes.log', level=logging.INFO)
 	while True:
 		data_check = {
-		"is_unix": localComputer.is_unix,
+		"computer_id": localComputer.computer_id,
 		"computer_name": localComputer.computer_name,
 		"location": localComputer.computer_location,
 		"users_count": localComputer.getActiveUsersCount(),

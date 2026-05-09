@@ -1,12 +1,13 @@
-import psutil, ifaddr, ipaddress, requests, os, json
+import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, pwd
 from datetime import datetime
 
 
 
 class Computer:
 
-	def __init__(self, computer_name: str, computer_location: str):
-		self.computer_name = computer_name
+	def __init__(self, computer_location: str=None):
+		self.computer_id = str(uuid.getnode())
+		self.computer_name = socket.gethostname()
 		self.computer_location = computer_location
 		if os.name == 'posix':
 			self.is_unix = True
@@ -17,11 +18,14 @@ class Computer:
 	def getActiveUsersCount() -> int:
 		return len(psutil.users())
 
-	@staticmethod
-	def getActiveUsers() -> list[str]:
+	def getActiveUsers(self) -> list[str]:
 		activeUsers = []
-		for user in psutil.users():
-			activeUsers.append(user[0])
+		if self.is_unix:
+			for entry in pwd.getpwall():
+				activeUsers.append(entry.pw_name)
+		else:
+			for user in psutil.users():
+				activeUsers.append(user[0])
 		return activeUsers
 
 
@@ -53,12 +57,12 @@ class Computer:
 		if self.is_unix:
 			x = 0
 			for i in diskPartitions:
-				disks[f"disk {x}"] = {"device": i[0], "mountpoint": "", "fstype": i[2]}
+				disks[f"disk {x}"] = {"device": i[0], "mountpoint": i[1], "fstype": i[2]}
 				x += 1
 		else:
 			x = 0
 			for i in diskPartitions:
-				disks[f"disk {x}"] = {"device": i[0], "mountpoint": i[1], "fstype": i[2]}
+				disks[f"disk {x}"] = {"device": i[0], "mountpoint": "", "fstype": i[2]}
 				x += 1
 
 		return disks
@@ -104,3 +108,8 @@ class Computer:
 		unix_boottime = psutil.boot_time()
 		boot_time = datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
 		return boot_time
+
+	@staticmethod
+	def getMachineId() -> str:
+		node_machineid = machineid.id()
+		return str(node_machineid)
