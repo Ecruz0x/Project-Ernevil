@@ -6,7 +6,6 @@ from datetime import datetime
 
 class Computer(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
-	computer_id: str
 	is_unix: bool
 	computer_name: str
 	location: Optional[str] = None
@@ -52,12 +51,12 @@ class RefreshComputer(BaseModel):
 
 class ComputerWithID(Computer):
 	model_config = ConfigDict(from_attributes = True)
-	computer_id: str
+	computer_id: int
 	fingerprint: str
 	lastHB: datetime
 
 
 class Location(BaseModel):
 	location_name: str
-	severity: str
+	severity: Optional[str] = None
 	computers: list[Computer] = []

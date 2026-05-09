@@ -10,7 +10,6 @@ localComputer = Computer()
 
 
 data = {
-	"computer_id": localComputer.computer_id,
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
 	"location": localComputer.computer_location,
