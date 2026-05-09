@@ -13,7 +13,7 @@ class User(Base):
 	id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 	username: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
 	email: Mapped[str] = mapped_column(String(60), unique=True, nullable=False)
-	password: Mapped[str] = mapped_column(String(99), unique=True, nullable=False)
+	password: Mapped[str] = mapped_column(String(99), unique=False, nullable=False)
 
 
 class Locations(Base):
@@ -25,7 +25,7 @@ class Locations(Base):
 class ComputerInfo(Base):
 	__tablename__ = "computerInfo"
 
-	computerid: Mapped[str] = mapped_column(Integer, primary_key=True, index=True)
+	computerid: Mapped[str] = mapped_column(String(256), primary_key=True, index=True)
 	computername: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 	is_unix: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 	location: Mapped[str] = mapped_column(ForeignKey("locations.name"), nullable=True, unique=False)
@@ -38,14 +38,15 @@ class ComputerInfo(Base):
 class MemoryInfo(Base):
 	__tablename__ = "memoryinfo"
 
-	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
+	computerid: Mapped[str] = mapped_column(primary_key=True, ForeignKey("computerInfo.computerid"), nullable=False, unique=True, index=True)
 	totalMemory: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
 	available_memory: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
+	usage: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
 
 class networkingInfo(Base):
 	__tablename__ = "netinfo"
 
-	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
+	computerid: Mapped[str] = mapped_column(primary_key=True, ForeignKey("computerInfo.computerid"), nullable=False, unique=True, index=True)
 	ifcount: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
 	ifname: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
 	ipaddr: Mapped[str] = mapped_column(String(135), unique=False, nullable=False)
@@ -54,8 +55,8 @@ class networkingInfo(Base):
 class processesInfo(Base):
 	__tablename__ = "processesinfo"
 
-	process_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
+	computerid: Mapped[str] = mapped_column(primary_key=True, ForeignKey("computerInfo.computerid"), nullable=False, unique=True, index=True)
+	process_id: Mapped[int] = mapped_column(Integer, primary_key=True)
 	processes_count: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
 	pid: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
 	process_name: Mapped[str] = mapped_column(String(20), unique=False, nullable=False)
@@ -63,7 +64,7 @@ class processesInfo(Base):
 class disksInfo(Base):
 	__tablename__ = "disksinfo"
 
-	computerid: Mapped[str] = mapped_column(ForeignKey("computerInfo.computerid"), nullable=True, unique=False)
+	computerid: Mapped[str] = mapped_column(primary_key=True, ForeignKey("computerInfo.computerid"), nullable=False, unique=True, index=True)
 	processes_count: Mapped[int] = mapped_column(Integer, nullable = False, unique=False)
 	partitionname: Mapped[str] = mapped_column(String(50), unique=False, nullable=False)
 	mountpoint: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
