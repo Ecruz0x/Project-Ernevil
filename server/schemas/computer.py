@@ -20,7 +20,7 @@ class Computer(BaseModel):
 	ifcount: int 							# Number of ip interfaces
 	ip_addr: dict							# IP Address per Interface
 	processes_count: int
-	processes: list
+	processes: list	
 	boot_time: str
 	is_alive: bool
 	node_machineid: str
