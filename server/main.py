@@ -110,10 +110,34 @@ def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
 
 @app.get("/api/computer/{computer_id}/memoryinfo")
 def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT * FROM memoryinfo WHERE computerid = {computer_id}"))
+    result = db.execute(text(f"SELECT * FROM memoryinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
 
+
+@app.get("/api/computer/{computer_id}/netinfo")
+def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT * FROM netinfo WHERE computer_id = {computer_id}"))
+    targetdetails = result.mappings().all()
+    return targetdetails
+
+@app.get("/api/computer/{computer_id}/processesinfo")
+def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT * FROM processesinfo WHERE computer_id = {computer_id}"))
+    targetdetails = result.mappings().all()
+    return targetdetails
+
+@app.get("/api/computer/{computer_id}/disksinfo")
+def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT * FROM disksinfo WHERE computer_id = {computer_id}"))
+    targetdetails = result.mappings().all()
+    return targetdetails
+
+@app.get("/api/computer/{computer_id}/computerusers")
+def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT * FROM computerusers WHERE computer_id = {computer_id}"))
+    targetdetails = result.mappings().all()
+    return targetdetails
 """
 
 
