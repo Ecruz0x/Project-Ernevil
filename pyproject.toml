@@ -12,6 +12,7 @@ dependencies = [
     "requests>=2.33.1",
     "smartie>=4.0.4",
     "sqlalchemy>=2.0.49",
+    "sqlalchemy-json>=0.7.0",
     "st-pages>=1.0.1",
     "streamlit>=1.57.0",
     "streamlit-code-editor>=0.1.22",

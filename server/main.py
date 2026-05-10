@@ -4,11 +4,12 @@ from .schemas.computer import ComputerWithID, CreateComputer, RefreshComputer
 from .schemas.locations import Location, CreateLocation, RLocation
 import time, asyncio, json
 from datetime import datetime
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 from .database import dbschema
 from .database.db import Base, engine, get_db
 from typing import Annotated
+import json
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,10 +17,10 @@ app = FastAPI()
 
 @app.post("/api/add_computer", response_model = bool, status_code = status.HTTP_201_CREATED)
 def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)]):
-    """result = db.execute(
-                    select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.fingerprint == "computer.fingerprint")
-                )"""
-    existing_computer = False              
+    result = db.execute(
+                select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.fingerprint == computer.fingerprint)
+            )
+    existing_computer = result.scalars().first()              
 
 ##ADD CPU COUNT
     if existing_computer:
@@ -67,7 +68,7 @@ def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_
     for user in computer.users:
         username = dbschema.computerUsers(
         computer=newComputer,
-        user = user
+        username = user
         )
         users.append(username)
 
@@ -87,24 +88,33 @@ def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_
     db.add_all(users)
     db.commit()
     return True
-"""
-@app.get("/api/computers", response_model = list[ComputerWithID])
-def getComputers():
+
+@app.get("/api/computers")
+def getComputers(db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text("SELECT * FROM computerInfo"))
+    computers = result.mappings().all()
     return computers
 
-@app.get("/api/livecomputers", response_model = list[ComputerWithID])
-def getLiveComputers():
-    liveComputers = []
-    for computer in computers:
-        if computer["is_alive"]:
-            liveComputers.append(computer)
+@app.get("/api/computers/livecomputers")
+def getLiveComputers(db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive"))
+    liveComputers = result.mappings().all()
     return liveComputers
 
+@app.get("/api/computer/{computer_id}")
+def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT * FROM computerInfo WHERE computerid = {computer_id}"))
+    targetComputer = result.mappings().all()
+    return targetComputer
 
 
-@app.get("/api/computer/{computer_id}", response_model = ComputerWithID)
-def getComputer(computer_id: int):
-    return computers[computer_id-1]
+@app.get("/api/computer/{computer_id}/memoryinfo")
+def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT * FROM memoryinfo WHERE computerid = {computer_id}"))
+    targetdetails = result.mappings().all()
+    return targetdetails
+
+"""
 
 
 @app.get("/api/locations", response_model = list[Location])
