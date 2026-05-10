@@ -34,7 +34,6 @@ class ComputerInfo(Base):
 	boottime: Mapped[datetime] = mapped_column(DateTime, unique = False, nullable=False)
 	is_alive: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 	node_machineid: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
-	uuid: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
 	added_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now())
 	fingerprint: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 

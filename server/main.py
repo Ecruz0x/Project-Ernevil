@@ -15,12 +15,13 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-@app.post("/api/add_computer", response_model = bool, status_code = status.HTTP_201_CREATED)
+@app.post("/api/add_computer", response_model = int, status_code = status.HTTP_201_CREATED)
 def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
-                select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.fingerprint == computer.fingerprint)
+                text(f"SELECT 1 FROM computerInfo WHERE fingerprint = '{computer.fingerprint}'")
             )
-    existing_computer = result.scalars().first()              
+    existing_computer = result.scalars().first()
+    print(existing_computer)
 
 ##ADD CPU COUNT
     if existing_computer:
@@ -36,7 +37,6 @@ def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_
         is_alive=True,
         node_machineid=computer.node_machineid,
         fingerprint= computer.fingerprint,
-        uuid= computer.uuid,
         added_on=datetime.now(),
         os=computer.os,
         )
@@ -87,7 +87,7 @@ def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_
     db.add_all(disks)
     db.add_all(users)
     db.commit()
-    return True
+    return newComputer.computerid
 
 @app.get("/api/computers")
 def getComputers(db: Annotated[Session, Depends(get_db)]):
@@ -110,7 +110,7 @@ def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
 
 @app.get("/api/computer/{computer_id}/memoryinfo")
 def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT * FROM memoryinfo WHERE computer_id = {computer_id}"))
+    result = db.execute(text(f"SELECT totalMemory, available_memory, usage FROM memoryinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
 

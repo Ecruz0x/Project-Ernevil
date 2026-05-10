@@ -1,10 +1,6 @@
 import hashlib
 
 
-def fingerprint(uuid, machineid):
-	fingerprint = "|".join([
-	    str(machineid),
-	    str(uuid),
-	])
-	id = hashlib.sha256(fingerprint.encode()).hexdigest()
-	return id
+def fingerprint(machineid):
+	fingerprint = hashlib.sha256(machineid.encode()).hexdigest()
+	return fingerprint

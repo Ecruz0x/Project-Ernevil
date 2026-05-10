@@ -22,12 +22,10 @@ data = {
 	"ip_addr": localComputer.getIfAddr(),
 	"processes": localComputer.getProcesses(),
 	"boot_time": localComputer.getBootTime(),
-	"uuid": localComputer.getUUID(),
 	"node_machineid": localComputer.getMachineId(),
 	"location": "fake location",
-	"fingerprint": fp.fingerprint(localComputer.getUUID(), localComputer.getMachineId())
+	"fingerprint": fp.fingerprint(localComputer.getMachineId())
 }
-
 
 def sendData(json: dict, url: str) -> dict:
 	res = requests.post(url, json = json)
@@ -98,7 +96,7 @@ def sendHeartBeat(computer_id: int):
 
 def main():
 	computerId = addComputer(data)
-
+	print(computerId)
 	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))
 				sendRef = multiprocessing.Process(target=sendRefresh, args = (computerId,))
 				try:

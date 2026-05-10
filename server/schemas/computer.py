@@ -17,7 +17,6 @@ class Computer(BaseModel):
 	ip_addr: dict							# IP Address per Interface
 	processes: list	
 	boot_time: datetime
-	uuid: str
 	node_machineid: str
 	fingerprint: str
 

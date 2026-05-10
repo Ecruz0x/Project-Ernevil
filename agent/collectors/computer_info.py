@@ -1,4 +1,4 @@
-import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, pwd, platform
+import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, pwd, platform, getmac
 from datetime import datetime
 
 
@@ -102,5 +102,5 @@ class Computer:
 		return platform.system()
 
 	@staticmethod
-	def getUUID() -> str:
-		return str(uuid.getnode())
+	def getMAC() -> str:
+		return getmac.get_mac_address()
