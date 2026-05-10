@@ -7,8 +7,8 @@ from datetime import datetime
 class Computer(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	is_unix: bool
+	os: str
 	computer_name: str
-	location: Optional[str] = None
 	users_count: int
 	users: list
 	cpu_count: int
@@ -21,7 +21,7 @@ class Computer(BaseModel):
 	processes_count: int
 	processes: list	
 	boot_time: str
-	is_alive: bool
+	uuid: str
 	node_machineid: str
 
 
@@ -55,8 +55,3 @@ class ComputerWithID(Computer):
 	fingerprint: str
 	lastHB: datetime
 
-
-class Location(BaseModel):
-	location_name: str
-	severity: Optional[str] = None
-	computers: list[Computer] = []

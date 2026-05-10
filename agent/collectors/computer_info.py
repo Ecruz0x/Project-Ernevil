@@ -1,4 +1,4 @@
-import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, pwd
+import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, pwd, platform
 from datetime import datetime
 
 
@@ -6,7 +6,6 @@ from datetime import datetime
 class Computer:
 
 	def __init__(self, computer_location: str=None):
-		self.computer_id = str(uuid.getnode())
 		self.computer_name = socket.gethostname()
 		self.computer_location = computer_location
 		if os.name == 'posix':
@@ -62,7 +61,7 @@ class Computer:
 		else:
 			x = 0
 			for i in diskPartitions:
-				disks[f"disk {x}"] = {"device": i[0], "mountpoint": "", "fstype": i[2]}
+				disks[f"disk {x}"] = {"device": i[0], "mountpoint": i[0], "fstype": i[2]}
 				x += 1
 
 		return disks
@@ -113,3 +112,11 @@ class Computer:
 	def getMachineId() -> str:
 		node_machineid = machineid.id()
 		return str(node_machineid)
+
+	@staticmethod
+	def getOS() -> str:
+		return platform.system()
+
+	@staticmethod
+	def getUUID() -> str:
+		return str(uuid.getnode())

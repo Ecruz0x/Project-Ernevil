@@ -12,7 +12,7 @@ localComputer = Computer()
 data = {
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
-	"location": localComputer.computer_location,
+	"os": localComputer.getOS(),
 	"users_count": localComputer.getActiveUsersCount(),
 	"users": localComputer.getActiveUsers(),
 	"cpu_count": localComputer.getCpuCount(),
@@ -25,6 +25,7 @@ data = {
 	"processes_count": localComputer.getProcessesCount(),
 	"processes": localComputer.getProcesses(),
 	"boot_time": localComputer.getBootTime(),
+	"uuid": localComputer.getUUID(),
 	"node_machineid": localComputer.getMachineId()
 }
 
@@ -43,7 +44,7 @@ def addComputer(data: dict) -> int:
 	computer_data["is_alive"] = True
 	url = f"{serverAgent}/api/add_computer"
 	r = sendData(json = computer_data, url = url)
-	computerId = r["computer_id"]
+	computerId = r
 	return computerId
 
 
