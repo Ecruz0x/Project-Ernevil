@@ -123,21 +123,23 @@ def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
 
 @app.get("/api/computer/{computer_id}/processesinfo")
 def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT * FROM processesinfo WHERE computer_id = {computer_id}"))
+    result = db.execute(text(f"SELECT pid, user, process_name FROM processesinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
 
 @app.get("/api/computer/{computer_id}/disksinfo")
 def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT * FROM disksinfo WHERE computer_id = {computer_id}"))
+    result = db.execute(text(f"SELECT partitionname, mountpoint, fstype FROM disksinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
 
 @app.get("/api/computer/{computer_id}/computerusers")
 def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT * FROM computerusers WHERE computer_id = {computer_id}"))
+    result = db.execute(text(f"SELECT username FROM computerusers WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
+
+
 """
 
 
