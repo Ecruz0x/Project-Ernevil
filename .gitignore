@@ -17,3 +17,6 @@ uv.lock
 
 # ignore logs
 changes.log
+
+# ignore DB
+*.db

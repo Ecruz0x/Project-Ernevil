@@ -65,7 +65,7 @@ def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_
 
     users = []
     for user in computer.users:
-        username = dbschema.processesInfo(
+        username = dbschema.computerUsers(
         computer=newComputer,
         user = user
         )
