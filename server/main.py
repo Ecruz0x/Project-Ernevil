@@ -4,11 +4,11 @@ from .schemas.computer import ComputerWithID, CreateComputer, RefreshComputer
 from .schemas.locations import Location, CreateLocation, RLocation
 import time, asyncio, json
 from datetime import datetime
-from .utils import fingerprint as fp
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-import dbschema
-from db import Base, engine, get_db
+from .database import dbschema
+from .database.db import Base, engine, get_db
+from typing import Annotated
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,33 +16,17 @@ app = FastAPI()
 
 @app.post("/api/add_computer", response_model = bool, status_code = status.HTTP_201_CREATED)
 def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(
-        select(models.ComputerInfo).where(models.ComputerInfo.fingerprint == computer.fingerprint),
-    )
-    existing_computer = result.scalars().first()
-    new_computer = {
-        "computer_id": computer.computer_id,
-        "fingerprint": fp.fingerprint(computer.computer_id, computer.node_machineid),
-        "is_unix": computer.is_unix,
-        "computer_name": computer.computer_name,
-        "location": computer.location,
-        "users_count": computer.users_count,
-        "users": computer.users,
-        "cpu_count": computer.cpu_count,
-        "cpu_usage": computer.cpu_usage,
-        "memory": computer.memory,
-        "disk_count": computer.disk_count,
-        "disks": computer.disks,
-        "ifcount": computer.ifcount,
-        "ip_addr": computer.ip_addr,
-        "processes_count": computer.processes_count,
-        "processes": computer.processes,
-        "boot_time": computer.boot_time,
-        "is_alive": True,
-        "lastHB": str(datetime.now()),
-        "node_machineid": computer.node_machineid
-    }
+    """result = db.execute(
+                    select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.fingerprint == "computer.fingerprint")
+                )"""
+    existing_computer = False              
 
+##ADD CPU COUNT
+    if existing_computer:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Computer already exists",
+        )
 
     newComputer = dbschema.ComputerInfo(
         computername=computer.computer_name,
@@ -50,36 +34,60 @@ def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_
         boottime=computer.boot_time,
         is_alive=True,
         node_machineid=computer.node_machineid,
-        fingerprint= fp.fingerprint(computer.uuid, computer.node_machineid),
-        uuid= computer.uuid
-    )
-    computerMemInfo = dbschema.MemoryInfo(
-        computer=new_computer,
+        fingerprint= computer.fingerprint,
+        uuid= computer.uuid,
+        added_on=datetime.now(),
+        os=computer.os,
+        )
+    MemInfo = dbschema.MemoryInfo(
+        computer=newComputer,
         totalMemory = computer.memory['totalMemory'],
         available_memory = computer.memory['availableMemory'],
         usage=computer.memory['usage']
-    )
-
-    networkingInfo = dbschema.networkingInfo(
-        computer=new_computer,
-        ifname=computer.ip_addr.keys(),
-        ipaddr=computer.ip_addr.values()[0]
-    )
-    
+        )
+    interfaces = []
+    for netinterface in computer.ip_addr.keys():
+        interface = dbschema.networkingInfo(
+        computer=newComputer,
+        ifname=netinterface,
+        ipaddr=computer.ip_addr[netinterface][0]
+        )
+        interfaces.append(interface)
+    processes = []
     for process in computer.processes:
         processesInfo = dbschema.processesInfo(
-        computer=new_computer,
+        computer=newComputer,
         pid=process['pid'],
         user=process['username'],
         process_name=process['name']
-    )
+        )
+        processes.append(processesInfo)
 
-    disksInfo = dbschema.disksInfo(
-        computer=new_computer,
-        for 
-    )
-    return new_computer.id
+    users = []
+    for user in computer.users:
+        username = dbschema.processesInfo(
+        computer=newComputer,
+        user = user
+        )
+        users.append(username)
 
+    disks = []
+    for disk in computer.disks.values():
+        disksInfo = dbschema.disksInfo(
+            computer=newComputer,
+            partitionname=disk['device'],
+            mountpoint=disk['mountpoint'],
+            fstype=disk['fstype']
+        )
+        disks.append(disksInfo)
+    db.add_all([newComputer, MemInfo])
+    db.add_all(interfaces)
+    db.add_all(processes)
+    db.add_all(disks)
+    db.add_all(users)
+    db.commit()
+    return True
+"""
 @app.get("/api/computers", response_model = list[ComputerWithID])
 def getComputers():
     return computers
@@ -148,4 +156,4 @@ async def expireHeartBeat():
 
 @app.on_event("startup")
 async def startExpiringHBs():
-    asyncio.create_task(expireHeartBeat())
+    asyncio.create_task(expireHeartBeat())"""

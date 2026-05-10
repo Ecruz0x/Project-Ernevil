@@ -13,10 +13,6 @@ class Computer:
 		else:
 			self.is_unix = False
 
-	@staticmethod
-	def getActiveUsersCount() -> int:
-		return len(psutil.users())
-
 	def getActiveUsers(self) -> list[str]:
 		activeUsers = []
 		if self.is_unix:
@@ -46,10 +42,6 @@ class Computer:
 				"usage": ram.percent}
 
 
-	@staticmethod
-	def getDiskCount() -> int:
-		return len(psutil.disk_partitions(all=False))
-
 	def getAvailablePartitions(self) -> dict:
 		diskPartitions = psutil.disk_partitions(all=False)
 		disks = {}
@@ -65,10 +57,6 @@ class Computer:
 				x += 1
 
 		return disks
-
-	@staticmethod
-	def getNetIfCount() -> int:
-		return len(psutil.net_if_addrs())-1                     # Counts localhost interface too, that's the reason behind the -1
 
 
 	@staticmethod
@@ -89,10 +77,6 @@ class Computer:
 					adapters_[adapter.nice_name].append(str(ipaddress.ip_address((f"{ip}"))))
 		return adapters_
 
-
-	@staticmethod
-	def getProcessesCount() -> int:
-		return len(psutil.pids())
 
 	@staticmethod
 	def getProcesses() -> list:

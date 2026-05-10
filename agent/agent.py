@@ -1,6 +1,7 @@
 from collectors.computer_info import Computer
 from datetime import datetime
 import requests, sys, multiprocessing, time, logging, asyncio
+from utils import fingerprint as fp
 
 logger = logging.getLogger(__name__)
 
@@ -13,20 +14,18 @@ data = {
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
 	"os": localComputer.getOS(),
-	"users_count": localComputer.getActiveUsersCount(),
 	"users": localComputer.getActiveUsers(),
 	"cpu_count": localComputer.getCpuCount(),
 	"cpu_usage": round(localComputer.getCpuUsage(), 2),
 	"memory": localComputer.getMemoryInfo(),
-	"disk_count": localComputer.getDiskCount(),
 	"disks": localComputer.getAvailablePartitions(),
-	"ifcount": localComputer.getNetIfCount(),
 	"ip_addr": localComputer.getIfAddr(),
-	"processes_count": localComputer.getProcessesCount(),
 	"processes": localComputer.getProcesses(),
 	"boot_time": localComputer.getBootTime(),
 	"uuid": localComputer.getUUID(),
-	"node_machineid": localComputer.getMachineId()
+	"node_machineid": localComputer.getMachineId(),
+	"location": "fake location",
+	"fingerprint": fp.fingerprint(localComputer.getUUID(), localComputer.getMachineId())
 }
 
 
@@ -55,7 +54,7 @@ def refreshComputer(data: dict, computerId: int):
 	r = sendData(data, url = f"{serverAgent}/api/refresh")
 	return True
 
-
+"""
 def sendRefresh(computer_id: int) -> bool:
 	logging.basicConfig(filename='log/changes.log', level=logging.INFO)
 	while True:
@@ -95,17 +94,18 @@ def sendHeartBeat(computer_id: int):
 		res = requests.post(url, json = {"id": computer_id})
 		print(res.text)
 		time.sleep(30)
-
+"""
 
 def main():
 	computerId = addComputer(data)
-	sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))
-	sendRef = multiprocessing.Process(target=sendRefresh, args = (computerId,))
-	try:
-		sendHB.start()
-		sendRef.start()
-	except KeyboardInterrupt:
-		exit(1)
+
+	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))
+				sendRef = multiprocessing.Process(target=sendRefresh, args = (computerId,))
+				try:
+					sendHB.start()
+					sendRef.start()
+				except KeyboardInterrupt:
+					exit(1)"""
 
 if __name__ == "__main__":
     sys.exit(main())

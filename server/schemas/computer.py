@@ -9,20 +9,17 @@ class Computer(BaseModel):
 	is_unix: bool
 	os: str
 	computer_name: str
-	users_count: int
 	users: list
 	cpu_count: int
 	cpu_usage: float
 	memory: dict
-	disk_count: int
 	disks: dict
-	ifcount: int 							# Number of ip interfaces
 	ip_addr: dict							# IP Address per Interface
-	processes_count: int
 	processes: list	
-	boot_time: str
+	boot_time: datetime
 	uuid: str
 	node_machineid: str
+	fingerprint: str
 
 
 class CreateComputer(Computer):
