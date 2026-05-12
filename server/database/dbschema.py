@@ -28,7 +28,7 @@ class ComputerInfo(Base):
 	__tablename__ = "computerInfo"
 
 	computerid: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-	computername: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+	computername: Mapped[str] = mapped_column(String(50), unique=False, nullable=False)
 	is_unix: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 	os: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)  ## TODO : Fix this (nullable=False)
 	boottime: Mapped[datetime] = mapped_column(DateTime, unique = False, nullable=False)

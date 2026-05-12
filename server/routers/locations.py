@@ -3,7 +3,9 @@ from .database.db import Base, engine, get_db
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
 
 
-@app.get("/api/locations", response_model = list[GetLocations])
+router = APIRouter()
+
+@router.get("/api/locations", response_model = list[GetLocations])
 def getLocations():  #### Database management Here
     return locations
 

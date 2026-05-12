@@ -24,28 +24,10 @@ class Computer(BaseModel):
 class CreateComputer(Computer):
 	pass
 
-class RefreshComputer(BaseModel):
-	model_config = ConfigDict(from_attributes = True)
-	is_unix: Optional[bool] = None
-	computer_name: Optional[str] = None
-	location: Optional[str] = None
-	users_count: Optional[int] = None
-	users: Optional[list] = None
-	cpu_count: Optional[int] = None
-	cpu_usage: Optional[float] = None
-	memory: Optional[dict] = None
-	disk_count: Optional[int] = None
-	disks: Optional[dict] = None
-	ifcount: Optional[int] = None
-	ip_addr: Optional[dict] = None
-	processes_count: Optional[int] = None
-	processes: Optional[list] = None
-	boot_time: Optional[str] = None
-	computer_id: str
-	last_refresh: str
 
 
 class ComputerCreated(Computer):
+	### Token instead of returning a computerid
 	model_config = ConfigDict(from_attributes = True)
 	computer_id: int
 	computername: str
@@ -76,23 +58,28 @@ class SpecificComputerInfo(BaseModel):
 	fingerprint: str
 
 class MemoryInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
 	totalMemory: float
 	available_memory: float
 	usage: float
 
 class NetworkingInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
 	ifname: str
 	ipaddr: str
 
 class ProcessesInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
 	pid: int
 	user: str
 	process_name: str
 
 class disksInfo(Base):
+	model_config = ConfigDict(from_attributes = True)
 	partitionname: str
 	mountpoint: str
 	fstype: str
 
 class CUsersInfo(Base):
+	model_config = ConfigDict(from_attributes = True)
 	username: str
