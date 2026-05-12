@@ -11,7 +11,12 @@ import json
 
 router = APIRouter()
 
-
-@router.get("/api/locations", response_model = list[Location])
-def getLocations():
-    return locations
+@router.post("", response_model = int, status_code = status.HTTP_201_CREATED)
+def refreshComputerInfo(data: RefreshComputer):
+    id = data.computer_id
+    update_data = data.dict(exclude_unset=True)
+    for computer in computers:
+        if computer['computer_id'] == id:
+            for k, v in update_data.items():
+                computer[k] = v
+    return id

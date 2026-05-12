@@ -1,42 +1,29 @@
 
 from fastapi import FastAPI, Request, HTTPException, status, Depends
-from .schemas.computer import ComputerWithID, CreateComputer, RefreshComputer
-from .schemas.locations import Location, CreateLocation, RLocation
-import time, asyncio
-from datetime import datetime
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 from .database import dbschema
 from .database.db import Base, engine, get_db
 from typing import Annotated
 
-Base.metadata.create_all(bind=engine)
+from routers import computers
+
 
 app = FastAPI()
 
+
+
+app.include_routers(computers, prefix = "/api/computers", tags = ["computers"])
 
 
 
 """
 
 
-@app.get("/api/locations", response_model = list[Location])
-def getLocations():
-    return locations
 
 
 
 
-
-@app.post("/api/refresh", response_model = int, status_code = status.HTTP_201_CREATED)
-def refreshComputer(data: RefreshComputer):
-    id = data.computer_id
-    update_data = data.dict(exclude_unset=True)
-    for computer in computers:
-        if computer['computer_id'] == id:
-            for k, v in update_data.items():
-                computer[k] = v
-    return id
 
 
 @app.post("/api/heartbeat", response_model = bool, status_code = 200)
