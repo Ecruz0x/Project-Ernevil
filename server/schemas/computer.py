@@ -26,7 +26,7 @@ class CreateComputer(Computer):
 
 
 
-class ComputerCreated(Computer):
+class ComputerCreated(BaseModel):
 	### Token instead of returning a computerid
 	model_config = ConfigDict(from_attributes = True)
 	computer_id: int
@@ -74,12 +74,12 @@ class ProcessesInfo(BaseModel):
 	user: str
 	process_name: str
 
-class DisksInfo(Base):
+class DisksInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	partitionname: str
 	mountpoint: str
 	fstype: str
 
-class CUsersInfo(Base):
+class CUsersInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	username: str

@@ -7,9 +7,8 @@ from sqlalchemy.orm import Session
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
 from typing import Annotated
-import time, asyncio
+import time, asyncio, logging
 
-Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
@@ -85,7 +84,8 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
     db.add_all(disks)
     db.add_all(users)
     db.commit()
-    success = ComputerCreated(newComputer.computerid, newComputer.computername, added_on)
+    added_info = {"computer_id": newComputer.computerid, "computername" : newComputer.computername, "added_on": newComputer.added_on}
+    return added_info
 
 
 @router.get("", response_model = list[ComputerInfo])
@@ -95,44 +95,45 @@ def getComputers(db: Annotated[Session, Depends(get_db)]):
     return computers
 
 @router.get("/live", response_model = list[ComputerInfo])
-def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[]:
+def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerInfo]:
     result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive"))
     liveComputers = result.mappings().all()
     return liveComputers
 
-@router.get("/{computerid}", response_model = SpecificComputerInfo)
+@router.get("", response_model = SpecificComputerInfo)
 def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(text(f"SELECT * FROM computerInfo WHERE computerid = {computer_id}"))
+    print(result)
     targetComputer = result.mappings().all()
     return targetComputer
 
 
-@router.get("/{computerid}", response_model = MemoryInfo)
+@router.get("/mem", response_model = MemoryInfo)
 def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> MemoryInfo:
     result = db.execute(text(f"SELECT totalMemory, available_memory, usage FROM memoryinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
-    return targetdetails
+    return targetdetails[0]
 
 
-@router.get("/{computerid}", response_model = list[NetworkingInfo])
+@router.get("/net", response_model = list[NetworkingInfo])
 def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[NetworkingInfo]:
     result = db.execute(text(f"SELECT ifname, ipaddr FROM netinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
 
-@router.get("/{computerid}", response_model = list[ProcessesInfo])
+@router.get("/ps", response_model = list[ProcessesInfo])
 def getProcessInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[ProcessesInfo]:
     result = db.execute(text(f"SELECT pid, user, process_name FROM processesinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
 
-@router.get("/{computerid}", response_model = list[DisksInfo])
+@router.get("/hd", response_model = list[DisksInfo])
 def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[DisksInfo]:
     result = db.execute(text(f"SELECT partitionname, mountpoint, fstype FROM disksinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
 
-@router.get("/{computerid}", response_model = list[CUsersInfo])
+@router.get("/users", response_model = list[CUsersInfo])
 def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[CUsersInfo]:
     result = db.execute(text(f"SELECT username FROM computerusers WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()

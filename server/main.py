@@ -6,14 +6,16 @@ from .database import dbschema
 from .database.db import Base, engine, get_db
 from typing import Annotated
 
-from routers import computers
+from .routers import computers
 
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
 
-app.include_routers(computers, prefix = "/api/computers", tags = ["computers"])
+app.include_router(computers.router, prefix = "/api/computers", tags = ["computers"])
+
 
 
 
