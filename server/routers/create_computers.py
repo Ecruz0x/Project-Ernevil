@@ -1,4 +1,4 @@
-from ..schemas.computer import ComputerWithID, CreateComputer
+from ..schemas.computer import ComputerCreated, CreateComputer
 from datetime import datetime
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
@@ -11,7 +11,7 @@ import models
 
 router = APIRouter()
 
-@router.post("", response_model = int, status_code = status.HTTP_201_CREATED)
+@router.post("", response_model = ComputerCreated, status_code = status.HTTP_201_CREATED)
 def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
                 text(f"SELECT 1 FROM computerInfo WHERE fingerprint = '{computer.fingerprint}'")
@@ -83,4 +83,4 @@ def createComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_
     db.add_all(disks)
     db.add_all(users)
     db.commit()
-    return newComputer.computerid
+    success = ComputerCreated(newComputer.computerid, newComputer.computername, added_on)

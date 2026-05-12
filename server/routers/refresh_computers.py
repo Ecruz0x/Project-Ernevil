@@ -7,3 +7,11 @@ from .database import dbschema
 from .database.db import Base, engine, get_db
 from typing import Annotated
 import json
+
+
+router = APIRouter()
+
+
+@router.get("/api/locations", response_model = list[Location])
+def getLocations():
+    return locations

@@ -45,9 +45,54 @@ class RefreshComputer(BaseModel):
 	last_refresh: str
 
 
-class ComputerWithID(Computer):
+class ComputerCreated(Computer):
 	model_config = ConfigDict(from_attributes = True)
 	computer_id: int
-	fingerprint: str
-	lastHB: datetime
+	computername: str
+	added_on: datetime
 
+
+class ComputerInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	computerid: int
+	computername: str
+	is_unix: bool
+	os: str
+	boottime: datetime
+	is_alive: bool
+	node_machineid: str
+	added_on: datetime
+	fingerprint: str
+
+class SpecificComputerInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	computername: str
+	is_unix: bool
+	os: str
+	boottime: datetime
+	is_alive: bool
+	node_machineid: str
+	added_on: datetime
+	fingerprint: str
+
+class MemoryInfo(BaseModel):
+	totalMemory: float
+	available_memory: float
+	usage: float
+
+class NetworkingInfo(BaseModel):
+	ifname: str
+	ipaddr: str
+
+class ProcessesInfo(BaseModel):
+	pid: int
+	user: str
+	process_name: str
+
+class disksInfo(Base):
+	partitionname: str
+	mountpoint: str
+	fstype: str
+
+class CUsersInfo(Base):
+	username: str
