@@ -74,7 +74,7 @@ class ProcessesInfo(BaseModel):
 	user: str
 	process_name: str
 
-class disksInfo(Base):
+class DisksInfo(Base):
 	model_config = ConfigDict(from_attributes = True)
 	partitionname: str
 	mountpoint: str
