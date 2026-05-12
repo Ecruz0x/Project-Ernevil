@@ -23,9 +23,10 @@ data = {
 	"processes": localComputer.getProcesses(),
 	"boot_time": localComputer.getBootTime(),
 	"node_machineid": localComputer.getMachineId(),
-	"location": "fake location",
 	"fingerprint": fp.fingerprint(localComputer.getMachineId())
 }
+
+print(data)
 
 def sendData(json: dict, url: str) -> dict:
 	res = requests.post(url, json = json)
@@ -39,12 +40,13 @@ def sendData(json: dict, url: str) -> dict:
 def addComputer(data: dict) -> int:
 	computer_data = data
 	computer_data["is_alive"] = True
-	url = f"{serverAgent}/api/add_computer"
+	url = f"{serverAgent}/api/computers"
 	r = sendData(json = computer_data, url = url)
 	computerId = r
 	return computerId
 
 
+"""
 def refreshComputer(data: dict, computerId: int):
 	data["computer_id"] = computerId
 	data["last_refresh"] = str(datetime.now())
@@ -52,7 +54,6 @@ def refreshComputer(data: dict, computerId: int):
 	r = sendData(data, url = f"{serverAgent}/api/refresh")
 	return True
 
-"""
 def sendRefresh(computer_id: int) -> bool:
 	logging.basicConfig(filename='log/changes.log', level=logging.INFO)
 	while True:
