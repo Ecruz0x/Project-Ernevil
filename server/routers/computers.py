@@ -18,7 +18,6 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
                 text(f"SELECT 1 FROM computerInfo WHERE fingerprint = '{computer.fingerprint}'")
             )
     existing_computer = result.scalars().first()
-    print(existing_computer)
 
 ##ADD CPU COUNT
     if existing_computer:
