@@ -1,6 +1,6 @@
-from ..collectors.computer_info import Computer
+from collectors.computer_info import Computer
 from datetime import datetime
-import requests, sys, multiprocessing, time, logging, asyncio
+import requests, sys, multiprocessing, time, logging, asyncio, json
 from utils import fingerprint as fp
 
 logger = logging.getLogger(__name__)
@@ -8,26 +8,9 @@ logger = logging.getLogger(__name__)
 with open("serverdata.json", "r") as data:
 	server_data = json.load(data)
 
-server = server_data["server_ip"]
+server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
 localComputer = Computer()
-
-
-data = {
-	"is_unix": localComputer.is_unix,
-	"computer_name": localComputer.computer_name,
-	"os": localComputer.getOS(),
-	"users": localComputer.getActiveUsers(),
-	"cpu_count": localComputer.getCpuCount(),
-	"cpu_usage": round(localComputer.getCpuUsage(), 2),
-	"memory": localComputer.getMemoryInfo(),
-	"disks": localComputer.getAvailablePartitions(),
-	"ip_addr": localComputer.getIfAddr(),
-	"processes": localComputer.getProcesses(),
-	"boot_time": localComputer.getBootTime(),
-	"node_machineid": localComputer.getMachineId(),
-	"fingerprint": fp.fingerprint(localComputer.getMachineId())
-}
 
 
 

@@ -1,5 +1,5 @@
-from ..collectors.computer_info import Computer
-import requests, json
+from collectors.computer_info import Computer
+import requests, json, time
 
 currentComputer = Computer()
 
@@ -11,12 +11,20 @@ server = server_data["server_ip"]
 
 
 
-def refreshMemInfo(computerid: int, fingerprint: str):
+def refreshMemInfo(computerid: int, fingerprint: str, oldData: dict):
+	storedMemInfo = oldData["memory"]
 	refURL = f"{server}/mem?computerid={computerid}"
 	currentMemInfo = currentComputer.getMemoryInfo()
-	r = requests.get(refURL)
-	storedMemInfo = r.data()
+	print(currentComputer)
+	print(oldData["memory"])
 	if currentMemInfo != storedMemInfo:
+		oldData["memory"] = currentMemInfo
 		updateR = requests.post(refURL, data = currentMemInfo)
-		return True
+		if updateR.status_code <= 201:
+			pritn(updateR.status_code)
+			yield True
+		else:
+			yield False
+
+
 

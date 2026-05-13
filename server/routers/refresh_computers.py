@@ -54,5 +54,3 @@ def refreshNetworkingInfo(newData: list[RefreshNetworkingInfo]):
     else:
         raise Exception(AuthenticationError)
 
-
-d

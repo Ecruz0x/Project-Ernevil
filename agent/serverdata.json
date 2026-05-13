@@ -3,5 +3,6 @@
 {
   "server_name": "main",
   "server_ip": "127.0.0.1",
-  "is_alive": True
+  "server_port": "8000",
+  "is_alive": true
 }
