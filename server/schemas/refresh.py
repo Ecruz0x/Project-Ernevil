@@ -10,7 +10,7 @@ class AuthenticateComputer(BaseModel):
 	fingerprint: str
 
 
-class RefreshComputerName(BaseModel, AuthenticateComputer):
+class RefreshComputerName(AuthenticateComputer):
 	newcomputername: str
 
 

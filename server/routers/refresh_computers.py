@@ -1,14 +1,14 @@
-from ..schemas.computer import RefreshComputerName, RefreshMemoryInfo, RefreshNetworkingInfo, RefreshProcessesInfo, RefreshDisksInfo, CUsersInfo
-from ..schemas.autentication import AuthenticateComputer
+from ..schemas.refresh import RefreshComputerName, RefreshMemoryInfo, RefreshNetworkingInfo, RefreshProcessesInfo, RefreshDisksInfo, CUsersInfo
+from ..schemas.authentication import AuthenticateComputer
 import time, asyncio, json
 from datetime import datetime
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
-from .database import dbschema
-from .database.db import Base, engine, get_db
+from ..database import dbschema
+from ..database.db import Base, engine, get_db
 from typing import Annotated
 import json
-
+from fastapi import APIRouter, HTTPException, status
 
 router = APIRouter()
 
