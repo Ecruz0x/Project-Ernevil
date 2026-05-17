@@ -13,11 +13,14 @@ from fastapi import APIRouter, HTTPException, status, Depends
 router = APIRouter()
 
 
+
+
 def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
-                text(f"SELECT 1 FROM computerInfo WHERE computerid = {computer_auth.computer_id} AND fingerprint = '{computer_auth.fingerprint}'")
+                text(f"SELECT 1 FROM computerInfo WHERE computerid = {computer_auth['computerid']} AND fingerprint = '{computer_auth['fingerprint']}'")
             )
     existing_computer = result.scalars().first()
+    print(existing_computer)
 
     if existing_computer:
         return True
@@ -29,7 +32,7 @@ def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Sess
 
 def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computerid": newData.computerid, "fingerprint": newData.fingerprint}
-    is_auth = authenticateComputer(auth_data)
+    is_auth = authenticateComputer(auth_data, db)
     name = newData.newcomputername
     if is_auth:
         result = db.execute(
@@ -42,14 +45,17 @@ def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Dep
 
 def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computerid": newData.computerid, "fingerprint": newData.fingerprint}
-    is_auth = authenticateComputer(auth_data)
+    is_auth = authenticateComputer(auth_data, db)
     if is_auth:
         result = db.execute(
-                text(f"UPDATE memoryinfo SET totalMemory = {newData.totalMemory}, available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computerid = {newData.computerid}")
+                text(f"UPDATE memoryinfo SET totalMemory = {newData.totalMemory}, available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computer_id = {newData.computerid}")
             )
         return True
     else:
-        raise Exception(AuthenticationError)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
 
 
 
