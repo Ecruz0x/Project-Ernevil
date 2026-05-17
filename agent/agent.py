@@ -44,8 +44,9 @@ def main():
 	while True:
 		computerId = 1
 		ex = refreshMemInfo(computerId, agentData["fingerprint"], agentData)
-		print(ex)
+		print(next(ex))
 		time.sleep(5)
+
 
 	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))
 				sendRef = multiprocessing.Process(target=sendRefresh, args = (computerId,))

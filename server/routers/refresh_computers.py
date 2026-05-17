@@ -25,6 +25,8 @@ def authenticateComputer(computer_auth: AuthenticateComputer):
         return False
 
 
+@router.post("/name", response_model = bool)
+
 def refreshComputerName(newData: RefreshComputerName):
     is_auth = authenticateComputer(newData.computer_id, newData.fingerprint)
     name = newData.newcomputername
@@ -35,14 +37,18 @@ def refreshComputerName(newData: RefreshComputerName):
     else:
         raise Exception(AuthenticationError)
 
+@router.post("/mem", response_model = bool)
+
 def refreshMemoryInfo(newData: RefreshMemoryInfo):
     is_auth = authenticateComputer(newData.computer_id, newData.fingerprint)
     if is_auth:
         result = db.execute(
                 text(f"UPDATE memoryinfo SET totalMemory = {newData.totalMemory}, available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computerid = {newData.computer_id}")
             )
+        return True
     else:
         raise Exception(AuthenticationError)
+
 
 
 """def refreshNetworkingInfo(newData: list[RefreshNetworkingInfo]):

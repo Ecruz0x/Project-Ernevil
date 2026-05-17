@@ -29,3 +29,4 @@ class RefreshDisksInfo(DisksInfo, AuthenticateComputer):
 
 class CUsersInfo(CUsersInfo, AuthenticateComputer):
 	pass
+
