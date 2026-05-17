@@ -21,7 +21,7 @@ def refreshMemInfo(computerid: int, fingerprint: str, oldData: dict):
 		oldData["memory"] = currentMemInfo
 		updateR = requests.post(refURL, data = currentMemInfo)
 		if updateR.status_code <= 201:
-			pritn(updateR.status_code)
+			print(updateR.status_code)
 			yield True
 		else:
 			yield False

@@ -1,4 +1,4 @@
-import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, pwd, platform, getmac
+import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, platform, getmac
 from datetime import datetime
 
 
@@ -9,6 +9,7 @@ class Computer:
 		self.computer_name = socket.gethostname()
 		self.computer_location = computer_location
 		if os.name == 'posix':
+			import pwd
 			self.is_unix = True
 		else:
 			self.is_unix = False

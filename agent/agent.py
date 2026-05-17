@@ -40,9 +40,11 @@ def sendHeartBeat(computer_id: int):
 """
 
 def main():
+
 	while True:
 		computerId = 1
 		ex = refreshMemInfo(computerId, agentData["fingerprint"], agentData)
+		print(ex)
 		time.sleep(5)
 
 	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))

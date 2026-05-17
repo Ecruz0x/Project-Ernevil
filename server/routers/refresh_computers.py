@@ -45,7 +45,7 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo):
         raise Exception(AuthenticationError)
 
 
-def refreshNetworkingInfo(newData: list[RefreshNetworkingInfo]):
+"""def refreshNetworkingInfo(newData: list[RefreshNetworkingInfo]):
     is_auth = authenticateComputer(newData.computer_id, newData.fingerprint)
     if is_auth:
         result = db.execute(
@@ -54,3 +54,4 @@ def refreshNetworkingInfo(newData: list[RefreshNetworkingInfo]):
     else:
         raise Exception(AuthenticationError)
 
+"""
