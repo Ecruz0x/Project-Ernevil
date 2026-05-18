@@ -17,8 +17,9 @@ class RefreshComputerName(AuthenticateComputer):
 class RefreshMemoryInfo(MemoryInfo, AuthenticateComputer):
 	pass
 
-class RefreshNetworkingInfo(NetworkingInfo, AuthenticateComputer):
-	pass
+class RefreshNetworkingInfo(AuthenticateComputer):
+	model_config = ConfigDict(from_attributes = True)
+	newNetInfo: dict
 
 
 class RefreshProcessesInfo(ProcessesInfo, AuthenticateComputer):
