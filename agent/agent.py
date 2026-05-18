@@ -43,8 +43,9 @@ def main():
 
 	while True:
 		computerId = 1
-		ex = refreshMemInfo(computerId, agentData["fingerprint"], agentData)
-		print(next(ex))
+		refmem = refreshMemInfo(computerId, agentData["fingerprint"], agentData)
+		print(next(refmem))
+		
 		time.sleep(5)
 
 

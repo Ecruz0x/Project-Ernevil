@@ -34,14 +34,14 @@ def refreshComputerName(computerid: int, fingerprint: str, oldData: dict):
 	storedMemInfo = oldData["memory"]
 	refURL = f"{server}/api/computers/mem?computerid={computerid}"
 	currentMemInfo = currentComputer.getMemoryInfo()
-	sent_data = {"computerid": computerid,
+	if currentMemInfo != storedMemInfo:
+		oldData["memory"] = currentMemInfo
+		to_send_data = {"computerid": computerid,
 				"fingerprint":fingerprint,
 				"totalMemory": currentMemInfo["totalMemory"],
 				"available_memory": currentMemInfo["availableMemory"],
 				"usage": currentMemInfo["usage"]}
-	if currentMemInfo != storedMemInfo:
-		oldData["memory"] = currentMemInfo
-		updateR = requests.post(refURL, data = sent_data)
+		updateR = requests.post(refURL, data = to_send_data)
 		if updateR.status_code <= 201:
 			yield True
 		else:
@@ -49,8 +49,8 @@ def refreshComputerName(computerid: int, fingerprint: str, oldData: dict):
 
 def refreshNetInfo(computerid: int, fingerprint: str, oldData: dict):
 	storedNetInfo = oldData["ip_addr"]
-	refURL = f"{server}/api/computers/mem?computerid={computerid}"
 	currentMemInfo = currentComputer.getMemoryInfo()
+	refURL = f"{server}/api/computers/mem?computerid={computerid}"
 	sent_data = {"computerid": computerid,
 				"fingerprint":fingerprint,
 				"totalMemory": currentMemInfo["totalMemory"],

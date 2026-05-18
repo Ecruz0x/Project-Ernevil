@@ -58,14 +58,19 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends
         )
 
 
+@router.post("/net", response_model = bool)
 
-"""def refreshNetworkingInfo(newData: list[RefreshNetworkingInfo]):
-    is_auth = authenticateComputer(newData.computer_id, newData.fingerprint)
+def refreshNetInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computerid": newData.computerid, "fingerprint": newData.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
     if is_auth:
         result = db.execute(
-                text(f"UPDATE netinfo SET available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computerid = {newData.computer_id}")
+                text(f"UPDATE memoryinfo SET totalMemory = {newData.totalMemory}, available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computer_id = {newData.computerid}")
             )
+        return True
     else:
-        raise Exception(AuthenticationError)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
 
-"""
