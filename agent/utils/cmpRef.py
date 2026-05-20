@@ -79,7 +79,7 @@ def refreshNetInfo(computerid: int, fingerprint: str, oldData: dict):
 		updateR = requests.post(refURL, json = removed)
 	if updated:
 		flag = "u"
-		updateR = requests.post(refURL, json = removed)
+		updateR = requests.post(refURL, json = updated)
 	
 	if updateR.status_code <= 201:
 		yield True

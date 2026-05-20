@@ -34,9 +34,10 @@ def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Dep
     is_auth = authenticateComputer(auth_data, db)
     name = newData.newcomputername
     if is_auth:
-        result = db.execute(
-                text(f"UPDATE computerInfo SET computername = '{name}' WHERE computerid = {newData.computerid}")
-            )
+        result = db.execute(select(dbschema.ComputerInfo).where(models.ComputerInfo.computerid == newData.computerid))
+        computer = result.scalars().first()
+        computer.computername = newData.newcomputername
+        db.commit()
     else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -49,9 +50,11 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends
     auth_data = {"computerid": newData.computerid, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        result = db.execute(
-                text(f"UPDATE memoryinfo SET totalMemory = {newData.totalMemory}, available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computer_id = {newData.computerid}")
-            )
+        result = db.execute(select(dbschema.MemoryInfo).where(models.MemoryInfo.computer_id == newData.computerid))
+        computer = result.scalars().first()
+        computer.memoryinfo = newData.totalMemory
+        computer.available_memory = newData.available_memory
+        computer.usage = newData.usage
         db.commit()
         return True
     else:
