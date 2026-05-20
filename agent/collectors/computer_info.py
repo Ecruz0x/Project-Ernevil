@@ -1,4 +1,4 @@
-import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, platform, getmac, pwd
+import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, platform, getmac
 from datetime import datetime
 
 

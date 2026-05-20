@@ -36,7 +36,7 @@ class ComputerCreated(BaseModel):
 
 class ComputerInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
-	computerid: int
+	computer_id: int
 	computername: str
 	is_unix: bool
 	os: str

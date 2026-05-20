@@ -83,7 +83,7 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
     db.add_all(disks)
     db.add_all(users)
     db.commit()
-    added_info = {"computer_id": newComputer.computerid, "computername" : newComputer.computername, "added_on": newComputer.added_on}
+    added_info = {"computer_id": newComputer.computer_id, "computername" : newComputer.computername, "added_on": newComputer.added_on}
     return added_info
 
 
@@ -101,7 +101,7 @@ def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerIn
 
 @router.get("", response_model = SpecificComputerInfo)
 def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT * FROM computerInfo WHERE computerid = {computer_id}"))
+    result = db.execute(text(f"SELECT * FROM computerInfo WHERE computer_id = {computer_id}"))
     print(result)
     targetComputer = result.mappings().all()
     return targetComputer

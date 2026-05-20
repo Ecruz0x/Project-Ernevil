@@ -12,11 +12,11 @@ server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
 
 
-def refreshComputerName(computerid: int, fingerprint: str, oldData: dict):
+def refreshComputerName(computer_id: int, fingerprint: str, oldData: dict):
 	storedName = oldData["computer_name"]
-	refURL = f"{server}/api/computers/name?computerid={computerid}"
+	refURL = f"{server}/api/computers/name?computer_id={computer_id}"
 	currentName = currentComputer.computer_name
-	sent_data = {"computerid": computerid,
+	sent_data = {"computer_id": computer_id,
 				"fingerprint":fingerprint,
 				"name": currentName}
 
@@ -30,13 +30,13 @@ def refreshComputerName(computerid: int, fingerprint: str, oldData: dict):
 
 
 
-def refreshMemInfo(computerid: int, fingerprint: str, oldData: dict):
+def refreshMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 	storedMemInfo = oldData["memory"]
-	refURL = f"{server}/api/computers/mem?computerid={computerid}"
+	refURL = f"{server}/api/computers/mem?computer_id={computer_id}"
 	currentMemInfo = currentComputer.getMemoryInfo()
 	if currentMemInfo != storedMemInfo:
 		oldData["memory"] = currentMemInfo
-		to_send_data = {"computerid": computerid,
+		to_send_data = {"computer_id": computer_id,
 				"fingerprint":fingerprint,
 				"totalMemory": currentMemInfo["totalMemory"],
 				"available_memory": currentMemInfo["availableMemory"],
@@ -47,10 +47,10 @@ def refreshMemInfo(computerid: int, fingerprint: str, oldData: dict):
 		else:
 			yield to_send_data
 
-def refreshNetInfo(computerid: int, fingerprint: str, oldData: dict):
+def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	storedNetInfo = oldData["ip_addr"]
 	currentNetInfo = currentComputer.getIfAddr()
-	refURL = f"{server}/api/computers/net?computerid={computerid}"
+	refURL = f"{server}/api/computers/net?computer_id={computer_id}"
 
 	# Handle added interfaces
 	added = {}

@@ -6,7 +6,7 @@ from .computer import MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUse
 
 class AuthenticateComputer(BaseModel):
 	### Token instead of id
-	computerid: int
+	computer_id: int
 	fingerprint: str
 
 

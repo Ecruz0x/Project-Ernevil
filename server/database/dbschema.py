@@ -27,7 +27,7 @@ class Locations(Base):
 class ComputerInfo(Base):
 	__tablename__ = "computerInfo"
 
-	computerid: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+	computer_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 	computername: Mapped[str] = mapped_column(String(50), unique=False, nullable=False)
 	is_unix: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 	os: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)  ## TODO : Fix this (nullable=False)
@@ -53,7 +53,7 @@ class MemoryInfo(Base):
 	__tablename__ = "memoryinfo"
 
 	computer_id = mapped_column(
-        ForeignKey("computerInfo.computerid")
+        ForeignKey("computerInfo.computer_id")
     )
 	entryid: Mapped[int] = mapped_column(Integer, primary_key=True)
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="memoryinfo")
@@ -65,7 +65,7 @@ class networkingInfo(Base):
 	__tablename__ = "netinfo"
 
 	computer_id = mapped_column(
-        ForeignKey("computerInfo.computerid")
+        ForeignKey("computerInfo.computer_id")
     )
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo", back_populates="netinfo")
 	if_id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -77,7 +77,7 @@ class processesInfo(Base):
 	__tablename__ = "processesinfo"
 
 	computer_id = mapped_column(
-        ForeignKey("computerInfo.computerid")
+        ForeignKey("computerInfo.computer_id")
     )
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="processes")
 	process_id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -89,7 +89,7 @@ class disksInfo(Base):
 	__tablename__ = "disksinfo"
 
 	computer_id = mapped_column(
-        ForeignKey("computerInfo.computerid")
+        ForeignKey("computerInfo.computer_id")
     )
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="disksinfo")
 	disk_id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -101,7 +101,7 @@ class computerUsers(Base):
 	__tablename__ = "computerusers"
 
 	computer_id = mapped_column(
-        ForeignKey("computerInfo.computerid")
+        ForeignKey("computerInfo.computer_id")
     )
 	userid: Mapped[int] = mapped_column(Integer, primary_key=True)
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="computerusers")
@@ -111,7 +111,7 @@ class computerUsers(Base):
 	__tablename__ = "heartbeatsRef"
 
 	computer_id = mapped_column(
-        ForeignKey("computerInfo.computerid")
+        ForeignKey("computerInfo.computer_id")
     )
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="heartbeats")
 	HBID: Mapped[int] = mapped_column(Integer, primary_key=True)

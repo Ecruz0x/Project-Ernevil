@@ -28,5 +28,5 @@ def addComputer(data: dict) -> int:
 	computer_data["is_alive"] = True
 	url = f"{server}/api/computers"
 	r = sendData(json = computer_data, url = url)
-	computerId = r["computer_id"]
-	return computerId
+	computer_id = r["computer_id"]
+	return computer_id
