@@ -43,7 +43,7 @@ def main():
 	computerId = 3
 	while True:
 		refmem = refreshMemInfo(computerId, agentData["fingerprint"], agentData)
-		print(next(refmem, None))
+		memstatus = next(refmem, None)
 		
 		time.sleep(5)
 

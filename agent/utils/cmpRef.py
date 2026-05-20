@@ -49,17 +49,39 @@ def refreshMemInfo(computerid: int, fingerprint: str, oldData: dict):
 
 def refreshNetInfo(computerid: int, fingerprint: str, oldData: dict):
 	storedNetInfo = oldData["ip_addr"]
-	currentMemInfo = currentComputer.getMemoryInfo()
-	refURL = f"{server}/api/computers/mem?computerid={computerid}"
-	sent_data = {"computerid": computerid,
-				"fingerprint":fingerprint,
-				"totalMemory": currentMemInfo["totalMemory"],
-				"available_memory": currentMemInfo["availableMemory"],
-				"usage": currentMemInfo["usage"]}
-	if currentMemInfo != storedMemInfo:
-		oldData["memory"] = currentMemInfo
-		updateR = requests.post(refURL, data = sent_data)
-		if updateR.status_code <= 201:
-			yield True
-		else:
-			yield sent_data
+	currentNetInfo = currentComputer.getIfAddr()
+	refURL = f"{server}/api/computers/net?computerid={computerid}"
+
+	# Handle added interfaces
+	added = {}
+	for interface in currentNetInfo.keys():
+		if interface not in storedNetInfo.keys():
+			added[interface] = currentNetInfo[interface]
+
+
+	# Handle removed interfaces
+	removed = {}
+	for interface in storedNetInfo.keys():
+		if interface not in currentNetInfo.keys():
+			removed[interface] = None
+
+	# Handle updated interfaces
+	updated = {}
+	for interface in storedNetInfo.keys():
+		if interface in currentNetInfo and currentNetInfo[interface] != storedNetInfo[interface]:
+			updated[interface] = currentNetInfo[interface]
+	
+	if added:
+		flag = "a"
+		updateR = requests.post(refURL, json = added)
+	if removed:
+		flag = "r"
+		updateR = requests.post(refURL, json = removed)
+	if updated:
+		flag = "u"
+		updateR = requests.post(refURL, json = removed)
+	
+	if updateR.status_code <= 201:
+		yield True
+	else:
+		yield sent_data
