@@ -20,7 +20,6 @@ def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Sess
                 text(f"SELECT 1 FROM computerInfo WHERE computerid = {computer_auth['computerid']} AND fingerprint = '{computer_auth['fingerprint']}'")
             )
     existing_computer = result.scalars().first()
-    print(existing_computer)
 
     if existing_computer:
         return True
@@ -39,7 +38,10 @@ def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Dep
                 text(f"UPDATE computerInfo SET computername = '{name}' WHERE computerid = {newData.computerid}")
             )
     else:
-        raise Exception(AuthenticationError)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
 
 @router.post("/mem", response_model = bool)
 
@@ -50,6 +52,7 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends
         result = db.execute(
                 text(f"UPDATE memoryinfo SET totalMemory = {newData.totalMemory}, available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computer_id = {newData.computerid}")
             )
+        db.commit()
         return True
     else:
         raise HTTPException(

@@ -14,7 +14,7 @@ class RefreshComputerName(AuthenticateComputer):
 	newcomputername: str
 
 
-class RefreshMemoryInfo(MemoryInfo, AuthenticateComputer):
+class RefreshMemoryInfo(AuthenticateComputer, MemoryInfo):
 	pass
 
 class RefreshNetworkingInfo(AuthenticateComputer):

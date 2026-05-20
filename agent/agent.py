@@ -40,11 +40,10 @@ def sendHeartBeat(computer_id: int):
 """
 
 def main():
-
+	computerId = 3
 	while True:
-		computerId = 1
 		refmem = refreshMemInfo(computerId, agentData["fingerprint"], agentData)
-		print(next(refmem))
+		print(next(refmem, None))
 		
 		time.sleep(5)
 
