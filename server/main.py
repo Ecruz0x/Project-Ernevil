@@ -6,7 +6,7 @@ from .database import dbschema
 from .database.db import Base, engine, get_db
 from typing import Annotated
 
-from .routers import computers, refresh_computers
+from .routers import add_resources, update_resources, get_resources, delete_resources
 
 Base.metadata.create_all(bind=engine)
 
@@ -14,8 +14,10 @@ app = FastAPI()
 
 
 
-app.include_router(computers.router, prefix = "/api/computers", tags = ["computers"])
-app.include_router(refresh_computers.router, prefix = "/api/computers", tags = ["refcomputers"])
+app.include_router(add_resources.router, prefix = "/api/computers", tags = ["Add Resources"])
+app.include_router(get_resources.router, prefix = "/api/computers", tags = ["Get Resources"])
+app.include_router(update_resources.router, prefix = "/api/computers", tags = ["Update Resources"])
+app.include_router(delete_resources.router, prefix = "/api/computers", tags = ["Delete Resources"])
 
 
 """

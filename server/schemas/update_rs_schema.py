@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 from datetime import datetime
-from .computer import MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
+from .add_rs_schema import MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
 
 
 class AuthenticateComputer(BaseModel):
@@ -10,23 +10,23 @@ class AuthenticateComputer(BaseModel):
 	fingerprint: str
 
 
-class RefreshComputerName(AuthenticateComputer):
+class UpdateComputerName(AuthenticateComputer):
 	newcomputername: str
 
 
-class RefreshMemoryInfo(AuthenticateComputer, MemoryInfo):
+class UpdateMemoryInfo(AuthenticateComputer, MemoryInfo):
 	pass
 
-class RefreshNetworkingInfo(AuthenticateComputer):
+class UpdateNetworkingInfo(AuthenticateComputer):
 	model_config = ConfigDict(from_attributes = True)
 	ifname: str
 	ipaddr: str | None = Field(default=None)
 
 
-class RefreshProcessesInfo(ProcessesInfo, AuthenticateComputer):
+class UpdateProcessesInfo(ProcessesInfo, AuthenticateComputer):
 	pass
 
-class RefreshDisksInfo(DisksInfo, AuthenticateComputer):
+class UpdateDisksInfo(DisksInfo, AuthenticateComputer):
 	pass
 
 class CUsersInfo(CUsersInfo, AuthenticateComputer):

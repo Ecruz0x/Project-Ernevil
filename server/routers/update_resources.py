@@ -1,4 +1,4 @@
-from ..schemas.refresh import RefreshComputerName, RefreshMemoryInfo, RefreshNetworkingInfo, RefreshProcessesInfo, RefreshDisksInfo, CUsersInfo
+from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, CUsersInfo
 from ..schemas.authentication import AuthenticateComputer
 import time, asyncio, json
 from datetime import datetime
@@ -29,7 +29,7 @@ def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Sess
 
 @router.put("/name", response_model = bool)
 
-def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Depends(get_db)]):
+def updateComputerName(newData: UpdateComputerName, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     name = newData.newcomputername
@@ -46,7 +46,7 @@ def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Dep
 
 @router.put("/mem", response_model = bool)
 
-def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends(get_db)]):
+def updateMemoryInfo(newData: UpdateMemoryInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
@@ -66,7 +66,35 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends
 
 
 @router.patch("/net", response_model = bool)
-def refreshNetInfo(newData: RefreshNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
+def updateNetInfo(newData: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
+    if is_auth:
+        result = db.execute(select(dbschema.networkingInfo).where((dbschema.networkingInfo.computer_id == newData.computer_id) 
+            & (newData.ifname == dbschema.networkingInfo.ifname)))
+        computer = result.scalars().first()
+        refresh_data = newData.model_dump(exclude_unset = True)
+        if computer:
+            for k, v in refresh_data.items():
+                setattr(computer, k, v)
+        else:
+            to_add = refresh_data
+            to_add.pop("fingerprint")
+            computer = dbschema.networkingInfo(**to_add)
+            db.add(computer)
+
+        db.commit()
+        db.refresh(computer)
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
+
+
+@router.patch("/net", response_model = bool)
+def updateNetInfo(newData: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
