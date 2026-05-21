@@ -28,7 +28,6 @@ def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Sess
 
 
 @router.put("/name", response_model = bool)
-
 def updateComputerName(newData: UpdateComputerName, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
@@ -45,7 +44,6 @@ def updateComputerName(newData: UpdateComputerName, db: Annotated[Session, Depen
         )
 
 @router.put("/mem", response_model = bool)
-
 def updateMemoryInfo(newData: UpdateMemoryInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
@@ -65,15 +63,16 @@ def updateMemoryInfo(newData: UpdateMemoryInfo, db: Annotated[Session, Depends(g
         )
 
 
+
 @router.patch("/net", response_model = bool)
-def updateNetInfo(newData: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
-    auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
+def updateNetInfo(newNetInfo: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newNetInfo.computer_id, "fingerprint": newNetInfo.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        result = db.execute(select(dbschema.networkingInfo).where((dbschema.networkingInfo.computer_id == newData.computer_id) 
-            & (newData.ifname == dbschema.networkingInfo.ifname)))
+        result = db.execute(select(dbschema.networkingInfo).where((dbschema.networkingInfo.computer_id == newNetInfo.computer_id) 
+            & (newNetInfo.ifname == dbschema.networkingInfo.ifname)))
         computer = result.scalars().first()
-        refresh_data = newData.model_dump(exclude_unset = True)
+        refresh_data = newNetInfo.model_dump(exclude_unset = True)
         if computer:
             for k, v in refresh_data.items():
                 setattr(computer, k, v)
@@ -92,27 +91,18 @@ def updateNetInfo(newData: UpdateNetworkingInfo, db: Annotated[Session, Depends(
             detail="Authentication Error",
         )
 
-
-@router.patch("/net", response_model = bool)
-def updateNetInfo(newData: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
-    auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
+@router.put("/ps", response_model = bool)
+def updateProcessesInfo(newPsInfo: list[UpdateProcessesInfo], db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newPsInfo[0].computer_id, "fingerprint": newPsInfo[0].fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        result = db.execute(select(dbschema.networkingInfo).where((dbschema.networkingInfo.computer_id == newData.computer_id) 
-            & (newData.ifname == dbschema.networkingInfo.ifname)))
-        computer = result.scalars().first()
-        refresh_data = newData.model_dump(exclude_unset = True)
-        if computer:
-            for k, v in refresh_data.items():
-                setattr(computer, k, v)
-        else:
-            to_add = refresh_data
+        db.execute(delete(dbschema.processesInfo).where(dbschema.processesInfo.computer_id == newPsInfo[0].computer_id))
+        for process in newPsInfo:
+            to_add = process.model_dump(exclude_unset = True)
             to_add.pop("fingerprint")
-            computer = dbschema.networkingInfo(**to_add)
-            db.add(computer)
-
+            psinf = dbschema.processesInfo(**to_add)
+            db.add(psinf)
         db.commit()
-        db.refresh(computer)
         return True
     else:
         raise HTTPException(
@@ -120,21 +110,4 @@ def updateNetInfo(newData: UpdateNetworkingInfo, db: Annotated[Session, Depends(
             detail="Authentication Error",
         )
 
-@router.patch("/ps", response_model = bool)
-def updateProcessesInfo(newData: UpdateProcessesInfo, db: Annotated[Session, Depends(get_db)]):
-    auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
-    is_auth = authenticateComputer(auth_data, db)
-    if is_auth:
-        db.execute(delete(dbschema.processesInfo).where(dbschema.processesInfo.computer_id == newData.computer_id))
-        to_add = newData.model_dump(exclude_unset = True)
-        to_add.pop("fingerprint")
-        psinf = dbschema.processesInfo(**to_add)
-        db.add(psinf)
-        db.commit()
-        db.refresh(computer)
-        return True
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Authentication Error",
-        )
+
