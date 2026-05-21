@@ -22,7 +22,7 @@ def refreshComputerName(computer_id: int, fingerprint: str, oldData: dict):
 
 	if currentName != storedName:
 		oldData["computer_name"] = currentName
-		updateR = requests.post(refURL, data = sent_data)
+		updateR = requests.put(refURL, data = sent_data)
 		if updateR.status_code <= 201:
 			yield True
 		else:
@@ -41,7 +41,7 @@ def refreshMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 				"totalMemory": currentMemInfo["totalMemory"],
 				"available_memory": currentMemInfo["availableMemory"],
 				"usage": currentMemInfo["usage"]}
-		updateR = requests.post(refURL, json = to_send_data)
+		updateR = requests.put(refURL, json = to_send_data)
 		if updateR.status_code <= 201:
 			yield True
 		else:

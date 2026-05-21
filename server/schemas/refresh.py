@@ -19,7 +19,8 @@ class RefreshMemoryInfo(AuthenticateComputer, MemoryInfo):
 
 class RefreshNetworkingInfo(AuthenticateComputer):
 	model_config = ConfigDict(from_attributes = True)
-	newNetInfo: dict
+	interface: str
+	ip_addresses: list | None = Field(default=None)
 
 
 class RefreshProcessesInfo(ProcessesInfo, AuthenticateComputer):

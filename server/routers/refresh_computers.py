@@ -27,7 +27,7 @@ def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Sess
         return False
 
 
-@router.post("/name", response_model = bool)
+@router.put("/name", response_model = bool)
 
 def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
@@ -44,7 +44,7 @@ def refreshComputerName(newData: RefreshComputerName, db: Annotated[Session, Dep
             detail="Authentication Error",
         )
 
-@router.post("/mem", response_model = bool)
+@router.put("/mem", response_model = bool)
 
 def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
@@ -56,6 +56,7 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends
         computer.available_memory = newData.available_memory
         computer.usage = newData.usage
         db.commit()
+        db.refresh(computer)
         return True
     else:
         raise HTTPException(
@@ -64,15 +65,19 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends
         )
 
 
-@router.post("/net", response_model = bool)
-
-def refreshNetInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends(get_db)]):
+@router.patch("/net", response_model = bool)
+def refreshNetInfo(newData: RefreshNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        result = db.execute(
-                text(f"UPDATE memoryinfo SET totalMemory = {newData.totalMemory}, available_memory = {newData.available_memory}, usage = {newData.usage} WHERE computer_id = {newData.computer_id}")
-            )
+        result = db.execute(select(dbschema.netinfo).where(dbschema.netinfo.computer_id == newData.computer_id))
+        computer = result.scalars().first()
+        refresh_data = newData.model_dump(exclude_unset = True)
+
+        for k, v in refresh_data.items():
+            setattr(computer, k, v)
+        db.commit()
+        db.refresh(computer)
         return True
     else:
         raise HTTPException(
