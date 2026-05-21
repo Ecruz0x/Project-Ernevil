@@ -52,7 +52,7 @@ def refreshMemoryInfo(newData: RefreshMemoryInfo, db: Annotated[Session, Depends
     if is_auth:
         result = db.execute(select(dbschema.MemoryInfo).where(dbschema.MemoryInfo.computer_id == newData.computer_id))
         computer = result.scalars().first()
-        computer.memoryinfo = newData.totalMemory
+        computer.totalMemory = newData.totalMemory
         computer.available_memory = newData.available_memory
         computer.usage = newData.usage
         db.commit()
@@ -70,12 +70,18 @@ def refreshNetInfo(newData: RefreshNetworkingInfo, db: Annotated[Session, Depend
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        result = db.execute(select(dbschema.netinfo).where(dbschema.netinfo.computer_id == newData.computer_id))
+        result = db.execute(select(dbschema.networkingInfo).where(
+            (dbschema.networkingInfo.computer_id == newData.computer_id) & 
+            (newData.ifname == dbschema.networkingInfo.ifname)
+            )
+        )
         computer = result.scalars().first()
         refresh_data = newData.model_dump(exclude_unset = True)
-
+        print(refresh_data)
         for k, v in refresh_data.items():
+            print("setting", k, "=", v)
             setattr(computer, k, v)
+
         db.commit()
         db.refresh(computer)
         return True

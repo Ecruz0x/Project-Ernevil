@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 from datetime import datetime
 from .computer import MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
@@ -19,8 +19,8 @@ class RefreshMemoryInfo(AuthenticateComputer, MemoryInfo):
 
 class RefreshNetworkingInfo(AuthenticateComputer):
 	model_config = ConfigDict(from_attributes = True)
-	interface: str
-	ip_addresses: list | None = Field(default=None)
+	ifname: str
+	ipaddr: str | None = Field(default=None)
 
 
 class RefreshProcessesInfo(ProcessesInfo, AuthenticateComputer):

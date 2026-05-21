@@ -47,7 +47,7 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         interface = dbschema.networkingInfo(
         computer=newComputer,
         ifname=netinterface,
-        ipaddr=computer.ip_addr[netinterface][0]
+        ipaddr=computer.ip_addr[netinterface]
         )
         interfaces.append(interface)
     processes = []
