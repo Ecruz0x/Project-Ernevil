@@ -70,17 +70,18 @@ def refreshNetInfo(newData: RefreshNetworkingInfo, db: Annotated[Session, Depend
     auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        result = db.execute(select(dbschema.networkingInfo).where(
-            (dbschema.networkingInfo.computer_id == newData.computer_id) & 
-            (newData.ifname == dbschema.networkingInfo.ifname)
-            )
-        )
+        result = db.execute(select(dbschema.networkingInfo).where((dbschema.networkingInfo.computer_id == newData.computer_id) 
+            & (newData.ifname == dbschema.networkingInfo.ifname)))
         computer = result.scalars().first()
         refresh_data = newData.model_dump(exclude_unset = True)
-        print(refresh_data)
-        for k, v in refresh_data.items():
-            print("setting", k, "=", v)
-            setattr(computer, k, v)
+        if computer:
+            for k, v in refresh_data.items():
+                setattr(computer, k, v)
+        else:
+            to_add = refresh_data
+            to_add.pop("fingerprint")
+            computer = dbschema.networkingInfo(**to_add)
+            db.add(computer)
 
         db.commit()
         db.refresh(computer)
