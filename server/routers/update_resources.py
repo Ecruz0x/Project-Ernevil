@@ -2,7 +2,7 @@ from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, Upd
 from ..schemas.authentication import AuthenticateComputer
 import time, asyncio, json
 from datetime import datetime
-from sqlalchemy import select, text
+from sqlalchemy import select, text, delete
 from sqlalchemy.orm import Session
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
@@ -120,3 +120,21 @@ def updateNetInfo(newData: UpdateNetworkingInfo, db: Annotated[Session, Depends(
             detail="Authentication Error",
         )
 
+@router.patch("/ps", response_model = bool)
+def updateProcessesInfo(newData: UpdateProcessesInfo, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
+    if is_auth:
+        db.execute(delete(dbschema.processesInfo).where(dbschema.processesInfo.computer_id == newData.computer_id))
+        to_add = newData.model_dump(exclude_unset = True)
+        to_add.pop("fingerprint")
+        psinf = dbschema.processesInfo(**to_add)
+        db.add(psinf)
+        db.commit()
+        db.refresh(computer)
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
