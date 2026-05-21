@@ -55,7 +55,7 @@ def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> l
     targetdetails = result.mappings().all()
     return targetdetails
 
-@router.get("/users", response_model = list[CUsersInfo])
+@router.get("/cusers", response_model = list[CUsersInfo])
 def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[CUsersInfo]:
     result = db.execute(text(f"SELECT username FROM computerusers WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()

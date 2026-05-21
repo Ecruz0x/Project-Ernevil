@@ -28,14 +28,14 @@ def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Sess
 
 
 @router.put("/name", response_model = bool)
-def updateComputerName(newData: UpdateComputerName, db: Annotated[Session, Depends(get_db)]):
-    auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
+def updateComputerName(newName: UpdateComputerName, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newName.computer_id, "fingerprint": newName.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
-    name = newData.newcomputername
+    name = newName.newcomputername
     if is_auth:
-        result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == newData.computer_id))
+        result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == newName.computer_id))
         computer = result.scalars().first()
-        computer.computername = newData.newcomputername
+        computer.computername = newName.newcomputername
         db.commit()
     else:
         raise HTTPException(
@@ -44,15 +44,15 @@ def updateComputerName(newData: UpdateComputerName, db: Annotated[Session, Depen
         )
 
 @router.put("/mem", response_model = bool)
-def updateMemoryInfo(newData: UpdateMemoryInfo, db: Annotated[Session, Depends(get_db)]):
-    auth_data = {"computer_id": newData.computer_id, "fingerprint": newData.fingerprint}
+def updateMemoryInfo(newMemInfo: UpdateMemoryInfo, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newMemInfo.computer_id, "fingerprint": newMemInfo.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        result = db.execute(select(dbschema.MemoryInfo).where(dbschema.MemoryInfo.computer_id == newData.computer_id))
+        result = db.execute(select(dbschema.MemoryInfo).where(dbschema.MemoryInfo.computer_id == newMemInfo.computer_id))
         computer = result.scalars().first()
-        computer.totalMemory = newData.totalMemory
-        computer.available_memory = newData.available_memory
-        computer.usage = newData.usage
+        computer.totalMemory = newMemInfo.totalMemory
+        computer.available_memory = newMemInfo.available_memory
+        computer.usage = newMemInfo.usage
         db.commit()
         db.refresh(computer)
         return True
@@ -63,7 +63,7 @@ def updateMemoryInfo(newData: UpdateMemoryInfo, db: Annotated[Session, Depends(g
         )
 
 
-
+## Needs DELETE endpoint
 @router.patch("/net", response_model = bool)
 def updateNetInfo(newNetInfo: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newNetInfo.computer_id, "fingerprint": newNetInfo.fingerprint}
@@ -111,3 +111,42 @@ def updateProcessesInfo(newPsInfo: list[UpdateProcessesInfo], db: Annotated[Sess
         )
 
 
+
+## Needs DELETE endpoint
+@router.patch("/hd", response_model = bool)
+def updateDisksInfo(newHdInfo: UpdateDisksInfo, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newHdInfo.computer_id, "fingerprint": newHdInfo.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
+    if is_auth:
+        refresh_data = newHdInfo.model_dump(exclude_unset = True)
+        to_add = refresh_data
+        to_add.pop("fingerprint")
+        computer = dbschema.disksInfo(**to_add)
+        db.add(computer)
+        db.commit()
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
+
+
+## Needs DELETE endpoint
+@router.patch("/cusers", response_model = bool)
+def updateDisksInfo(newUserInfo: CUsersInfo, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newUserInfo.computer_id, "fingerprint": newUserInfo.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
+    if is_auth:
+        refresh_data = newUserInfo.model_dump(exclude_unset = True)
+        to_add = refresh_data
+        to_add.pop("fingerprint")
+        computer = dbschema.computerUsers(**to_add)
+        db.add(computer)
+        db.commit()
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
