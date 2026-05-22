@@ -60,8 +60,7 @@ def main():
 	while True:
 		refmem = refreshMemInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
 		memstatus = next(refmem, None)
-		refnetinfo = refreshNetInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
-		netstatus = next(refnetinfo, None)
+		refreshNetInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
 		
 		time.sleep(5)
 

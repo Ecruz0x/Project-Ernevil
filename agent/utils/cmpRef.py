@@ -60,6 +60,9 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	for interface in currentNetInfo.keys():
 		if interface not in storedNetInfo.keys():
 			added[interface] = currentNetInfo[interface]
+	for k in added.keys():
+		oldData["ip_addr"][k] = added[k]
+
 
 
 	# Handle removed interfaces
@@ -67,6 +70,8 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	for interface in storedNetInfo.keys():
 		if interface not in currentNetInfo.keys():
 			removed[interface] = None
+	for k in removed:
+		del oldData["ip_addr"][k]
 
 	# Handle updated interfaces
 	updated = {}
@@ -77,19 +82,20 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	if added:
 		for k in added.keys():
 			uDataA = CrData
-			uDataA["ifname"] = k
-			uDataA["ip_addr"] = added[k][1]
-			print(uDataA)
-			updateR = requests.patch(refURL, json = uDataA)
-			if updateR.status_code <= 201:
-				yield True
+			if len(added[k]) == 2:
+				uDataA["ifname"] = k
+				uDataA["ip_addr"] = added[k][1]
+				print(uDataA)
+				updateR = requests.patch(refURL, json = uDataA)
+				if updateR.status_code <= 201:
+					return True
 	if removed:
 		for k in removed.keys():
 			uDataR = CrData
 			uDataR["ifname"] = k
 			updateR = requests.delete(refURL, json = uDataR)
 			if updateR.status_code <= 201:
-				yield True
+				return True
 	if updated:
 		for k in updated.keys():
 			uDataU = CrData
@@ -97,6 +103,5 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			uDataU["ip_addr"] = updated[k][1]
 			updateR = requests.patch(refURL, json = uDataU)
 			if updateR.status_code <= 201:
-				yield True
+				return True
 	
-	oldData["ip_addr"] = currentNetInfo
