@@ -49,3 +49,16 @@ def deleteDiskInfo(HDInfo: RemoveDisksInfo, db: Annotated[Session, Depends(get_d
 	            detail="Authentication Error",
 	        )
 
+@router.delete("/cusers", response_model = bool)
+def deleteUserInfo(UserInfo: RCUsersInfo, db: Annotated[Session, Depends(get_db)]):
+	auth_data = {"computer_id": UserInfo.computer_id, "fingerprint": UserInfo.fingerprint}
+	    is_auth = authenticateComputer(auth_data, db)
+	    if is_auth:
+	        db.execute(delete(dbschema.disksInfo).where((dbschema.computerUsers.computer_id == UserInfo.computer_id) & (dbschema.computerUsers.username == UserInfo.username)))
+	        db.commit()
+	        return True
+	    else:
+	        raise HTTPException(
+	            status_code=status.HTTP_400_BAD_REQUEST,
+	            detail="Authentication Error",
+	        )
