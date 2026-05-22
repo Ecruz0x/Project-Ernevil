@@ -3,7 +3,8 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
-from typing import Annotated
+from typing import Annotated 
+from ..schemas.remove_rs_schema import AuthenticateComputer, RemoveNetworkingInfo, RemoveDisksInfo, RCUsersInfo
 
 
 router = APIRouter()
@@ -33,3 +34,18 @@ def deleteNetInfo(IFInfo: RemoveNetworkingInfo, db: Annotated[Session, Depends(g
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Authentication Error",
         )
+
+@router.delete("/hd", response_model = bool)
+def deleteDiskInfo(HDInfo: RemoveDisksInfo, db: Annotated[Session, Depends(get_db)]):
+	auth_data = {"computer_id": HDInfo.computer_id, "fingerprint": HDInfo.fingerprint}
+	    is_auth = authenticateComputer(auth_data, db)
+	    if is_auth:
+	        db.execute(delete(dbschema.disksInfo).where((dbschema.disksInfo.computer_id == HDInfo.computer_id) & (dbschema.disksInfo.partitionname == HDInfo.partitionname)))
+	        db.commit()
+	        return True
+	    else:
+	        raise HTTPException(
+	            status_code=status.HTTP_400_BAD_REQUEST,
+	            detail="Authentication Error",
+	        )
+
