@@ -1,1 +1,6 @@
-## Update interval, Retry time, HB intervals
+
+{
+  "agentid": null,
+  "agent_ip": "127.0.0.1",
+  "is_alive": true
+}

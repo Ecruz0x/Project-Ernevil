@@ -2,12 +2,12 @@ from utils.cmpDt import addComputer
 from utils.cmpRef import refreshMemInfo
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
-import sys, time
+import sys, time, json
 
 localComputer = Computer()
 
 
-agentData = {
+currentAgentInfo = {
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
 	"os": localComputer.getOS(),
@@ -25,6 +25,10 @@ agentData = {
 
 
 
+# Update interval, Retry time, HB intervals
+with open("./agentdata.json", "r") as agentdata:
+	agent_data = json.load(agentdata)
+
 
 
 """
@@ -40,9 +44,17 @@ def sendHeartBeat(computer_id: int):
 """
 
 def main():
-	computer_id = addComputer(agentData)
+	
+	computer_id = addComputer(currentAgentInfo)
+	if agent_data["agentid"]:
+		isAddedComputer = requests.get(f"/api/computers?computer_id={agent_data}")
+		if isAddedComputer:
+			computer_id = agent_data["agentid"]
+		else:
+			computer_id = addComputer(currentAgentInfo)
+			agent_data["agentid"] = computer_id
 	while True:
-		refmem = refreshMemInfo(computer_id, agentData["fingerprint"], agentData)
+		refmem = refreshMemInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
 		memstatus = next(refmem, None)
 		
 		time.sleep(5)

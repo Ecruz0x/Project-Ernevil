@@ -58,7 +58,7 @@ def deleteUserInfo(UserInfo: RCUsersInfo, db: Annotated[Session, Depends(get_db)
 	auth_data = {"computer_id": UserInfo.computer_id, "fingerprint": UserInfo.fingerprint}
 	is_auth = authenticateComputer(auth_data, db)
 	if is_auth:
-	    db.execute(delete(dbschema.disksInfo)
+	    db.execute(delete(dbschema.computerUsers)
 	    .where((dbschema.computerUsers.computer_id == UserInfo.computer_id) & 
 	    (dbschema.computerUsers.username == UserInfo.username)).execution_options(is_delete_using=True, synchronize_session="fetch"))
 	    db.commit()

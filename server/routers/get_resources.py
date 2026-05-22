@@ -10,6 +10,19 @@ router = APIRouter()
 
 
 
+#### TODO: Authentication Needed Here
+
+
+@router.get("", response_model = bool)
+def isAddedComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT 1 FROM computerInfo WHERE computer_id = {computer_id}"))
+    existing_computer = result.scalars().first()
+    if existing_computer:
+        return True
+    else:
+        return False
+
+
 @router.get("", response_model = list[ComputerInfo])
 def getComputers(db: Annotated[Session, Depends(get_db)]):
     result = db.execute(text("SELECT * FROM computerInfo"))
@@ -25,7 +38,6 @@ def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerIn
 @router.get("", response_model = SpecificComputerInfo)
 def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(text(f"SELECT * FROM computerInfo WHERE computer_id = {computer_id}"))
-    print(result)
     targetComputer = result.mappings().all()
     return targetComputer
 

@@ -29,7 +29,6 @@ def refreshComputerName(computer_id: int, fingerprint: str, oldData: dict):
 			yield sent_data
 
 
-
 def refreshMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 	storedMemInfo = oldData["memory"]
 	refURL = f"{server}/api/computers/mem?computer_id={computer_id}"
@@ -52,6 +51,10 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	currentNetInfo = currentComputer.getIfAddr()
 	refURL = f"{server}/api/computers/net?computer_id={computer_id}"
 
+	CrData = {
+		"computer_id": computer_id,
+		 "fingerprint": fingerprint
+	}
 	# Handle added interfaces
 	added = {}
 	for interface in currentNetInfo.keys():
@@ -72,16 +75,27 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			updated[interface] = currentNetInfo[interface]
 	
 	if added:
-		flag = "a"
-		updateR = requests.post(refURL, json = added)
+		for k in added.keys():
+			uDataA = CrData
+			uDataA["ifname"] = k
+			uDataA["ip_addr"] = added[k]
+			updateR = requests.patch(refURL, json = uDataA)
+			if updateR.status_code <= 201:
+				yield True
 	if removed:
-		flag = "r"
-		updateR = requests.post(refURL, json = removed)
+		for k in removed.keys():
+			uDataR = CrData
+			uDataR["ifname"] = k
+			updateR = requests.delete(refURL, json = uDataR)
+			if updateR.status_code <= 201:
+				yield True
 	if updated:
-		flag = "u"
-		updateR = requests.post(refURL, json = updated)
-	
-	if updateR.status_code <= 201:
-		yield True
+		for k in added.keys():
+			uDataU = CrData
+			uDataU["ifname"] = k
+			uDataU["ip_addr"] = added[k]
+			updateR = requests.patch(refURL, json = uDataU)
+			if updateR.status_code <= 201:
+				yield True
 	else:
-		yield sent_data
+		pass
