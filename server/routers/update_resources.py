@@ -1,4 +1,4 @@
-from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, CUsersInfo
+from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, UCUsersInfo
 from ..schemas.authentication import AuthenticateComputer
 import time, asyncio, json
 from datetime import datetime
@@ -134,7 +134,7 @@ def updateDisksInfo(newHdInfo: UpdateDisksInfo, db: Annotated[Session, Depends(g
 
 ## Needs DELETE endpoint
 @router.patch("/cusers", response_model = bool)
-def updateUserInfo(newUserInfo: CUsersInfo, db: Annotated[Session, Depends(get_db)]):
+def updateUserInfo(newUserInfo: UCUsersInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newUserInfo.computer_id, "fingerprint": newUserInfo.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:

@@ -1,5 +1,5 @@
-from .update_rs_schema import AuthenticateComputer
-
+from .update_rs_schema import AuthenticateComputer, UCUsersInfo
+from pydantic import BaseModel, ConfigDict, Field
 
 
 
@@ -12,6 +12,5 @@ class RemoveDisksInfo(AuthenticateComputer):
 	model_config = ConfigDict(from_attributes = True)
 	partitionname: str
 
-class RCUsersInfo(CUsersInfo, AuthenticateComputer):
-	model_config = ConfigDict(from_attributes = True)
-	username: str
+class RCUsersInfo(UCUsersInfo, AuthenticateComputer):
+	pass

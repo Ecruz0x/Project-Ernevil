@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
-from sqlalchemy import select, text
+from sqlalchemy import select, text, delete
 from sqlalchemy.orm import Session
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
@@ -26,7 +26,9 @@ def deleteNetInfo(IFInfo: RemoveNetworkingInfo, db: Annotated[Session, Depends(g
     auth_data = {"computer_id": IFInfo.computer_id, "fingerprint": IFInfo.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
     if is_auth:
-        db.execute(delete(dbschema.networkingInfo).where((dbschema.networkingInfo.computer_id == IFInfo.computer_id) & (dbschema.networkingInfo.ifname == IFInfo.ifname)))
+        db.execute(delete(dbschema.networkingInfo)
+        .where((dbschema.networkingInfo.computer_id == IFInfo.computer_id) & 
+        (dbschema.networkingInfo.ifname == IFInfo.ifname)).execution_options(is_delete_using=True, synchronize_session="fetch"))
         db.commit()
         return True
     else:
@@ -38,27 +40,31 @@ def deleteNetInfo(IFInfo: RemoveNetworkingInfo, db: Annotated[Session, Depends(g
 @router.delete("/hd", response_model = bool)
 def deleteDiskInfo(HDInfo: RemoveDisksInfo, db: Annotated[Session, Depends(get_db)]):
 	auth_data = {"computer_id": HDInfo.computer_id, "fingerprint": HDInfo.fingerprint}
-	    is_auth = authenticateComputer(auth_data, db)
-	    if is_auth:
-	        db.execute(delete(dbschema.disksInfo).where((dbschema.disksInfo.computer_id == HDInfo.computer_id) & (dbschema.disksInfo.partitionname == HDInfo.partitionname)))
-	        db.commit()
-	        return True
-	    else:
-	        raise HTTPException(
-	            status_code=status.HTTP_400_BAD_REQUEST,
-	            detail="Authentication Error",
-	        )
+	is_auth = authenticateComputer(auth_data, db)
+	if is_auth:
+	    db.execute(delete(dbschema.disksInfo)
+	    .where((dbschema.disksInfo.computer_id == HDInfo.computer_id) & 
+	    (dbschema.disksInfo.partitionname == HDInfo.partitionname)).execution_options(is_delete_using=True, synchronize_session="fetch"))
+	    db.commit()
+	    return True
+	else:
+	    raise HTTPException(
+	    status_code=status.HTTP_400_BAD_REQUEST,
+	    detail="Authentication Error",
+	    )
 
 @router.delete("/cusers", response_model = bool)
 def deleteUserInfo(UserInfo: RCUsersInfo, db: Annotated[Session, Depends(get_db)]):
 	auth_data = {"computer_id": UserInfo.computer_id, "fingerprint": UserInfo.fingerprint}
-	    is_auth = authenticateComputer(auth_data, db)
-	    if is_auth:
-	        db.execute(delete(dbschema.disksInfo).where((dbschema.computerUsers.computer_id == UserInfo.computer_id) & (dbschema.computerUsers.username == UserInfo.username)))
-	        db.commit()
-	        return True
-	    else:
-	        raise HTTPException(
-	            status_code=status.HTTP_400_BAD_REQUEST,
-	            detail="Authentication Error",
-	        )
+	is_auth = authenticateComputer(auth_data, db)
+	if is_auth:
+	    db.execute(delete(dbschema.disksInfo)
+	    .where((dbschema.computerUsers.computer_id == UserInfo.computer_id) & 
+	    (dbschema.computerUsers.username == UserInfo.username)).execution_options(is_delete_using=True, synchronize_session="fetch"))
+	    db.commit()
+	    return True
+	else:
+	    raise HTTPException(
+	    status_code=status.HTTP_400_BAD_REQUEST,
+	    detail="Authentication Error",
+		)

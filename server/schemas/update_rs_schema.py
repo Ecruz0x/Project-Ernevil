@@ -29,6 +29,6 @@ class UpdateProcessesInfo(ProcessesInfo, AuthenticateComputer):
 class UpdateDisksInfo(DisksInfo, AuthenticateComputer):
 	pass
 
-class CUsersInfo(CUsersInfo, AuthenticateComputer):
+class UCUsersInfo(CUsersInfo, AuthenticateComputer):
 	pass
 
