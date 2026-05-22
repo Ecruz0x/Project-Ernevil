@@ -78,7 +78,8 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 		for k in added.keys():
 			uDataA = CrData
 			uDataA["ifname"] = k
-			uDataA["ip_addr"] = added[k]
+			uDataA["ip_addr"] = added[k][1]
+			print(uDataA)
 			updateR = requests.patch(refURL, json = uDataA)
 			if updateR.status_code <= 201:
 				yield True
@@ -90,12 +91,12 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			if updateR.status_code <= 201:
 				yield True
 	if updated:
-		for k in added.keys():
+		for k in updated.keys():
 			uDataU = CrData
 			uDataU["ifname"] = k
-			uDataU["ip_addr"] = added[k]
+			uDataU["ip_addr"] = updated[k][1]
 			updateR = requests.patch(refURL, json = uDataU)
 			if updateR.status_code <= 201:
 				yield True
-	else:
-		pass
+	
+	oldData["ip_addr"] = currentNetInfo
