@@ -50,9 +50,10 @@ def updateMemoryInfo(newMemInfo: UpdateMemoryInfo, db: Annotated[Session, Depend
     if is_auth:
         result = db.execute(select(dbschema.MemoryInfo).where(dbschema.MemoryInfo.computer_id == newMemInfo.computer_id))
         computer = result.scalars().first()
-        computer.totalMemory = newMemInfo.totalMemory
-        computer.available_memory = newMemInfo.available_memory
-        computer.usage = newMemInfo.usage
+        if computer:
+            computer.totalMemory = newMemInfo.totalMemory
+            computer.available_memory = newMemInfo.available_memory
+            computer.usage = newMemInfo.usage
         db.commit()
         db.refresh(computer)
         return True
@@ -74,8 +75,8 @@ def updateNetInfo(newNetInfo: UpdateNetworkingInfo, db: Annotated[Session, Depen
         computer = result.scalars().first()
         refresh_data = newNetInfo.model_dump(exclude_unset = True)
         if computer:
-            for k, v in refresh_data.items():
-                setattr(computer, k, v)
+            computer.ifname = newNetInfo.ifname
+            computer.ipaddr = newNetInfo.ipaddr
         else:
             to_add = refresh_data
             to_add.pop("fingerprint")

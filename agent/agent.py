@@ -49,14 +49,15 @@ def sendHeartBeat(computer_id: int):
 """
 
 def main():
-	if agent_data["agentid"]:
-		agid = agent_data["agentid"]
-		isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
-		if isAddedComputer:
-			computer_id = agid
-		else:
-			computer_id = addComputer(currentAgentInfo)
-			agent_data["agentid"] = computer_id
+	computer_id = addComputer(currentAgentInfo)
+	"""if agent_data["agentid"]:
+					agid = agent_data["agentid"]
+					isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
+					if isAddedComputer:
+						computer_id = agid
+					else:
+						computer_id = addComputer(currentAgentInfo)
+						agent_data["agentid"] = computer_id"""
 	while True:
 		refmem = refreshMemInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
 		memstatus = next(refmem, None)

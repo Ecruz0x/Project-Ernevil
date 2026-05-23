@@ -70,7 +70,7 @@ class networkingInfo(Base):
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo", back_populates="netinfo")
 	if_id: Mapped[int] = mapped_column(Integer, primary_key=True)
 	ifname: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
-	ipaddr: Mapped[str] = mapped_column(String(135), unique=False, nullable=False)
+	ipaddr: Mapped[str] = mapped_column(String(135), unique=False, nullable=True)
 	
 
 class processesInfo(Base):
