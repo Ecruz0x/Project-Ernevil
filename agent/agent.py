@@ -4,14 +4,16 @@ from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy
 
-localComputer = Computer()
+
 
 with open("serverdata.json", "r") as data:
 	server_data = json.load(data)
 
 server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
+localComputer = Computer()
 
+global currentAgentInfo 
 currentAgentInfo = {
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
@@ -48,8 +50,9 @@ def sendHeartBeat(computer_id: int):
 		time.sleep(30)
 """
 
-def main():
-	computer_id = addComputer(currentAgentInfo)
+def main(AgentInfo: dict):
+	cagentdata = copy.deepcopy(currentAgentInfo)
+	computer_id = addComputer(cagentdata)
 	"""if agent_data["agentid"]:
 					agid = agent_data["agentid"]
 					isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
@@ -58,11 +61,11 @@ def main():
 					else:
 						computer_id = addComputer(currentAgentInfo)
 						agent_data["agentid"] = computer_id"""
-	cagentdata = copy.deepcopy(currentAgentInfo)
+	
 	while True:
 		refmem = refreshMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		memstatus = next(refmem, None)
-		refreshNetInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
+		refreshNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		time.sleep(10)
 
 
@@ -75,4 +78,4 @@ def main():
 					exit(1)"""
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(currentAgentInfo))

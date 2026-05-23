@@ -63,18 +63,16 @@ class Computer:
 	@staticmethod
 	def getIfAddr() -> dict:
 		adapters = ifaddr.get_adapters()
-
+		stats = psutil.net_if_stats()
 		adapters_ = {}
-
 		for adapter in adapters:
-			if adapter.ips:
-				for ip in adapter.ips:
-					if isinstance(ip.ip, tuple):
-						ip = ip.ip[0]
-					else:
-						ip = ip.ip
-					if "." in ip:
-						adapters_[adapter.nice_name] = str(ipaddress.ip_address((f"{ip}")))
+			for ip in adapter.ips:
+				addr = ip.ip[0] if isinstance(ip.ip, tuple) else ip.ip
+				addr = str(addr)
+				if "." not in addr:
+					continue
+				else:
+					adapters_[adapter.nice_name] = addr
 		return adapters_
 
 

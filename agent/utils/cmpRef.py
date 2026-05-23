@@ -47,6 +47,7 @@ def refreshMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 			yield to_send_data
 
 def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
+	
 	storedNetInfo = oldData["ip_addr"]
 	currentNetInfo = currentComputer.getIfAddr()
 
