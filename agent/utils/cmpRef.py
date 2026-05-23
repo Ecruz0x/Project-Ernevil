@@ -143,5 +143,6 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 	removed = {}
 	for k in stored_keys - current_keys:
 		removed[k] = None
+		
 
 	
