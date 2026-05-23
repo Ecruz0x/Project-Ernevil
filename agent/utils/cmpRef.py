@@ -12,7 +12,7 @@ server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
 
 
-def refreshComputerName(computer_id: int, fingerprint: str, oldData: dict):
+def updateComputerName(computer_id: int, fingerprint: str, oldData: dict):
 	storedName = oldData["computer_name"]
 	refURL = f"{server}/api/computers/name?computer_id={computer_id}"
 	currentName = currentComputer.computer_name
@@ -29,7 +29,7 @@ def refreshComputerName(computer_id: int, fingerprint: str, oldData: dict):
 			yield sent_data
 
 
-def refreshMemInfo(computer_id: int, fingerprint: str, oldData: dict):
+def updateMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 	storedMemInfo = oldData["memory"]
 	refURL = f"{server}/api/computers/mem?computer_id={computer_id}"
 	currentMemInfo = currentComputer.getMemoryInfo()
@@ -46,7 +46,7 @@ def refreshMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 		else:
 			yield to_send_data
 
-def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
+def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	
 	storedNetInfo = oldData["ip_addr"]
 	currentNetInfo = currentComputer.getIfAddr()
@@ -110,18 +110,38 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			payload = copy.deepcopy(CrData)
 			payload["ifname"] = k
 			payload["ipaddr"] = v
-			print("#################################payload###########################")
-			print(payload)
-			print("#################################payload###########################")
 			r = requests.patch(refURL, json = payload)
 			if r.status_code == 200:
 				storedNetInfo[k] = copy.deepcopy(v)
 			else:
 				print(f"Failed updating : {k}")
 				success_ = False
-	print("CURRENT:", currentNetInfo)
-	print("STORED :", storedNetInfo)
-	print("UPDATED:", updated)
 	if success_:
 		oldData["ip_addr"] = copy.deepcopy(currentNetInfo)
 	return success_
+
+
+def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
+	storedDiskInfo = oldData["disks"]
+	currentDiskInfo = currentComputer.getAvailablePartitions()
+
+	refURL = f"{server}/api/computers/hd?computer_id={computer_id}"
+
+	CrData = {
+		"computer_id": computer_id,
+		 "fingerprint": fingerprint
+	}
+
+	current_keys = set(currentDiskInfo.keys())
+	stored_keys = set(storedNetInfo.keys())
+	# Handle added disks
+	added = {}
+	for k in current_keys - stored_keys:
+		added[k] = currentDiskInfo[k]
+
+	# Handle removed disks
+	removed = {}
+	for k in stored_keys - current_keys:
+		removed[k] = None
+
+	

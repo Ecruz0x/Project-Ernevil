@@ -1,5 +1,5 @@
 from utils.cmpDt import addComputer
-from utils.cmpRef import refreshMemInfo, refreshNetInfo
+from utils.cmpRef import updateMemInfo, updateNetInfo
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy
@@ -13,7 +13,7 @@ server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
 localComputer = Computer()
 
-global currentAgentInfo 
+
 currentAgentInfo = {
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
@@ -50,7 +50,7 @@ def sendHeartBeat(computer_id: int):
 		time.sleep(30)
 """
 
-def main(AgentInfo: dict):
+def main():
 	cagentdata = copy.deepcopy(currentAgentInfo)
 	computer_id = addComputer(cagentdata)
 	"""if agent_data["agentid"]:
@@ -63,9 +63,9 @@ def main(AgentInfo: dict):
 						agent_data["agentid"] = computer_id"""
 	
 	while True:
-		refmem = refreshMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		refmem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		memstatus = next(refmem, None)
-		refreshNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		time.sleep(10)
 
 
@@ -78,4 +78,4 @@ def main(AgentInfo: dict):
 					exit(1)"""
 
 if __name__ == "__main__":
-    sys.exit(main(currentAgentInfo))
+    sys.exit(main())
