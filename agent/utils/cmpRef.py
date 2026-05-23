@@ -105,3 +105,4 @@ def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			updateR = requests.patch(refURL, json = uDataU)
 			if updateR.status_code <= 201:
 				return True
+				
