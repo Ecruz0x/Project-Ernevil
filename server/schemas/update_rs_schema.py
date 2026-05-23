@@ -20,7 +20,7 @@ class UpdateMemoryInfo(AuthenticateComputer, MemoryInfo):
 class UpdateNetworkingInfo(AuthenticateComputer):
 	model_config = ConfigDict(from_attributes = True)
 	ifname: str
-	ipaddr: str | None = Field(default=None)
+	ipaddr: str
 
 
 class UpdateProcessesInfo(ProcessesInfo, AuthenticateComputer):

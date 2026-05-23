@@ -68,14 +68,13 @@ class Computer:
 
 		for adapter in adapters:
 			if adapter.ips:
-				adapters_[adapter.nice_name] = []
 				for ip in adapter.ips:
 					if isinstance(ip.ip, tuple):
 						ip = ip.ip[0]
 					else:
 						ip = ip.ip
-						
-					adapters_[adapter.nice_name].append(str(ipaddress.ip_address((f"{ip}"))))
+					if "." in ip:
+						adapters_[adapter.nice_name] = str(ipaddress.ip_address((f"{ip}")))
 		return adapters_
 
 

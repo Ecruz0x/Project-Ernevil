@@ -2,7 +2,7 @@ from utils.cmpDt import addComputer
 from utils.cmpRef import refreshMemInfo, refreshNetInfo
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
-import sys, time, json, requests
+import sys, time, json, requests, copy
 
 localComputer = Computer()
 
@@ -58,12 +58,12 @@ def main():
 					else:
 						computer_id = addComputer(currentAgentInfo)
 						agent_data["agentid"] = computer_id"""
+	cagentdata = copy.deepcopy(currentAgentInfo)
 	while True:
-		refmem = refreshMemInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
+		refmem = refreshMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		memstatus = next(refmem, None)
 		refreshNetInfo(computer_id, currentAgentInfo["fingerprint"], currentAgentInfo)
-		
-		time.sleep(5)
+		time.sleep(10)
 
 
 	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))

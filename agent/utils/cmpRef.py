@@ -1,5 +1,5 @@
 from collectors.computer_info import Computer
-import requests, json, time
+import requests, json, time, copy
 
 currentComputer = Computer()
 
@@ -47,62 +47,80 @@ def refreshMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 			yield to_send_data
 
 def refreshNetInfo(computer_id: int, fingerprint: str, oldData: dict):
-	
 	storedNetInfo = oldData["ip_addr"]
-	
 	currentNetInfo = currentComputer.getIfAddr()
-	print("stored")
-	print(storedNetInfo)
-	print("current")
-	print(currentNetInfo)
+
 	refURL = f"{server}/api/computers/net?computer_id={computer_id}"
 
 	CrData = {
 		"computer_id": computer_id,
 		 "fingerprint": fingerprint
 	}
+
+	current_keys = set(currentNetInfo.keys())
+	stored_keys = set(storedNetInfo.keys())
 	# Handle added interfaces
 	added = {}
-	for interface in currentNetInfo.keys():
-		if interface not in storedNetInfo.keys() and not "virtual" in interface.lower():
-			added[interface] = currentNetInfo[interface]
+	for k in current_keys - stored_keys:
+		if "virtual" not in k:
+			added[k] = currentNetInfo[k]
 
 	# Handle removed interfaces
 	removed = {}
-	for interface in storedNetInfo.keys():
-		if interface not in currentNetInfo.keys():
-			removed[interface] = None
-	for k in removed:
-		del oldData["ip_addr"][k]
+	for k in stored_keys - current_keys:
+		if "virtual" not in k:
+			removed[k] = None
 
 	# Handle updated interfaces
 	updated = {}
-	for interface in storedNetInfo.keys():
-		if interface in currentNetInfo and currentNetInfo[interface] != storedNetInfo[interface]:
-			updated[interface] = currentNetInfo[interface]
+	for k in current_keys & stored_keys:
+		if currentNetInfo[k] != storedNetInfo[k]:
+			updated[k] = currentNetInfo[k]
 	
-	if added:
-		for k in added.keys():
-			uDataA = CrData
-			uDataA["ifname"] = k
-			uDataA["ip_addr"] = added[k][1]
-			updateR = requests.patch(refURL, json = uDataA)
-			print(uDataA)
-			if updateR.status_code <= 201:
-				return True
-	if removed:
-		for k in removed.keys():
-			uDataR = CrData
-			uDataR["ifname"] = k
-			updateR = requests.delete(refURL, json = uDataR)
-			if updateR.status_code <= 201:
-				return True
-	if updated:
-		for k in updated.keys():
-			uDataU = CrData
-			uDataU["ifname"] = k
-			uDataU["ip_addr"] = updated[k][1]
-			updateR = requests.patch(refURL, json = uDataU)
-			if updateR.status_code <= 201:
-				return True
-				
+	success_ = True
+
+	for k, v in added.items():
+		if "virtual" not in k.lower():
+			payload = copy.deepcopy(CrData)
+			payload["ifname"] = k
+			payload["ipaddr"] = v
+			r = requests.patch(refURL, json = payload)
+			storedNetInfo[k] = v
+			if r.status_code == 200:
+				storedNetInfo[k] = copy.deepcopy(v)
+			else:
+				print(f"Failed adding : {k}")
+				success_ = False
+
+	for k, v in removed.items():
+		if "virtual" not in k.lower():
+			payload = copy.deepcopy(CrData)
+			payload["ifname"] = k
+			payload["ipaddr"] = None
+			r = requests.delete(refURL, json = payload)
+			if r.status_code == 200:
+				del storedNetInfo[k]
+			else:
+				print(f"Failed removing : {k}")
+				success_ = False
+
+	for k, v in updated.items():
+		if "virtual" not in k.lower():
+			payload = copy.deepcopy(CrData)
+			payload["ifname"] = k
+			payload["ipaddr"] = v
+			print("#################################payload###########################")
+			print(payload)
+			print("#################################payload###########################")
+			r = requests.patch(refURL, json = payload)
+			if r.status_code == 200:
+				storedNetInfo[k] = copy.deepcopy(v)
+			else:
+				print(f"Failed updating : {k}")
+				success_ = False
+	print("CURRENT:", currentNetInfo)
+	print("STORED :", storedNetInfo)
+	print("UPDATED:", updated)
+	if success_:
+		oldData["ip_addr"] = copy.deepcopy(currentNetInfo)
+	return success_
