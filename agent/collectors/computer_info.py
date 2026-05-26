@@ -47,16 +47,11 @@ class Computer:
 		diskPartitions = psutil.disk_partitions(all=False)
 		disks = {}
 		if self.is_unix:
-			x = 0
 			for i in diskPartitions:
-				disks[f"disk {x}"] = {"device": i[0], "mountpoint": i[1], "fstype": i[2]}
-				x += 1
+				disks[f"{i[0]}"] = {"mountpoint": i[1], "fstype": i[2]}
 		else:
-			x = 0
 			for i in diskPartitions:
-				disks[f"disk {x}"] = {"device": i[0], "mountpoint": i[0], "fstype": i[2]}
-				x += 1
-
+				disks[f"{i[0]}"] = {"mountpoint": i[1], "fstype": i[2]}
 		return disks
 
 
