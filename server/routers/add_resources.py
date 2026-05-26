@@ -69,12 +69,12 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         users.append(username)
 
     disks = []
-    for disk in computer.disks.values():
+    for k, v in computer.disks.items():
         disksInfo = dbschema.disksInfo(
-            computer=newComputer,
-            partitionname=disk['device'],
-            mountpoint=disk['mountpoint'],
-            fstype=disk['fstype']
+            computer = newComputer,
+            partitionname = k,
+            mountpoint = v['mountpoint'],
+            fstype = v['fstype']
         )
         disks.append(disksInfo)
     db.add_all([newComputer, MemInfo])
