@@ -135,6 +135,7 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 
 	current_keys = set(currentDiskInfo.keys())
 	stored_keys = set(storedNetInfo.keys())
+	success_ = True
 	# Handle added disks
 	added = {}
 	for k in current_keys - stored_keys:
@@ -144,7 +145,31 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 	removed = {}
 	for k in stored_keys - current_keys:
 		removed[k] = None
-		
+	
+
+	for k, v in added.items():
+		payload = copy.deepcopy(CrData)
+		payload["partitionname"] = k
+		payload["mountpoint"] = v["mountpoint"]
+		payload["fstype"] = v["fstype"]
+		r = requests.patch(refURL, json = payload)
+		if r.status_code == 200:
+			storedNetInfo[k] = copy.deepcopy(v)
+		else:
+			print(f"Failed adding : {k}")
+			success_ = False
+
+	for k, v in removed.items():
+		payload = copy.deepcopy(CrData)
+		payload["partitionname"] = k
+		r = requests.delete(refURL, json = payload)
+		if r.status_code == 200:
+			pass
+		else:
+			print(f"Failed removing : {k}")
+			success_ = False
+
+	storedDiskInfo = currentDiskInfo
 	time.sleep(10)
 
-	
+	return success_
