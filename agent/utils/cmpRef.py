@@ -118,6 +118,7 @@ def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 				success_ = False
 	if success_:
 		oldData["ip_addr"] = copy.deepcopy(currentNetInfo)
+	time.sleep(10)
 	return success_
 
 
@@ -144,5 +145,6 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 	for k in stored_keys - current_keys:
 		removed[k] = None
 		
+	time.sleep(10)
 
 	
