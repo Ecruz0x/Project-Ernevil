@@ -1,5 +1,5 @@
 from utils.cmpDt import addComputer
-from utils.cmpRef import updateMemInfo, updateNetInfo
+from utils.cmpRef import updateMemInfo, updateNetInfo, updateDiskInfo
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy
@@ -65,6 +65,8 @@ def main():
 	while True:
 		refmem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		refnet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		refdsk = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		
 
 
 
