@@ -24,7 +24,9 @@ class UpdateNetworkingInfo(AuthenticateComputer):
 
 
 class UpdateProcessesInfo(ProcessesInfo, AuthenticateComputer):
-	pass
+	computer_id: int
+	fingerprint: str
+	username: Optional[str] = None
 
 class UpdateDisksInfo(DisksInfo, AuthenticateComputer):
 	pass

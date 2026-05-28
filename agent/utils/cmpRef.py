@@ -133,7 +133,7 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 	}
 
 	current_keys = set(currentDiskInfo.keys())
-	stored_keys = set(storedNetInfo.keys())
+	stored_keys = set(storedDiskInfo.keys())
 	success_ = True
 	# Handle added disks
 	added = {}
@@ -145,28 +145,28 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 	for k in stored_keys - current_keys:
 		removed[k] = None
 	
-
-	for k, v in added.items():
-		payload = copy.deepcopy(CrData)
-		payload["partitionname"] = k
-		payload["mountpoint"] = v["mountpoint"]
-		payload["fstype"] = v["fstype"]
-		r = requests.patch(refURL, json = payload)
-		if r.status_code == 200:
-			storedNetInfo[k] = copy.deepcopy(v)
-		else:
-			print(f"Failed adding : {k}")
-			success_ = False
-
-	for k, v in removed.items():
-		payload = copy.deepcopy(CrData)
-		payload["partitionname"] = k
-		r = requests.delete(refURL, json = payload)
-		if r.status_code == 200:
-			pass
-		else:
-			print(f"Failed removing : {k}")
-			success_ = False
+	if added:
+		for k, v in added.items():
+			payload = copy.deepcopy(CrData)
+			payload["partitionname"] = k
+			payload["mountpoint"] = v["mountpoint"]
+			payload["fstype"] = v["fstype"]
+			r = requests.patch(refURL, json = payload)
+			if r.status_code == 200:
+				storedDiskInfo[k] = copy.deepcopy(v)
+			else:
+				print(f"Failed adding : {k}")
+				success_ = False
+	if removed:
+		for k, v in removed.items():
+			payload = copy.deepcopy(CrData)
+			payload["partitionname"] = k
+			r = requests.delete(refURL, json = payload)
+			if r.status_code == 200:
+				pass
+			else:
+				print(f"Failed removing : {k}")
+				success_ = False
 
 	storedDiskInfo = currentDiskInfo
 
@@ -183,18 +183,21 @@ def updateProcessesInfo(computer_id: int, fingerprint: str, oldData: dict):
 	success_ = True
 
 	for d in payload:
-		d["computer_id"] computer_id
+		d["computer_id"] = computer_id
 		d["fingerprint"] = fingerprint
 
-	r = requests.patch(refURL, json = payload)
+	json_payload = json.dumps(payload)
+	r = requests.put(refURL, json = payload)
 	if r.status_code == 200:
-			pass
-		else:
-			print(f"Failed Updating processes")
-			success_ = False
+		pass
+	else:
+		print(r.json())
+		print(f"Failed Updating processes")
+		success_ = False
 	return success_
 
 
 def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
-	storedUserInfo = oldData["users"]
-	currentUserInfo = currentComputer.getActiveUsers()
+	"""storedUserInfo = oldData["users"]
+				currentUserInfo = currentComputer.getActiveUsers()"""
+	pass

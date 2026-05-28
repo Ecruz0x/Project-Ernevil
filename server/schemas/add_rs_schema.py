@@ -71,8 +71,8 @@ class NetworkingInfo(BaseModel):
 class ProcessesInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	pid: int
-	user: str
-	process_name: str
+	username: str
+	name: str
 
 class DisksInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)

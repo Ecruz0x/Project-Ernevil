@@ -55,8 +55,8 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         processesInfo = dbschema.processesInfo(
         computer=newComputer,
         pid=process['pid'],
-        user=process['username'],
-        process_name=process['name']
+        username=process['username'],
+        name=process['name']
         )
         processes.append(processesInfo)
 

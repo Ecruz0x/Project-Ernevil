@@ -1,5 +1,5 @@
 from utils.cmpDt import addComputer
-from utils.cmpRef import updateMemInfo, updateNetInfo, updateDiskInfo
+from utils.cmpRef import updateMemInfo, updateNetInfo, updateDiskInfo, updateProcessesInfo
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy
@@ -64,10 +64,14 @@ def main():
 	
 	while True:
 		refmem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		print(refmem)
 		refnet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		print(refnet)
 		refdsk = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		refu = 
-
+		print(refdsk)
+		refps = updateProcessesInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		print(refps)
+		time.sleep(15)
 
 
 	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))

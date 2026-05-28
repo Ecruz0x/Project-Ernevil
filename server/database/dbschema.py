@@ -82,8 +82,8 @@ class processesInfo(Base):
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="processes")
 	process_id: Mapped[int] = mapped_column(Integer, primary_key=True)
 	pid: Mapped[int] = mapped_column(Integer, nullable = True, unique=False)
-	user: Mapped[str] = mapped_column(String(200), unique=False, nullable=True)
-	process_name: Mapped[str] = mapped_column(String(20), unique=False, nullable=True)
+	username: Mapped[str] = mapped_column(String(200), unique=False, nullable=True)
+	name: Mapped[str] = mapped_column(String(20), unique=False, nullable=True)
 
 class disksInfo(Base):
 	__tablename__ = "disksinfo"
