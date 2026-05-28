@@ -64,9 +64,8 @@ def main():
 	
 	while True:
 		refmem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		memstatus = next(refmem, None)
-		updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		time.sleep(10)
+		refnet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+
 
 
 	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))

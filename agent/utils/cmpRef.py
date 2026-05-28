@@ -42,9 +42,9 @@ def updateMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 				"usage": currentMemInfo["usage"]}
 		updateR = requests.put(refURL, json = to_send_data)
 		if updateR.status_code <= 201:
-			yield True
+			return True
 		else:
-			yield to_send_data
+			return to_send_data
 
 def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	
