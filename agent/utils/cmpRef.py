@@ -172,6 +172,10 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 
 	return success_
 
+
+def updateProcessesInfo():
+	pass
+
 def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
 	storedUserInfo = oldData["users"]
 	currentUserInfo = currentComputer.getActiveUsers()
