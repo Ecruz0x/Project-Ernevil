@@ -198,6 +198,26 @@ def updateProcessesInfo(computer_id: int, fingerprint: str, oldData: dict):
 
 
 def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
-	"""storedUserInfo = oldData["users"]
-				currentUserInfo = currentComputer.getActiveUsers()"""
-	pass
+	storedUserInfo = oldData["users"]
+	currentUserInfo = currentComputer.getActiveUsers()
+
+	refURL = f"{server}/api/computers/cusers?computer_id={computer_id}"
+
+	CrData = {
+		"computer_id": computer_id,
+		 "fingerprint": fingerprint
+	}
+
+	current_keys = set(currentUserInfo.keys())
+	stored_keys = set(storedUserInfo.keys())
+	success_ = True
+	# Handle added disks
+	added = {}
+	for k in current_keys - stored_keys:
+		added[k] = storedUserInfo[k]
+
+	# Handle removed disks
+	removed = {}
+	for k in stored_keys - current_keys:
+		removed[k] = None
+	
