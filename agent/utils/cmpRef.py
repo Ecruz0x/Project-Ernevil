@@ -173,8 +173,27 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 	return success_
 
 
-def updateProcessesInfo():
-	pass
+def updateProcessesInfo(computer_id: int, fingerprint: str, oldData: dict):
+	refURL = f"{server}/api/computers/ps?computer_id={computer_id}"
+
+	current_ps = currentComputer.getProcesses()
+	oldData["processes"] = current_ps
+	payload = current_ps
+
+	success_ = True
+
+	for d in payload:
+		d["computer_id"] computer_id
+		d["fingerprint"] = fingerprint
+
+	r = requests.patch(refURL, json = payload)
+	if r.status_code == 200:
+			pass
+		else:
+			print(f"Failed Updating processes")
+			success_ = False
+	return success_
+
 
 def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
 	storedUserInfo = oldData["users"]

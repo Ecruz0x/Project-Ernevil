@@ -66,7 +66,7 @@ def main():
 		refmem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		refnet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		refdsk = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		
+		refu = 
 
 
 
