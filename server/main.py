@@ -6,7 +6,8 @@ from .database import dbschema
 from .database.db import Base, engine, get_db
 from typing import Annotated
 
-from .routers import add_resources, update_resources, get_resources, delete_resources
+from .routers import add_resources, update_resources, get_resources, delete_resources, heartbeats
+from .utils.heartbeat_utils import expireHeartBeat
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,34 +19,13 @@ app.include_router(add_resources.router, prefix = "/api/computers", tags = ["Add
 app.include_router(get_resources.router, prefix = "/api/computers", tags = ["Get Resources"])
 app.include_router(update_resources.router, prefix = "/api/computers", tags = ["Update Resources"])
 app.include_router(delete_resources.router, prefix = "/api/computers", tags = ["Delete Resources"])
-
-
-
-
-"""
-
+app.include_router(heartbeats.router, prefix = "/api/computers", tags = ["Heartbeat Handler"])
 
 
 
 
 
-@app.get("/api/expired")
-def expiredComputers():
-    expired_computers = {}
-    for k in computers:
-        if k["is_alive"] == False:
-            expired_computers[k["computer_id"]] = k["lastHB"]
-    return expired_computers
-
-
-async def expireHeartBeat():
-    while True:
-        for k in computers:
-            duration = datetime.now() - k["lastHB"]
-            if duration.total_seconds() >= 150:
-                k["is_alive"] = False
-        await asyncio.sleep(50)
 
 @app.on_event("startup")
-async def startExpiringHBs():
-    asyncio.create_task(expireHeartBeat())"""
+async def main():
+    asyncio.create_task(expireHeartBeat())

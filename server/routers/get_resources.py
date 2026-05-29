@@ -72,3 +72,9 @@ def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]) 
     result = db.execute(text(f"SELECT username FROM computerusers WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     return targetdetails
+
+@router.get("/expired", response_model = list[ComputerInfo])
+def getExpiredComputers():
+    result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.is_alive == False))
+    expired_computers = result.mappings().all()
+    return expired_computers

@@ -27,3 +27,4 @@ def handleHeartBeat(computer: AuthenticateComputer, db: Annotated[Session, Depen
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Authentication Error",
         )
+

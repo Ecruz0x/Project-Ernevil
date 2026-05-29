@@ -11,8 +11,11 @@ import asyncio
 
 async def expireHeartBeat(db: Annotated[Session, Depends(get_db)]):
     while True:
-        for k in computers:
-            duration = datetime.now() - k["lastHB"]
-            if duration.total_seconds() >= 150:
-                k["is_alive"] = False
+        db.execute(
+            update(computerInfo)
+            .where(datetime.now() - computerInfo.last_heartbeat >= 150)
+            .values(is_alive=False)
+        )
         await asyncio.sleep(50)
+
+
