@@ -23,7 +23,7 @@ def sendData(json: dict, url: str) -> dict:
 		raise ValueError("Sending Error")
 	
 
-def addComputer(data: dict) -> int:
+def initializeComputerInfo(data: dict) -> int:
 	computer_data = data
 	computer_data["is_alive"] = True
 	url = f"{server}/api/computers"

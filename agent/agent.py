@@ -1,5 +1,6 @@
-from utils.cmpDt import addComputer
-from utils.cmpRef import updateMemInfo, updateNetInfo, updateDiskInfo, updateProcessesInfo
+from utils.initializer import initializeComputerInfo
+from utils.updater import updateMemInfo, updateNetInfo, updateDiskInfo, updateProcessesInfo
+from utils.heart import sendBeat
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy
@@ -37,18 +38,6 @@ with open("./agentdata.json", "r") as agentdata:
 	agent_data = json.load(agentdata)
 
 
-
-"""
-
-
-
-def sendHeartBeat(computer_id: int):
-	url = f"{serverAgent}/api/heartbeat"
-	while True:
-		res = requests.post(url, json = {"id": computer_id})
-		print(res.text)
-		time.sleep(30)
-"""
 
 def main():
 	cagentdata = copy.deepcopy(currentAgentInfo)

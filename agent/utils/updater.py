@@ -221,3 +221,4 @@ def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
 	for k in stored_keys - current_keys:
 		removed[k] = None
 	
+	
