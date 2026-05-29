@@ -31,7 +31,6 @@ def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Sess
 def updateComputerName(newName: UpdateComputerName, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newName.computer_id, "fingerprint": newName.fingerprint}
     is_auth = authenticateComputer(auth_data, db)
-    name = newName.newcomputername
     if is_auth:
         result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == newName.computer_id))
         computer = result.scalars().first()

@@ -32,10 +32,11 @@ class ComputerInfo(Base):
 	is_unix: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 	os: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)  ## TODO : Fix this (nullable=False)
 	boottime: Mapped[datetime] = mapped_column(DateTime, unique = False, nullable=False)
-	is_alive: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 	node_machineid: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
-	added_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now())
 	fingerprint: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+	added_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now())
+	last_heartbeat: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now())
+	is_alive: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 
 	# Relationships
 	location_id = mapped_column(
@@ -106,15 +107,3 @@ class computerUsers(Base):
 	userid: Mapped[int] = mapped_column(Integer, primary_key=True)
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="computerusers")
 	username: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
-
-"""class HBRInfo(Base):
-	__tablename__ = "heartbeatsRef"
-
-	computer_id = mapped_column(
-        ForeignKey("computerInfo.computer_id")
-    )
-	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="heartbeats")
-	HBID: Mapped[int] = mapped_column(Integer, primary_key=True)
-	lastHB: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-	last_refresh: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-"""

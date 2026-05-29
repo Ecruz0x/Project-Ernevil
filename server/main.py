@@ -29,19 +29,6 @@ app.include_router(delete_resources.router, prefix = "/api/computers", tags = ["
 
 
 
-
-
-@app.post("/api/heartbeat", response_model = bool, status_code = 200)
-def handleHeartBeat(computer_id: dict):
-    for k in computers:
-        if k["computer_id"] == computer_id["id"]:
-            k["lastHB"] = datetime.now()
-            k["is_alive"] = True
-            return True
-        else:
-            return False
-
-
 @app.get("/api/expired")
 def expiredComputers():
     expired_computers = {}
