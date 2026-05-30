@@ -42,12 +42,14 @@ agent_data = json.load(agentdata)
 def main():
 	cagentdata = copy.deepcopy(currentAgentInfo)
 	computer_id = None
+	isInitialized = False
 	if agent_data["agentid"]:
 		agid = agent_data["agentid"]
 		isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
-		if isAddedComputer:
+		if isAddedComputer.status_code == 200:
+			isInitialized = True
 			computer_id = agid
-	else:
+	if not isInitialized:
 		computer_id = initializeComputerInfo(cagentdata)
 		agent_data["agentid"] = computer_id
 		agentdata.seek(0)

@@ -20,7 +20,10 @@ def isAddedComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     if existing_computer:
         return True
     else:
-        return False
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer unavailable Error",
+        )
 
 
 @router.get("", response_model = list[ComputerInfo])
@@ -33,48 +36,95 @@ def getComputers(db: Annotated[Session, Depends(get_db)]):
 def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerInfo]:
     result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive"))
     liveComputers = result.mappings().all()
-    return liveComputers
+    if liveComputers:
+        return liveComputers
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer is unreachable.",
+        )
 
 @router.get("", response_model = SpecificComputerInfo)
 def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(text(f"SELECT * FROM computerInfo WHERE computer_id = {computer_id}"))
     targetComputer = result.mappings().all()
-    return targetComputer
+    if targetComputer:
+        return targetComputer
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer is unreachable.",
+        )
 
 
 @router.get("/mem", response_model = MemoryInfo)
 def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> MemoryInfo:
     result = db.execute(text(f"SELECT totalMemory, available_memory, usage FROM memoryinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
-    return targetdetails[0]
+    if targetdetails:
+        return targetdetails[0]
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer is offline or unreachable.",
+        )
 
 
 @router.get("/net", response_model = list[NetworkingInfo])
 def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[NetworkingInfo]:
     result = db.execute(text(f"SELECT ifname, ipaddr FROM netinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
-    return targetdetails
+    if targetdetails:
+        return targetdetails
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer is offline or unreachable.",
+        )
 
 @router.get("/ps", response_model = list[ProcessesInfo])
 def getProcessInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[ProcessesInfo]:
     result = db.execute(text(f"SELECT pid, user, process_name FROM processesinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
-    return targetdetails
+    if targetdetails:
+        return targetdetails
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer is offline or unreachable.",
+        )
 
 @router.get("/hd", response_model = list[DisksInfo])
 def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[DisksInfo]:
     result = db.execute(text(f"SELECT partitionname, mountpoint, fstype FROM disksinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
-    return targetdetails
+    if targetdetails:
+        return targetdetails
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer unavailable Error",
+        )
 
 @router.get("/cusers", response_model = list[CUsersInfo])
 def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[CUsersInfo]:
     result = db.execute(text(f"SELECT username FROM computerusers WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
-    return targetdetails
+    if targetdetails:
+        return targetdetails
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer is offline or unreachable.",
+        )
 
 @router.get("/expired", response_model = list[ComputerInfo])
 def getExpiredComputers():
     result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.is_alive == False))
     expired_computers = result.mappings().all()
-    return expired_computers
+    if expired_computers:
+        return expired_computers
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        )
