@@ -35,23 +35,25 @@ currentAgentInfo = {
 
 
 # Update interval, Retry time, HB intervals
-with open("./agentdata.json", "r") as agentdata:
-	agent_data = json.load(agentdata)
-
+agentdata = open("./agentdata.json", "r+")
+agent_data = json.load(agentdata)
 
 
 def main():
 	cagentdata = copy.deepcopy(currentAgentInfo)
-	computer_id = initializeComputerInfo(cagentdata)
-
-	"""if agent_data["agentid"]:
-					agid = agent_data["agentid"]
-					isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
-					if isAddedComputer:
-						computer_id = agid
-					else:
-						computer_id = addComputer(currentAgentInfo)
-						agent_data["agentid"] = computer_id"""
+	computer_id = None
+	if agent_data["agentid"]:
+		agid = agent_data["agentid"]
+		isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
+		if isAddedComputer:
+			computer_id = agid
+	else:
+		computer_id = initializeComputerInfo(cagentdata)
+		agent_data["agentid"] = computer_id
+		agentdata.seek(0)
+		json.dump(agent_data, agentdata, indent=4)
+		agentdata.truncate()
+		agentdata.close()
 	
 
 	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"]))

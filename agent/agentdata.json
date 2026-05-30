@@ -1,6 +1,5 @@
-
 {
-  "agentid": null,
-  "agent_ip": "127.0.0.1",
-  "is_alive": true
+    "agentid": 1,
+    "agent_ip": "127.0.0.1",
+    "is_alive": true
 }
