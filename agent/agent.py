@@ -56,8 +56,9 @@ def main():
 		agentdata.close()
 	
 
-	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"]))
-	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata))
+	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"], agent_data["heartbeat_interval"], server))
+	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
+
 	try:
 		beat.start()
 		updates.start()

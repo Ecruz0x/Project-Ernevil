@@ -14,4 +14,3 @@ class Base(DeclarativeBase):
 def get_db():
 	with sessionlocal() as db:
 		yield db
-

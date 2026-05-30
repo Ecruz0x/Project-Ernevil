@@ -223,10 +223,10 @@ def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
 	
 
 
-def sendFullUpdates(computer_id, cagentdata):
+def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int):
 	while True:
 		uMem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		uNet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		uD = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		uPs = updateProcessesInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		time.sleep(30)
+		time.sleep(update_interval)
