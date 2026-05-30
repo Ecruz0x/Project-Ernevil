@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
 from ..schemas.add_rs_schema import ComputerCreated, CreateComputer
-from ..schemas.add_rs_schema import ComputerInfo, SpecificComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
+from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
 from datetime import datetime
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
@@ -41,6 +41,10 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         totalMemory = computer.memory['totalMemory'],
         available_memory = computer.memory['availableMemory'],
         usage=computer.memory['usage']
+        )
+    CPUInfo = dbschema.CPUInfo(
+        computer=newComputer,
+        usage = computer.cpu['usage']
         )
     interfaces = []
     for netinterface in computer.ip_addr.keys():

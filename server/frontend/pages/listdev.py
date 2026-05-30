@@ -1,17 +1,24 @@
 import streamlit as st
 import pandas as pd
 import streamlit_shadcn_ui as ui
+import requests
 
 
 
 
 st.header("Available Devices")
 
+rcmp = requests.get("http://127.0.0.1:8000/api/computers")
+if rcmp.status_code == 200:
+    computers = rcmp.json()
+
+data = []
 
 
-data = [
-    {"Computer Name": "Paid", "Location": "INV001", "OS": 500, "Status": "Credit Card"},
-]
+
+##### Location Management
+for computer in computers:
+	data.append({"Computer Name": computer["computername"], "Location": "NULL", "OS": computer["os"], "Status": "Online" if computer["is_alive"] else "Offline"})
 
 
 df = pd.DataFrame(data)

@@ -45,7 +45,7 @@ def main():
 	isInitialized = False
 	if agent_data["agentid"]:
 		agid = agent_data["agentid"]
-		isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
+		isAddedComputer = requests.get(f"{server}/api/computers/is_added?computer_id={agid}")
 		if isAddedComputer.status_code == 200:
 			isInitialized = True
 			computer_id = agid

@@ -20,6 +20,8 @@ def handleHeartBeat(computer: AuthenticateComputer, db: Annotated[Session, Depen
         result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == computer.computer_id))
         computer = result.scalars().first()
         computer.last_heartbeat = datetime.now()
+        if not computer.is_alive:
+            computer.is_alive = True
         db.commit()
         return True
     else:

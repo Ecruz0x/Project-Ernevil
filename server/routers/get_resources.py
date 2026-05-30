@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
-from ..schemas.add_rs_schema import ComputerInfo, SpecificComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
+from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
 from typing import Annotated
@@ -13,7 +13,7 @@ router = APIRouter()
 #### TODO: Authentication Needed Here
 
 
-@router.get("", response_model = bool)
+@router.get("/is_added", response_model = bool)
 def isAddedComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(text(f"SELECT 1 FROM computerInfo WHERE computer_id = {computer_id}"))
     existing_computer = result.scalars().first()
@@ -36,20 +36,14 @@ def getComputers(db: Annotated[Session, Depends(get_db)]):
 def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerInfo]:
     result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive"))
     liveComputers = result.mappings().all()
-    if liveComputers:
-        return liveComputers
-    else:
-        raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Computer is unreachable.",
-        )
+    return liveComputers
 
-@router.get("", response_model = SpecificComputerInfo)
+@router.get("/c", response_model = ComputerInfo)
 def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(text(f"SELECT * FROM computerInfo WHERE computer_id = {computer_id}"))
     targetComputer = result.mappings().all()
     if targetComputer:
-        return targetComputer
+        return targetComputer[0]
     else:
         raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,

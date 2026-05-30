@@ -46,17 +46,6 @@ class ComputerInfo(BaseModel):
 	added_on: datetime
 	fingerprint: str
 
-class SpecificComputerInfo(BaseModel):
-	model_config = ConfigDict(from_attributes = True)
-	computername: str
-	is_unix: bool
-	os: str
-	boottime: datetime
-	is_alive: bool
-	node_machineid: str
-	added_on: datetime
-	fingerprint: str
-
 class MemoryInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	totalMemory: float
@@ -83,3 +72,7 @@ class DisksInfo(BaseModel):
 class CUsersInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	username: str
+
+class CPUInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	usage: float

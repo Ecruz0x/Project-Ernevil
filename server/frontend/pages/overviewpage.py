@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_extras.resizable_columns import resizable_columns
 from streamlit_extras.card_selector import *
 import streamlit_shadcn_ui as ui
-
+import requests
 
 st.header("General Overview")
 st.text("""
@@ -42,16 +42,28 @@ selected = card_selector(
 
 st.header("Current metrics")
 
-v = 30
+
+##### Login and access tokens....####
+
+
+rcmp = requests.get("http://127.0.0.1:8000/api/computers")
+if rcmp.status_code == 200:
+    cmps = len(rcmp.json())
+    last_added = rcmp.json()[-1]["computername"]
+
+
+rloc = requests.get("http://127.0.0.1:8000/api/locations/get_locations")
+if rloc.status_code == 200:
+    loc = len(rloc.json())
 
 cols = st.columns(3)
 with cols[0]:
-    ui.metric_card(title="Devices", content=v, description="Detected devices", key="devices")
+    ui.metric_card(title="Devices", content=cmps, description="Detected devices", key="devices")
 with cols[1]:
-    ui.metric_card(title="Locations", content=v, description="Available locations", key="locations")
+    ui.metric_card(title="Locations", content=loc, description="Available locations", key="locations")
 with cols[2]:
-    ui.metric_card(title="Last added Device", content=v, description="Last added device", key="ladev")
+    ui.metric_card(title="Last added Device", content=last_added, description="Last added device", key="ladev")
 
 nxtcols = st.columns(1)
 with nxtcols[0]:
-	ui.metric_card(title="Last Alert", content=v, description="Last detected alert", key="laalert")
+	ui.metric_card(title="Last Alert", content=5, description="Last detected alert", key="laalert")

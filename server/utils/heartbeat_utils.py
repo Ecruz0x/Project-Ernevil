@@ -22,6 +22,12 @@ async def expireHeartBeat():
                 .values(is_alive=False)
             )
 
+            stmt_rev = (
+                update(dbschema.ComputerInfo)
+                .where(dbschema.ComputerInfo.last_heartbeat >= threshold)
+                .values(is_alive=True)
+            )
+
             db.execute(stmt)
             db.commit()
 
