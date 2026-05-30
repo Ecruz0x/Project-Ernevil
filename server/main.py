@@ -3,11 +3,13 @@ from fastapi import FastAPI, Request, HTTPException, status, Depends
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 from .database import dbschema
-from .database.db import Base, engine, get_db
+from .database.db import Base, engine, get_db, sessionlocal
 from typing import Annotated
-
+import asyncio
 from .routers import add_resources, update_resources, get_resources, delete_resources, heartbeats
 from .utils.heartbeat_utils import expireHeartBeat
+
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,4 +30,7 @@ app.include_router(heartbeats.router, prefix = "/api/computers", tags = ["Heartb
 
 @app.on_event("startup")
 async def main():
-    asyncio.create_task(expireHeartBeat())
+    try:
+        asyncio.create_task(expireHeartBeat())
+    except KeyboardInterrupt:
+        exit(1)

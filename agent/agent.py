@@ -1,9 +1,9 @@
 from utils.initializer import initializeComputerInfo
-from utils.updater import updateMemInfo, updateNetInfo, updateDiskInfo, updateProcessesInfo
+from utils.updater import sendFullUpdates
 from utils.heart import sendBeat
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
-import sys, time, json, requests, copy
+import sys, time, json, requests, copy, multiprocessing
 
 
 
@@ -33,6 +33,7 @@ currentAgentInfo = {
 
 
 
+
 # Update interval, Retry time, HB intervals
 with open("./agentdata.json", "r") as agentdata:
 	agent_data = json.load(agentdata)
@@ -41,7 +42,8 @@ with open("./agentdata.json", "r") as agentdata:
 
 def main():
 	cagentdata = copy.deepcopy(currentAgentInfo)
-	computer_id = addComputer(cagentdata)
+	computer_id = initializeComputerInfo(cagentdata)
+
 	"""if agent_data["agentid"]:
 					agid = agent_data["agentid"]
 					isAddedComputer = requests.get(f"{server}/api/computers?computer_id={agid}")
@@ -51,25 +53,15 @@ def main():
 						computer_id = addComputer(currentAgentInfo)
 						agent_data["agentid"] = computer_id"""
 	
-	while True:
-		refmem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		print(refmem)
-		refnet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		print(refnet)
-		refdsk = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		print(refdsk)
-		refps = updateProcessesInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		print(refps)
-		time.sleep(15)
 
+	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"]))
+	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata))
+	try:
+		beat.start()
+		updates.start()
+	except KeyboardInterrupt:
+		exit(1)
 
-	"""sendHB = multiprocessing.Process(target=sendHeartBeat, args = (computerId,))
-				sendRef = multiprocessing.Process(target=sendRefresh, args = (computerId,))
-				try:
-					sendHB.start()
-					sendRef.start()
-				except KeyboardInterrupt:
-					exit(1)"""
 
 if __name__ == "__main__":
     sys.exit(main())
