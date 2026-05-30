@@ -3,6 +3,7 @@ import streamlit_shadcn_ui as ui
 import pandas as pd
 from code_editor import code_editor
 import requests, time
+from st_aggrid import AgGrid
 
 rcmp = requests.get("http://127.0.0.1:8000/api/computers/live")
 if rcmp.status_code == 200:
@@ -13,10 +14,8 @@ else:
 st.header("Monitor your infrastructure")
 
 
-
-
 if computers:
-    st.html("<h2>Choose a device (Only online devices will appear) </h2>")
+    st.html("<h2>Select a device (only online devices are displayed)</h2>")
     computer_map = {}
     for computer in computers:
         computer_map[computer["computername"]] = computer["computer_id"]
@@ -39,6 +38,7 @@ if computers:
     rcmpb = requests.get(f"http://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}")
     if rcmpb.status_code == 200:
         boottime = rcmpb.json()["boottime"]
+        os = rcmpb.json()["os"]
     else:
         boottime = "Unavailable"
 
@@ -51,25 +51,76 @@ if computers:
         ui.metric_card(title="Boot time", content=boottime, description=f"When {choice} was last started", key="ladev")
 
 
+    # Users scraper
+    rusers = requests.get(f"http://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}")
+    if rusers.status_code == 200:
+        users = rusers.json()
+        
+    # Processes scraper
+    rps = requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}")
+    ps_data = rps.json()
+
+    # Disks scraper
+    rdsk = requests.get(f"http://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}")
+    dsk_data = rdsk.json()
+
+    # NetIF scraper
+    rnet = requests.get(f"http://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}")
+    net_data = rnet.json()
+
     data = [
-        {"Users": "Paid", "Disks": "INV001", "Processes Count": "500", "OS": "Credit Card"},
+        {"Users count": str(len(users)), "Disks count": str(len(dsk_data)), "Processes Count": str(len(ps_data)), "OS": os},
     ]
 
+    df_general = pd.DataFrame(data)
 
-    df = pd.DataFrame(data)
+    st.table(df_general)
 
-    st.table(df)
+    st.html(f"<h3>Processes</h3><p style='font-size: 17px;'>Visualize and analyze processes on <strong>{choice}</strong></p>")
+    data_ps = []
+    for ps in ps_data:
+        temp_d = {}
+        temp_d["PID"] = str(ps["pid"])
+        temp_d["Process"] = ps["name"]
+        temp_d["User"] = ps["username"] if ps["username"] else "Null"
+        data_ps.append(temp_d)
+
+    ps_df = pd.DataFrame(data_ps)
+    AgGrid(
+        ps_df,
+        fit_columns_on_grid_load=True,
+        enable_enterprise_modules=True
+    )
+
+
+    st.html(f"<h3>Disks</h3>")
+    disk_data = []
+
+    for disk in dsk_data:
+        d = {}
+        d["Partition Name"] = disk["partitionname"]
+        d["Mount Point"] = disk["mountpoint"]
+        d["File System"] = disk["fstype"]
+        disk_data.append(d)
+
+    df_dsk = pd.DataFrame(disk_data)
+
+    st.table(df_dsk)
+
 
     st.html(f"<h3>Networking</h3>")
 
-    networking = [
-        {"Network Interfaces": "Paid", "IP Addresses": "INV001"},
-    ]
+    networking = []
+    for interface in net_data:
+        temp_d = {}
+        temp_d["Network Interface"] = interface["ifname"]
+        temp_d["IPv4 Address"] = interface["ipaddr"]
+        networking.append(temp_d)
 
 
-    df2 = pd.DataFrame(networking)
+    df_net = pd.DataFrame(networking)
 
-    st.table(df2)
+    st.table(df_net)
 
     st.html(f"<h2>Execute shell commands on {choice}</h2>")
     response = code_editor("# Write You commands here", response_mode="debounce")

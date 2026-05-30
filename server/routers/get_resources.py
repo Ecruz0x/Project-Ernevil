@@ -78,7 +78,7 @@ def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> lis
 
 @router.get("/ps", response_model = list[ProcessesInfo])
 def getProcessInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[ProcessesInfo]:
-    result = db.execute(text(f"SELECT pid, user, process_name FROM processesinfo WHERE computer_id = {computer_id}"))
+    result = db.execute(text(f"SELECT pid, username, name FROM processesinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     if targetdetails:
         return targetdetails
