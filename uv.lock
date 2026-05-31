@@ -276,6 +276,7 @@ dependencies = [
     { name = "streamlit-code-editor" },
     { name = "streamlit-extras" },
     { name = "streamlit-shadcn-ui" },
+    { name = "websockets" },
 ]
 
 [package.metadata]
@@ -296,6 +297,7 @@ requires-dist = [
     { name = "streamlit-code-editor", specifier = ">=0.1.22" },
     { name = "streamlit-extras", specifier = ">=1.5.0" },
     { name = "streamlit-shadcn-ui", specifier = ">=0.1.19" },
+    { name = "websockets", specifier = ">=16.0" },
 ]
 
 [[package]]

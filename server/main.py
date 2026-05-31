@@ -5,7 +5,7 @@ from .database import dbschema
 from .database.db import Base, engine, get_db, sessionlocal
 from typing import Annotated
 import asyncio
-from .routers import add_resources, update_resources, get_resources, delete_resources, heartbeats, locations
+from .routers import add_resources, update_resources, get_resources, delete_resources, heartbeats, locations, websocket
 from .utils.heartbeat_utils import expireHeartBeat
 
 
@@ -22,7 +22,7 @@ app.include_router(update_resources.router, prefix = "/api/computers", tags = ["
 app.include_router(delete_resources.router, prefix = "/api/computers", tags = ["Delete Resources"])
 app.include_router(heartbeats.router, prefix = "/api/computers", tags = ["Heartbeat Handler"])
 app.include_router(locations.router, prefix = "/api/locations", tags = ["Locations"])
-
+app.include_router(websocket.router, prefix = "/api", tags = ["Websocket"])
 
 
 
