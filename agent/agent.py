@@ -61,7 +61,7 @@ def main():
 
 	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"], agent_data["heartbeat_interval"], server))
 	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
-	websocket = multiprocessing.Process(target=test_client)
+	websocket = multiprocessing.Process(target=test_client, args = (computer_id,))
 
 	try:
 		beat.start()
