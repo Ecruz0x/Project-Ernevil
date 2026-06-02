@@ -3,16 +3,16 @@ from fastapi.responses import HTMLResponse
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: list[WebSocket] = []
+        self.active_connections: dict = {}
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket, computer_id: int):
         await websocket.accept()
-        self.active_connections.append(websocket)
+        self.active_connections[computer_id] = websocket
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    def disconnect(self, computer_id: int):
+        del self.active_connections[computer_id]
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
+    async def send_specific_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
 
     async def broadcast(self, message: str):
