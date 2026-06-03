@@ -1,4 +1,7 @@
-﻿# Project Ernevil
-Ernevil is an open-source monitoring platform designed to oversee and manage multiple computers within a Local Area Network (LAN), with planned support for cloud-based infrastructure in future releases.
-Agents are automatically registered by sending a POST API request containing their system information to the server. The server dynamically discovers, stores, and manages connected agents in memory before persisting them to the database. Built with scalability and automation in mind, Ernevil aims to provide administrators with an efficient and centralized monitoring solution. 
-Ernevil is fully open source and intended solely for legal and authorized use. The developers and contributors of the project are not responsible for any misuse, unauthorized activity, or illegal deployment of the software.
+# Project Ernevil
+
+Ernevil is an open-source monitoring platform for managing and monitoring multiple computers across a LAN, with future cloud support planned. Agents automatically register by sending system information to the server, which discovers, tracks, and persists them for centralized management.
+
+Built for scalability and automation, Ernevil provides administrators with an efficient and unified monitoring solution.
+
+This project is intended solely for authorized and lawful use. The developers and contributors assume no responsibility for misuse, unauthorized access, or illegal deployment of the software.
