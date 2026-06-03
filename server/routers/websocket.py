@@ -34,7 +34,16 @@ def captureSc(computer_id: int):
 
 @router.post("/shutdown")
 def shutDownComputer(computer_id: int):
-    pass
+    try:
+        websocket = manager.active_connections[computer_id]
+        await manager.send_specific_message("shutdown now", websocket)
+        response = await websocket.receive_text()
+        return {"result": response}
+    except KeyError as e:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="websocket not found",
+        ) 
 
 @router.post("/restart")
 def restartComputer(computer_id: int):
