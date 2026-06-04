@@ -12,6 +12,11 @@ async def ws_client(computer_id: int, is_unix: bool):
             if is_unix:
                 result = subprocess.run(msg.split(), capture_output=True, text=True)
             else:
+                if msg == "shutdown now":
+                    msg = "Stop-Computer -Force"
+                elif msg == "sudo reboot":
+                    msg = "Restart-Computer -Force"
+                    
                 result = subprocess.run(["powershell.exe", "-NoProfile", "-Command", msg], capture_output=True, text=True)
 
             await ws.send(result.stdout)

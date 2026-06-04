@@ -33,7 +33,7 @@ def captureSc(computer_id: int):
     pass
 
 @router.post("/shutdown")
-def shutDownComputer(computer_id: int):
+async def shutDownComputer(computer_id: int):
     try:
         websocket = manager.active_connections[computer_id]
         await manager.send_specific_message("shutdown now", websocket)
@@ -46,5 +46,14 @@ def shutDownComputer(computer_id: int):
         ) 
 
 @router.post("/restart")
-def restartComputer(computer_id: int):
-    pass
+async def restartComputer(computer_id: int):
+    try:
+        websocket = manager.active_connections[computer_id]
+        await manager.send_specific_message("sudo reboot", websocket)
+        response = await websocket.receive_text()
+        return {"result": response}
+    except KeyError as e:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="websocket not found",
+        ) 
