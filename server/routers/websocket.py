@@ -20,7 +20,6 @@ async def execCommands(commandBody: CommandRequest):
         websocket = manager.active_connections[commandBody.computer_id]
         await manager.send_specific_message(commandBody.command, websocket)
         response = await websocket.receive_text()
-        print(response)
         return {"result": response}
     except KeyError as e:
         raise HTTPException(
