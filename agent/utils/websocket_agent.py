@@ -17,7 +17,7 @@ async def ws_client(computer_id: int, is_unix: bool):
                 elif msg == "sudo reboot":
                     msg = "Restart-Computer -Force"
                     
-                result = subprocess.run(["powershell.exe", "-NoProfile", "-Command", msg], capture_output=True, text=True)
+                result = subprocess.run(["powershell.exe", "-NoProfile", "-Command", f"({msg} | ConvertTo-Json)"], capture_output=True, text=True)
 
             await ws.send(result.stdout)
 
