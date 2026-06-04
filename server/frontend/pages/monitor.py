@@ -128,7 +128,7 @@ if computers:
 
     if st.button("Execute"):
         rcmds = requests.post("http://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text']})
-        st.code(rcmds.json()["result"]) if st.code(rcmds.json()["result"]) else st.code("Error, check your command and try again.")
+        st.code(rcmds.json()["result"]) if rcmds.json()["result"] else st.code("Error, check your command and try again.")
 
     st.html(f"<h2>Open a remote session on {choice}</h2>")
 
