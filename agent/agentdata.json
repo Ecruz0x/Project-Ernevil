@@ -4,5 +4,6 @@
     "is_alive": true,
     "heartbeat_interval": 15,
     "updates_interval": 30,
-    "expiration_interval": 150
+    "expiration_interval": 150,
+    "retries": 5
 }

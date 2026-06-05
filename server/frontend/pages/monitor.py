@@ -52,21 +52,36 @@ if computers:
 
 
     # Users scraper
-    rusers = requests.get(f"http://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}")
-    if rusers.status_code == 200:
-        users = rusers.json()
+    try:
+        rusers = requests.get(f"http://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}")
+        if rusers.status_code == 200:
+            users = rusers.json()
+    except Exception as e:
+        st.write("Unknown Error, please refresh the page and try again.")
         
     # Processes scraper
-    rps = requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}")
-    ps_data = rps.json()
+    try:
+        rps = requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}")
+        if rps.status_code == 200:
+            ps_data = rps.json()
+    except Exception as e:
+        st.write("Unknown Error, please refresh the page and try again.")
 
     # Disks scraper
-    rdsk = requests.get(f"http://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}")
-    dsk_data = rdsk.json()
+    try:
+        rdsk = requests.get(f"http://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}")
+        if rdsk.status_code == 200:
+            dsk_data = rdsk.json()
+    except Exception as e:
+        st.write("Unknown Error, please refresh the page and try again.")
 
     # NetIF scraper
-    rnet = requests.get(f"http://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}")
-    net_data = rnet.json()
+    try:
+        rnet = requests.get(f"http://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}")
+        if rnet.status_code == 200:
+            net_data = rnet.json()
+    except Exception as e:
+        st.write("Unknown Error, please refresh the page and try again.")
 
     data = [
         {"Users count": str(len(users)), "Disks count": str(len(dsk_data)), "Processes Count": str(len(ps_data)), "OS": os},
@@ -129,13 +144,30 @@ if computers:
     if st.button("Execute"):
         rcmds = requests.post("http://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text']})
         result = rcmds.json()["result"]
-        output = str(result)
-        st.code(output)
+        if result:
+            output = str(result)
+            st.code(output)
+        else:
+            st.code("Execution error, please check your command and try again.")
 
     st.html(f"<h2>Open a remote session on {choice}</h2>")
 
     if st.button("Open a session"):
         st.write("Why hello there")
+
+    st.html(f"<h2>Shutdown or restart {choice}</h2>")
+
+
+    left, right = st.columns(2)
+
+    if left.button(f"Shutdown", width="stretch", key="left_btn"):
+        requests.post("http://127.0.0.1:8000/api/shutdown", json = {"computer_id": computer_map[choice]})
+
+    if right.button(f"Restart", width="stretch", key="right_btn"):
+        requests.post("http://127.0.0.1:8000/api/restart", json = {"computer_id": computer_map[choice]})
+
+        
+
 
 
 else:

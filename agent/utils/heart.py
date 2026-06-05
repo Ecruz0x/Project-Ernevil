@@ -10,5 +10,9 @@ def sendBeat(computer_id: int, fingerprint: str, heartbeat_interval: int, server
 	}
 	while True:
 		time.sleep(heartbeat_interval)
-		res = requests.post(url, json = CrData)
+		try:
+			res = requests.post(url, json = CrData)
+		except Exception as e:
+			print("Error: Could not establish connection")
+
 
