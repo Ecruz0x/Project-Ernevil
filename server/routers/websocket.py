@@ -32,9 +32,9 @@ def captureSc(computer_id: int):
     pass
 
 @router.post("/shutdown")
-async def shutDownComputer(ShutdownComputer):
+async def shutDownComputer(computer: ShutdownComputer):
     try:
-        websocket = manager.active_connections[computer_id]
+        websocket = manager.active_connections[computer.computer_id]
         await manager.send_specific_message("shutdown now", websocket)
         response = await websocket.receive_text()
         return {"result": response}
@@ -45,9 +45,9 @@ async def shutDownComputer(ShutdownComputer):
         ) 
 
 @router.post("/restart")
-async def restartComputer(RestartComputer):
+async def restartComputer(computer: RestartComputer):
     try:
-        websocket = manager.active_connections[computer_id]
+        websocket = manager.active_connections[computer.computer_id]
         await manager.send_specific_message("sudo reboot", websocket)
         response = await websocket.receive_text()
         return {"result": response}
