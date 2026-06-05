@@ -1,7 +1,7 @@
 from fastapi import APIRouter, WebSocket, HTTPException, status
 from ..utils import connection_manager
 import asyncio
-from ..schemas.executors_schemas import CommandRequest
+from ..schemas.executors_schemas import CommandRequest, RestartComputer, ShutdownComputer
 
 
 router = APIRouter()
@@ -32,7 +32,7 @@ def captureSc(computer_id: int):
     pass
 
 @router.post("/shutdown")
-async def shutDownComputer(computer_id: int):
+async def shutDownComputer(ShutdownComputer):
     try:
         websocket = manager.active_connections[computer_id]
         await manager.send_specific_message("shutdown now", websocket)
@@ -45,7 +45,7 @@ async def shutDownComputer(computer_id: int):
         ) 
 
 @router.post("/restart")
-async def restartComputer(computer_id: int):
+async def restartComputer(RestartComputer):
     try:
         websocket = manager.active_connections[computer_id]
         await manager.send_specific_message("sudo reboot", websocket)

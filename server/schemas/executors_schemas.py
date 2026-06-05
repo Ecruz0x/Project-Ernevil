@@ -7,3 +7,10 @@ class CommandRequest(BaseModel):
 	computer_id: int
 #    signature: str
 
+class RestartComputer(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	computer_id: int
+
+class ShutdownComputer(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	computer_id: int
