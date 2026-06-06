@@ -42,10 +42,6 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         available_memory = computer.memory['availableMemory'],
         usage=computer.memory['usage']
         )
-    CPUInfo = dbschema.CPUInfo(
-        computer=newComputer,
-        usage = computer.cpu['usage']
-        )
     interfaces = []
     for netinterface in computer.ip_addr.keys():
         interface = dbschema.networkingInfo(
@@ -90,3 +86,7 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
     added_info = {"computer_id": newComputer.computer_id, "computername" : newComputer.computername, "added_on": newComputer.added_on}
     return added_info
 
+"""CPUInfo = dbschema.CPUInfo(
+        computer=newComputer,
+        usage = computer.cpu['usage']
+        )"""

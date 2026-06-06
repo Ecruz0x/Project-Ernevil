@@ -43,27 +43,25 @@ selected = card_selector(
 st.header("Current metrics")
 
 
-##### Login and access tokens....####
-
-
 rcmp = requests.get("http://127.0.0.1:8000/api/computers")
-if rcmp.status_code == 200:
-    cmps = len(rcmp.json())
-    last_added = rcmp.json()[-1]["computername"]
-
-
 rloc = requests.get("http://127.0.0.1:8000/api/locations/get_locations")
-if rloc.status_code == 200:
-    loc = len(rloc.json())
+if rcmp.status_code == 200 and rloc.status_code == 200:
+    cmps = rcmp.json()
+    if len(cmps) >= 1:
+        last_added = cmps[-1]["computername"]
+    
+        loc = len(rloc.json())
+        cols = st.columns(3)
+        with cols[0]:
+            ui.metric_card(title="Devices", content=len(cmps), description="Detected devices", key="devices")
+        with cols[1]:
+            ui.metric_card(title="Locations", content=loc, description="Available locations", key="locations")
+        with cols[2]:
+            ui.metric_card(title="Last added Device", content=last_added, description="Last added device", key="ladev")
 
-cols = st.columns(3)
-with cols[0]:
-    ui.metric_card(title="Devices", content=cmps, description="Detected devices", key="devices")
-with cols[1]:
-    ui.metric_card(title="Locations", content=loc, description="Available locations", key="locations")
-with cols[2]:
-    ui.metric_card(title="Last added Device", content=last_added, description="Last added device", key="ladev")
+        nxtcols = st.columns(1)
+        with nxtcols[0]:
+        	ui.metric_card(title="Last Alert", content=5, description="Last detected alert", key="laalert")
 
-nxtcols = st.columns(1)
-with nxtcols[0]:
-	ui.metric_card(title="Last Alert", content=5, description="Last detected alert", key="laalert")
+    else:
+        st.html("<p>No devices are currently detected. Please verify that your agents are running and that the credentials are configured correctly.</p>")
