@@ -10,7 +10,8 @@ with open("serverdata.json", "r") as data:
 server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
 
-
+def subReqFCheck(computer_id):
+	pass
 
 def updateComputerName(computer_id: int, fingerprint: str, oldData: dict):
 	storedName = oldData["computer_name"]
@@ -221,8 +222,12 @@ def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
 	for k in stored_keys - current_keys:
 		removed[k] = None
 	
-def updateBootTime():
-	pass
+def updateBootTime(computer_id: int, fingerprint: str):
+	reqCheck = requests.get(f"{server}/api/computers?computer_id={computer_id}")
+	storedBT = reqCheck.json()[0]["boottime"]
+	currentBT = currentComputer.getBootTime()
+	if currentBT != storedBT:
+		requests.patch(f"{server}/api/computers/bt", json={"computer_id": computer_id, "fingerprint": fingerprint, "boottime": currentBT})
 
 def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int):
 	while True:
@@ -230,4 +235,5 @@ def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int):
 		uNet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		uD = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata)
 		uPs = updateProcessesInfo(computer_id, cagentdata["fingerprint"], cagentdata)
+		uBt = updateBootTime(computer_id, cagentdata["fingerprint"])
 		time.sleep(update_interval)

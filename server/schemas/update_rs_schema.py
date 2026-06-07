@@ -34,3 +34,5 @@ class UpdateDisksInfo(DisksInfo, AuthenticateComputer):
 class UCUsersInfo(CUsersInfo, AuthenticateComputer):
 	pass
 
+class UpdateBootTime(AuthenticateComputer):
+	boottime: datetime

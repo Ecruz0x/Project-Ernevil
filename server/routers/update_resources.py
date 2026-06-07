@@ -1,4 +1,4 @@
-from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, UCUsersInfo
+from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, UCUsersInfo, UpdateBootTime
 from ..schemas.authentication import AuthenticateComputer
 import time, asyncio, json
 from datetime import datetime
@@ -144,6 +144,24 @@ def updateUserInfo(newUserInfo: UCUsersInfo, db: Annotated[Session, Depends(get_
         computer = dbschema.computerUsers(**to_add)
         db.add(computer)
         db.commit()
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
+
+@router.patch("/bt", response_model = bool)
+def updateBootTime(boottime: UpdateBootTime, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": boottime.computer_id, "fingerprint": boottime.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
+    if is_auth:
+        result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == boottime.computer_id))
+        computer = result.scalars().first()
+        if computer:
+            computer.boottime = boottime.boottime
+        db.commit()
+        db.refresh(computer)
         return True
     else:
         raise HTTPException(

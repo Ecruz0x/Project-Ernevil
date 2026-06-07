@@ -21,5 +21,6 @@ dependencies = [
     "streamlit-code-editor>=0.1.22",
     "streamlit-extras>=1.5.0",
     "streamlit-shadcn-ui>=0.1.19",
+    "usb-monitor>=1.23",
     "websockets>=16.0",
 ]
