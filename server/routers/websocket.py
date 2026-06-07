@@ -2,6 +2,7 @@ from fastapi import APIRouter, WebSocket, HTTPException, status
 from ..utils import connection_manager
 import asyncio
 from ..schemas.executors_schemas import CommandRequest, RestartComputer, ShutdownComputer
+import math
 
 
 router = APIRouter()
@@ -10,7 +11,9 @@ manager = connection_manager.ConnectionManager()
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
     await manager.connect(websocket, computer_id)
+
     while True:
+        alerts = await websocket.receive_text()
         await asyncio.sleep(60)
 
 
@@ -58,3 +61,10 @@ async def restartComputer(computer: RestartComputer):
         )
 
 
+@router.websocket("/ws/alert")
+async def websocket_endpoint(websocket: WebSocket, computer_id: int):
+    await manager.connect(websocket, computer_id)
+    alert = await websocket.receive_text()
+    print(alert)
+    while True:
+        await asyncio.sleep(math.inf)

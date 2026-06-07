@@ -4,7 +4,7 @@ from utils.heart import sendBeat
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy, multiprocessing
-from utils.websocket_agent import agent_ws
+from utils.commands_websocket import agent_ws
 import asyncio
 
 
@@ -41,6 +41,10 @@ agentdata = open("./agentdata.json", "r+")
 agent_data = json.load(agentdata)
 
 
+#Alerts handler
+
+
+
 def main():
 	cagentdata = copy.deepcopy(currentAgentInfo)
 	computer_id = None
@@ -59,11 +63,10 @@ def main():
 		agentdata.truncate()
 		agentdata.close()
 	
-
 	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"], agent_data["heartbeat_interval"], server))
 	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
-	websocket = multiprocessing.Process(target=agent_ws, args=(computer_id, currentAgentInfo["is_unix"]))
-
+	commands_websocket = multiprocessing.Process(target=agent_ws, args=(computer_id, currentAgentInfo["is_unix"]))
+	alerts = multiprocessing.Process(target=agent_ws, args=(computer_id, currentAgentInfo["is_unix"], ))
 	try:
 		beat.start()
 		updates.start()
