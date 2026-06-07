@@ -48,6 +48,7 @@ class ComputerInfo(Base):
 	netinfo = relationship("networkingInfo", back_populates="computer")
 	disksinfo = relationship("disksInfo", back_populates="computer")
 	computerusers = relationship("computerUsers", back_populates="computer")
+	usb_devices = relationship("usbInfo", back_populates="computer")
 
 
 class MemoryInfo(Base):
@@ -113,7 +114,7 @@ class usbInfo(Base):
 	computer_id = mapped_column(
         ForeignKey("computerInfo.computer_id")
     )
-    computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="usb_devices")
-    device_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    vendor_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
-    product_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
+	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="usb_devices")
+	device_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+	vendor_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
+	product_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)

@@ -78,20 +78,20 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         )
         disks.append(disksInfo)
     usbDev = []
-    for k, v in computer.usb_devices.items():
+    for dev in computer.usb_devices:
         deviceInfo = dbschema.usbInfo(
-            computer = newComputer,
-            vendor_id = k,
-            product_id = v
-        )
+                computer = newComputer,
+                vendor_id = dev["vendor_id"],
+                product_id = dev["product_id"]
+            )
         usbDev.append(deviceInfo)
     db.add_all([newComputer, MemInfo])
     db.add_all(interfaces)
     db.add_all(processes)
     db.add_all(disks)
     db.add_all(users)
-    db.add_all()
-    db.commit(usbDev)
+    db.add_all(usbDev)
+    db.commit()
     added_info = {"computer_id": newComputer.computer_id, "computername" : newComputer.computername, "added_on": datetime.now()}
     return added_info
 

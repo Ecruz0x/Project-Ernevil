@@ -102,17 +102,15 @@ class Computer:
 	def getMAC() -> str:
 		return getmac.get_mac_address()
 
-	def getUSBDevices(self) -> str:
-		usbDev = {}
-		if self.is_unix:
-			devices = usb.core.find(find_all=True)
-			for device in devices:
-				usbDev["vendor_id"] = hex(device.idVendor)
-				usbDev["product_id"] = hex(device.idProduct)
-		else:
-			#shutil.copy("./required_drivers/*", "C:\\Windows\\System32")
-			devices = usb.core.find(find_all=True)
-			for device in devices:
-				usbDev["vendor_id"] = hex(device.idVendor)
-				usbDev["product_id"] = hex(device.idProduct)
-		return usbDev
+	def getUSBDevices(self) -> list[dict]:
+	    usb_devices = []
+
+	    devices = usb.core.find(find_all=True)
+
+	    for device in devices:
+	        usb_devices.append({
+	            "vendor_id": hex(device.idVendor),
+	            "product_id": hex(device.idProduct)
+	        })
+
+	    return usb_devices

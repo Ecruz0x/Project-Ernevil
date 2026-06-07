@@ -15,10 +15,11 @@ class Computer(BaseModel):
 	memory: dict
 	disks: dict
 	ip_addr: dict							# IP Address per Interface
-	processes: list	
+	processes: list
 	boot_time: datetime
 	node_machineid: str
 	fingerprint: str
+	usb_devices: list
 
 
 class CreateComputer(Computer):
