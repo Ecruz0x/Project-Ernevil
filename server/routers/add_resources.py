@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
 from ..schemas.add_rs_schema import ComputerCreated, CreateComputer
-from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
+from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo, usbInfo
 from datetime import datetime
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
@@ -77,14 +77,26 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
             fstype = v['fstype']
         )
         disks.append(disksInfo)
+    usbDev = []
+    for k, v in computer.usb_devices.items():
+        deviceInfo = dbschema.usbInfo(
+            computer = newComputer,
+            vendor_id = k,
+            product_id = v
+        )
+        usbDev.append(deviceInfo)
     db.add_all([newComputer, MemInfo])
     db.add_all(interfaces)
     db.add_all(processes)
     db.add_all(disks)
     db.add_all(users)
-    db.commit()
-    added_info = {"computer_id": newComputer.computer_id, "computername" : newComputer.computername, "added_on": newComputer.added_on}
+    db.add_all()
+    db.commit(usbDev)
+    added_info = {"computer_id": newComputer.computer_id, "computername" : newComputer.computername, "added_on": datetime.now()}
     return added_info
+
+
+
 
 """CPUInfo = dbschema.CPUInfo(
         computer=newComputer,

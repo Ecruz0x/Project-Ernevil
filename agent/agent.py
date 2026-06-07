@@ -29,7 +29,8 @@ currentAgentInfo = {
 	"processes": localComputer.getProcesses(),
 	"boot_time": localComputer.getBootTime(),
 	"node_machineid": localComputer.getMachineId(),
-	"fingerprint": fp(localComputer.getMachineId())
+	"fingerprint": fp(localComputer.getMachineId()),
+	"usb_devices": localComputer.getUSBDevices()
 }
 
 

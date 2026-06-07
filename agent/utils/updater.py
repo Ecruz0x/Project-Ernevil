@@ -229,6 +229,9 @@ def updateBootTime(computer_id: int, fingerprint: str):
 	if currentBT != storedBT:
 		requests.patch(f"{server}/api/computers/bt", json={"computer_id": computer_id, "fingerprint": fingerprint, "boottime": currentBT})
 
+def updateUSBInfo(computer_id: int, fingerprint: str):
+	pass
+
 def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int):
 	while True:
 		uMem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)

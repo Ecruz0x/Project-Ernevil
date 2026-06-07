@@ -76,3 +76,9 @@ class CUsersInfo(BaseModel):
 class CPUInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	usage: float
+
+class usbInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	computer_id: int
+	vendor_id: str
+	product_id: str

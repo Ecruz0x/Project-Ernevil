@@ -1,5 +1,9 @@
 import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, platform, getmac
 from datetime import datetime
+import wmi
+import usb.core
+import usb.util
+
 
 
 
@@ -97,3 +101,18 @@ class Computer:
 	@staticmethod
 	def getMAC() -> str:
 		return getmac.get_mac_address()
+
+	def getUSBDevices(self) -> str:
+		usbDev = {}
+		if self.is_unix:
+			devices = usb.core.find(find_all=True)
+			for device in devices:
+				usbDev["vendor_id"] = hex(device.idVendor)
+				usbDev["product_id"] = hex(device.idProduct)
+		else:
+			#shutil.copy("./required_drivers/*", "C:\\Windows\\System32")
+			devices = usb.core.find(find_all=True)
+			for device in devices:
+				usbDev["vendor_id"] = hex(device.idVendor)
+				usbDev["product_id"] = hex(device.idProduct)
+		return usbDev

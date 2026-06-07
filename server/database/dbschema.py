@@ -107,3 +107,13 @@ class computerUsers(Base):
 	userid: Mapped[int] = mapped_column(Integer, primary_key=True)
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="computerusers")
 	username: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
+
+class usbInfo(Base):
+	__tablename__ = "usb_devices"
+	computer_id = mapped_column(
+        ForeignKey("computerInfo.computer_id")
+    )
+    computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="usb_devices")
+    device_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    vendor_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
+    product_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
