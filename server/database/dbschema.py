@@ -116,5 +116,7 @@ class usbInfo(Base):
     )
 	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="usb_devices")
 	device_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+	manufacturer: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
+	product: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
 	vendor_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
 	product_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)

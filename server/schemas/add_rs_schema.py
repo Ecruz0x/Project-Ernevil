@@ -19,7 +19,7 @@ class Computer(BaseModel):
 	boot_time: datetime
 	node_machineid: str
 	fingerprint: str
-	usb_devices: list
+	usb_devices: list[dict]
 
 
 class CreateComputer(Computer):
@@ -81,5 +81,7 @@ class CPUInfo(BaseModel):
 class usbInfo(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	computer_id: int
+	manufacturer: Optional[str] = "Unknown"
+	product: Optional[str] = "Unknown"
 	vendor_id: str
 	product_id: str

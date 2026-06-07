@@ -103,14 +103,33 @@ class Computer:
 		return getmac.get_mac_address()
 
 	def getUSBDevices(self) -> list[dict]:
-	    usb_devices = []
+		usb_devices = []
+		devices = usb.core.find(find_all=True)
+		for device in devices:
+			try:
+				manufacturer = usb.util.get_string(device, device.iManufacturer)
+				product = usb.util.get_string(device, device.iProduct)
+			except Exception as e:
+				manufacturer = "Unknown"
+				product = "Unknown"
 
-	    devices = usb.core.find(find_all=True)
+			usb_devices.append({
+				"manufacturer": manufacturer,
+				"product": product,
+				"vendor_id": hex(device.idVendor),
+				"product_id": hex(device.idProduct)
+				})
 
-	    for device in devices:
-	        usb_devices.append({
-	            "vendor_id": hex(device.idVendor),
-	            "product_id": hex(device.idProduct)
-	        })
+		return usb_devices
 
-	    return usb_devices
+import usb.core
+import usb.util
+
+for device in usb.core.find(find_all=True):
+    try:
+        manufacturer = usb.util.get_string(device, device.iManufacturer)
+        product = usb.util.get_string(device, device.iProduct)
+
+        print(f"{manufacturer} - {product}")
+    except Exception as e:
+        print(f"Unknown device: {e}")

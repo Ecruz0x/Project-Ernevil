@@ -81,6 +81,8 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
     for dev in computer.usb_devices:
         deviceInfo = dbschema.usbInfo(
                 computer = newComputer,
+                manufacturer = dev["manufacturer"],
+                product = dev["product"],
                 vendor_id = dev["vendor_id"],
                 product_id = dev["product_id"]
             )
