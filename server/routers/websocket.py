@@ -6,11 +6,12 @@ import math
 
 
 router = APIRouter()
-manager = connection_manager.ConnectionManager()
+agent_ws = connection_manager.ConnectionManager()
+frontend_ws = connection_manager.ConnectionManager()
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
-    await manager.connect(websocket, computer_id)
+    await agent_ws.connect(websocket, computer_id)
 
     while True:
         alerts = await websocket.receive_text()
@@ -20,8 +21,8 @@ async def websocket_endpoint(websocket: WebSocket, computer_id: int):
 @router.post("/commands")
 async def execCommands(commandBody: CommandRequest):
     try:
-        websocket = manager.active_connections[commandBody.computer_id]
-        await manager.send_specific_message(commandBody.command, websocket)
+        websocket = agent_ws.active_connections[commandBody.computer_id]
+        await agent_ws.send_specific_message(commandBody.command, websocket)
         response = await websocket.receive_text()
         return {"result": response}
     except KeyError as e:
@@ -37,8 +38,8 @@ def captureSc(computer_id: int):
 @router.post("/shutdown")
 async def shutDownComputer(computer: ShutdownComputer):
     try:
-        websocket = manager.active_connections[computer.computer_id]
-        await manager.send_specific_message("shutdown now", websocket)
+        websocket = agent_ws.active_connections[computer.computer_id]
+        await agent_ws.send_specific_message("shutdown now", websocket)
         response = await websocket.receive_text()
         return {"result": response}
     except KeyError as e:
@@ -50,8 +51,8 @@ async def shutDownComputer(computer: ShutdownComputer):
 @router.post("/restart")
 async def restartComputer(computer: RestartComputer):
     try:
-        websocket = manager.active_connections[computer.computer_id]
-        await manager.send_specific_message("sudo reboot", websocket)
+        websocket = agent_ws.active_connections[computer.computer_id]
+        await agent_ws.send_specific_message("sudo reboot", websocket)
         response = await websocket.receive_text()
         return {"result": response}
     except KeyError as e:
@@ -63,8 +64,11 @@ async def restartComputer(computer: RestartComputer):
 
 @router.websocket("/ws/alert")
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
-    await manager.connect(websocket, computer_id)
-    alert = await websocket.receive_text()
-    print(alert)
+    await agent_ws.connect(websocket, computer_id)
+    await frontend_ws.connect(websocket)
     while True:
-        await asyncio.sleep(math.inf)
+        try:
+            alert = await websocket.receive_text()
+
+        except Exception as e:
+            pass

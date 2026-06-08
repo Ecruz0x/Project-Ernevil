@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import subprocess
 import time
-from websockets_init import agentWebsocket
+from .websockets_init import agentWebsocket
                 
 
 def commands_ws_client(computer_id: int, is_unix: bool):
