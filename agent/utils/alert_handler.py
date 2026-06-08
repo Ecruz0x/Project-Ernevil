@@ -1,5 +1,5 @@
-from usb_monitor import startUSBMonitoring
-from websockets_init import agentWebsocket
+from .usb_monitor import startUSBMonitoring
+from .websockets_init import agentWebsocket
 import asyncio
 
 

@@ -65,14 +65,14 @@ def main():
 		agentdata.close()
 	
 	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"], agent_data["heartbeat_interval"], server))
-	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
 	commands_websocket = multiprocessing.Process(target=commands_ws_client, args=(computer_id, currentAgentInfo["is_unix"]))
 	usbalerts = multiprocessing.Process(target=start_usb_alerts, args=(computer_id, currentAgentInfo["is_unix"], ))
+	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
 	try:
-		beat.start()
-		updates.start()
 		commands_websocket.start()
 		usbalerts.start()
+		beat.start()
+		updates.start()
 	except KeyboardInterrupt:
 		exit(1)
 

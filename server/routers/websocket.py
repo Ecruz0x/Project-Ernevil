@@ -13,9 +13,6 @@ frontend_ws = connection_manager.ConnectionManager()
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
     await agent_ws.connect(websocket, computer_id)
 
-    while True:
-        alerts = await websocket.receive_text()
-        await asyncio.sleep(60)
 
 
 @router.post("/commands")
@@ -64,11 +61,13 @@ async def restartComputer(computer: RestartComputer):
 
 @router.websocket("/ws/alert")
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
-    await agent_ws.connect(websocket, computer_id)
-    await frontend_ws.connect(websocket)
+    if computer_id == 9619:
+        await frontend_ws.connect(websocket, computer_id)
+    else:
+        await agent_ws.connect(websocket, computer_id)
     while True:
         try:
-            alert = await websocket.receive_text()
-
+            agent_alerts = await agent_ws.recv_text(websocket)
+            frontend_ws.send_specific_message(agent_alerts, websocket)
         except Exception as e:
             pass
