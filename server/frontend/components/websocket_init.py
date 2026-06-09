@@ -26,6 +26,5 @@ class frontendWebsocket:
 				print("Websockets Error, Retrying connection...")
 
 	async def receiveAlerts(self):
-		while True:
-			msg = await self.ws.recv()
-			yield msg
+		msg = await self.ws.recv()
+		yield msg

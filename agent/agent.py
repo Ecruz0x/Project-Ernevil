@@ -5,7 +5,7 @@ from utils.alert_handler import start_usb_alerts
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy, multiprocessing
-from utils.commands_websocket import commands_ws_client
+from utils.commands_websocket import launchCmdWS
 import asyncio
 
 
@@ -65,7 +65,7 @@ def main():
 		agentdata.close()
 	
 	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"], agent_data["heartbeat_interval"], server))
-	commands_websocket = multiprocessing.Process(target=commands_ws_client, args=(computer_id, currentAgentInfo["is_unix"]))
+	commands_websocket = multiprocessing.Process(target=launchCmdWS, args=(computer_id, currentAgentInfo["is_unix"]))
 	usbalerts = multiprocessing.Process(target=start_usb_alerts, args=(computer_id, currentAgentInfo["is_unix"], ))
 	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
 	try:

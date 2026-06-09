@@ -23,7 +23,7 @@ class ConnectionManager:
 
     async def recv_text(self, websocket):
         if websocket in self.active_connections.values():
-            await websocket.receive_text()
+            return await websocket.receive_text()
         else:
             raise ValueError("Websocket not found error.")
 

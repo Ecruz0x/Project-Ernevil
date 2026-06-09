@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, HTTPException, status
+from fastapi import APIRouter, WebSocket, HTTPException, status, WebSocketDisconnect
 from ..utils import connection_manager
 import asyncio
 from ..schemas.executors_schemas import CommandRequest, RestartComputer, ShutdownComputer
@@ -12,7 +12,11 @@ frontend_ws = connection_manager.ConnectionManager()
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
     await agent_ws.connect(websocket, computer_id)
-
+    while True:
+        try:
+            await asyncio.sleep(float("inf"))
+        except KeyboardInterrupt:
+            break
 
 
 @router.post("/commands")
@@ -63,11 +67,17 @@ async def restartComputer(computer: RestartComputer):
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
     if computer_id == 9619:
         await frontend_ws.connect(websocket, computer_id)
+        try:
+            await websocket.receive_text()
+        except WebSocketDisconnect:
+            pass
     else:
         await agent_ws.connect(websocket, computer_id)
-    while True:
+
         try:
-            agent_alerts = await agent_ws.recv_text(websocket)
-            frontend_ws.send_specific_message(agent_alerts, websocket)
-        except Exception as e:
-            pass
+            while True:
+                alert = await websocket.receive_text()
+                #await frontend_ws.broadcast(alert)
+
+        except WebSocketDisconnect as e:
+            print(e)

@@ -1,4 +1,4 @@
-from .usb_monitor import startUSBMonitoring
+from .usb_monitor import launchUsbMon
 from .websockets_init import agentWebsocket
 import asyncio
 
@@ -8,12 +8,12 @@ async def send_usb_alerts(computer_id: int, is_unix: bool):
 
 	ws = agentWebsocket(computer_id, is_unix, uri)
 	await ws.initializeSocket()
-
-	async for event_type, device_info in startUSBMonitoring():
-		await ws.send_alert(type = "alert", category = "USB device event", manufacturer = device_info['manufacturer'], product = device_info['product'], message = f"USB device {event_type}ed")
+	while True:
+		async for event_type, device_info in launchUsbMon():
+			await ws.send_alert(type = "alert", category = "USB device event", manufacturer = device_info['manufacturer'], product = device_info['product'], message = f"USB device {event_type}ed")
 
 
 
 def start_usb_alerts(computer_id: int, is_unix: bool):
-	asyncio.run(send_usb_alerts(1, False))
+	asyncio.run(send_usb_alerts(computer_id, is_unix))
 
