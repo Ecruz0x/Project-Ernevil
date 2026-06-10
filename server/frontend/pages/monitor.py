@@ -41,16 +41,57 @@ if computers:
         os = rcmpb.json()["os"]
     else:
         boottime = "Unavailable"
+    @st.fragment(run_every="5s")
+    def live_metrics():
+        cols = st.columns(3)
+        rmem = requests.get(f"http://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}")
+        if rmem.status_code == 200:
+            memdata = rmem.json()["usage"]
+            memdata = str(memdata) + "%"
+        else:
+            memdata = "Unavailable"
 
-    cols = st.columns(3)
-    with cols[0]:
-        ui.metric_card(title="CPU Usage", content=v, description="Current CPU usage", key="cpu")
-    with cols[1]:
-        ui.metric_card(title="Memory Usage", content=memdata, description="Current memory usage", key="ram")
-    with cols[2]:
-        ui.metric_card(title="Boot time", content=boottime, description=f"When {choice} was last started", key="ladev")
+        rcmpb = requests.get(f"http://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}")
+        if rcmpb.status_code == 200:
+            boottime = rcmpb.json()["boottime"]
+            os = rcmpb.json()["os"]
+        else:
+            boottime = "Unavailable"
+
+        with cols[0]:
+            ui.metric_card(title="CPU Usage", content=v, description="Current CPU usage", key="cpu")
+        with cols[1]:
+            ui.metric_card(title="Memory Usage", content=memdata, description="Current memory usage", key="ram")
+        with cols[2]:
+            ui.metric_card(title="Boot time", content=boottime, description=f"When {choice} was last started", key="ladev")
+
+    live_metrics()
 
 
+    ps_count = len(requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}").json())
+    @st.fragment(run_every="15s")
+    def processes_scraper():
+        # Processes scraper
+        try:
+            rps = requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}")
+            if rps.status_code == 200:
+                ps_data = rps.json()
+            data_ps = []
+            for ps in ps_data:
+                temp_d = {}
+                temp_d["PID"] = str(ps["pid"])
+                temp_d["Process"] = ps["name"]
+                temp_d["User"] = ps["username"] if ps["username"] else "Null"
+                data_ps.append(temp_d)
+
+            ps_df = pd.DataFrame(data_ps)
+            AgGrid(
+                ps_df,
+                fit_columns_on_grid_load=True,
+                enable_enterprise_modules=True
+            )
+        except Exception as e:
+            return st.write("Unknown Error, please refresh the page and try again.")
     # Users scraper
     try:
         rusers = requests.get(f"http://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}")
@@ -59,14 +100,6 @@ if computers:
     except Exception as e:
         st.write("Unknown Error, please refresh the page and try again.")
         
-    # Processes scraper
-    try:
-        rps = requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}")
-        if rps.status_code == 200:
-            ps_data = rps.json()
-    except Exception as e:
-        st.write("Unknown Error, please refresh the page and try again.")
-
     # Disks scraper
     try:
         rdsk = requests.get(f"http://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}")
@@ -84,7 +117,7 @@ if computers:
         st.write("Unknown Error, please refresh the page and try again.")
 
     data = [
-        {"Users count": str(len(users)), "Disks count": str(len(dsk_data)), "Processes Count": str(len(ps_data)), "OS": os},
+        {"Users count": str(len(users)), "Disks count": str(len(dsk_data)), "Processes Count": str(ps_count), "OS": os},
     ]
 
     df_general = pd.DataFrame(data)
@@ -92,22 +125,7 @@ if computers:
     st.table(df_general)
 
     st.html(f"<h3>Processes</h3><p style='font-size: 17px;'>Visualize and analyze processes on <strong>{choice}</strong></p>")
-    data_ps = []
-    for ps in ps_data:
-        temp_d = {}
-        temp_d["PID"] = str(ps["pid"])
-        temp_d["Process"] = ps["name"]
-        temp_d["User"] = ps["username"] if ps["username"] else "Null"
-        data_ps.append(temp_d)
-
-    ps_df = pd.DataFrame(data_ps)
-    AgGrid(
-        ps_df,
-        fit_columns_on_grid_load=True,
-        enable_enterprise_modules=True
-    )
-
-
+    processes_scraper()
     st.html(f"<h3>Disks</h3>")
     disk_data = []
 

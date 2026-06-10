@@ -40,7 +40,7 @@ generateComputerReports = st.Page(
 )
 
 networkAlerts = st.Page(
-	"pages/netalerts.py", title="Network Alerts", icon=":material/notification_important:"
+	"pages/netalerts.py", title="Alerts and Notifications", icon=":material/notification_important:"
 )
 
 

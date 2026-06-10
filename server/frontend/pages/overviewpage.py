@@ -45,10 +45,13 @@ st.header("Current metrics")
 try:
     rcmp = requests.get("http://127.0.0.1:8000/api/computers")
     rloc = requests.get("http://127.0.0.1:8000/api/locations/get_locations")
+    ralerts = requests.get("http://127.0.0.1:8000/api/get_alerts")
+    alerts = ralerts.json()
     if rcmp.status_code == 200 and rloc.status_code == 200:
         cmps = rcmp.json()
         if len(cmps) >= 1:
             last_added = cmps[-1]["computername"]
+
         
             loc = len(rloc.json())
             cols = st.columns(3)
@@ -61,7 +64,8 @@ try:
 
             nxtcols = st.columns(1)
             with nxtcols[0]:
-            	ui.metric_card(title="Last Alert", content=5, description="Last detected alert", key="laalert")
+                name = [computer["computername"] for computer in cmps if alerts[-1]["computer_id"] == computer["computer_id"]]
+                ui.metric_card(title="Last Alert", content=f"{alerts[-1]['event']} on {name[0]}", description="Last detected alert", key="laalert")
 
         else:
             st.error(
@@ -72,3 +76,5 @@ except Exception as e:
     st.error(
         "Failed to communicate with the web server. This may be caused by an invalid configuration, network issue, or server unavailability. Please verify your settings and retry."
     )
+
+
