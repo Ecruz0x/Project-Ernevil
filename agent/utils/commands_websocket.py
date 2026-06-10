@@ -16,3 +16,4 @@ async def commands_ws_client(computer_id: int, is_unix: bool):
 
 def launchCmdWS(computer_id: int, is_unix: bool):
     asyncio.run(commands_ws_client(computer_id, is_unix))
+    
