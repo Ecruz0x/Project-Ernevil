@@ -3,32 +3,35 @@ from streamlit_extras.resizable_columns import resizable_columns
 from streamlit_extras.card_selector import *
 import streamlit_shadcn_ui as ui
 import requests, random
+from streamlit_autorefresh import st_autorefresh
 
-
+count = st_autorefresh(interval=10000, key="bootstraptimer")
 
 st.header("Detected Alerts")
-st.html("<h3>Alerts identified by the system will appear here.</h3>")
+st.html("<h3>ASystem-generated alerts appear here in real time.</h3>")
+st.html("<h5>Review, track, and manage security events and agent notifications.</h5>")
 
 
 try:
     r = requests.get("http://127.0.0.1:8000/api/get_alerts")
     alerts = r.json()
-    for i in range(len(alerts)):
-        if alerts[i]["type"] == "USB alert":
-            with st.container(border=True):
-                st.markdown(f"##### {alerts[i]['type']}")
-                st.write(alerts[i]["event"])
+    if alerts:
+        for i in range(len(alerts)):
+            if alerts[i]["type"] == "USB alert":
+                with st.container(border=True):
+                    st.markdown(f"##### {alerts[i]['type']}")
+                    st.write(alerts[i]["event"])
 
-                col1, col2 = st.columns(2)
-                idx = alerts[i]["computer_id"]
+                    col1, col2 = st.columns(2)
+                    idx = alerts[i]["computer_id"]
 
-                with col1:
-                    st.caption(f"Category: {alerts[i]['category']}")
-                    st.caption(f"Manufacturer: {alerts[i]['manufacturer']}")
+                    with col1:
+                        st.caption(f"Category: {alerts[i]['category']}")
+                        st.caption(f"Manufacturer: {alerts[i]['manufacturer']}")
 
-                with col2:
-                    st.caption(f"Product: {alerts[i]['product']}")
-                    st.caption(f"Expires: {alerts[i]['expires_at']}")
+                    with col2:
+                        st.caption(f"Product: {alerts[i]['product']}")
+                        st.caption(f"Expires: {alerts[i]['expires_at']}")
 
                     
 except Exception as e:

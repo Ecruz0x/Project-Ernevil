@@ -19,6 +19,7 @@ dependencies = [
     "st-pages>=1.0.1",
     "streamlit>=1.57.0",
     "streamlit-aggrid>=1.2.1.post2",
+    "streamlit-autorefresh>=1.0.1",
     "streamlit-code-editor>=0.1.22",
     "streamlit-extras>=1.5.0",
     "streamlit-shadcn-ui>=0.1.19",

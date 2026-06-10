@@ -274,6 +274,7 @@ dependencies = [
     { name = "st-pages" },
     { name = "streamlit" },
     { name = "streamlit-aggrid" },
+    { name = "streamlit-autorefresh" },
     { name = "streamlit-code-editor" },
     { name = "streamlit-extras" },
     { name = "streamlit-shadcn-ui" },
@@ -299,6 +300,7 @@ requires-dist = [
     { name = "st-pages", specifier = ">=1.0.1" },
     { name = "streamlit", specifier = ">=1.57.0" },
     { name = "streamlit-aggrid", specifier = ">=1.2.1.post2" },
+    { name = "streamlit-autorefresh", specifier = ">=1.0.1" },
     { name = "streamlit-code-editor", specifier = ">=0.1.22" },
     { name = "streamlit-extras", specifier = ">=1.5.0" },
     { name = "streamlit-shadcn-ui", specifier = ">=0.1.19" },
@@ -2223,6 +2225,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/47/18/2b1e99ca2c803d920bbc1beb6a7c60a954f587e23a861dd44b57d00744d7/streamlit_aggrid-1.2.1.post2.tar.gz", hash = "sha256:ad186998894af9356d7fa1d6de9f324a376714583cccc31d87c8c003334089fc", size = 5669190, upload-time = "2025-12-29T14:00:34.187Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1a/dc/baec10d371834ca2fbf26a71289d73be79e031c734a9830d7cc2879aeb83/streamlit_aggrid-1.2.1.post2-py3-none-any.whl", hash = "sha256:a812274e69bc6dcdebdd390c2eca7d0502e90420b869d4abf9d74ca3af47bc51", size = 5732799, upload-time = "2025-12-29T14:00:30.524Z" },
+]
+
+[[package]]
+name = "streamlit-autorefresh"
+version = "1.0.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/88/8c/e48bee687408fe563652bda4a7f2f5ef85d5a527b1883513fdcb05f1e66b/streamlit-autorefresh-1.0.1.tar.gz", hash = "sha256:a89abf23f2c4e52d37be442115cd5566b41f382e3c09ff08817e17a25f50b8ed", size = 351385, upload-time = "2023-06-25T18:58:34.889Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/82/e378f178498f1d99a672d81df71ebe9693a106cec6a628ee52ce3288cd6d/streamlit_autorefresh-1.0.1-py3-none-any.whl", hash = "sha256:8f0a772eff9d56807d19dc422e44ef92d900bbb22b1b85de31d8d82ea7d875f1", size = 700771, upload-time = "2023-06-25T18:58:33.195Z" },
 ]
 
 [[package]]

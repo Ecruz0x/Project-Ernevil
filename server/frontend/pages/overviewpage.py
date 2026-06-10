@@ -50,9 +50,9 @@ try:
     if rcmp.status_code == 200 and rloc.status_code == 200:
         cmps = rcmp.json()
         if len(cmps) >= 1:
+
             last_added = cmps[-1]["computername"]
 
-        
             loc = len(rloc.json())
             cols = st.columns(3)
             with cols[0]:
@@ -64,8 +64,10 @@ try:
 
             nxtcols = st.columns(1)
             with nxtcols[0]:
-                name = [computer["computername"] for computer in cmps if alerts[-1]["computer_id"] == computer["computer_id"]]
-                ui.metric_card(title="Last Alert", content=f"{alerts[-1]['event']} on {name[0]}", description="Last detected alert", key="laalert")
+                name = None
+                if alerts:
+                    name = [computer["computername"] for computer in cmps if alerts[-1]["computer_id"] == computer["computer_id"]]
+                ui.metric_card(title="Last Alert", content=f"{alerts[-1]['event'] if alerts else 'No recent alert detected'} on {name[0] if name else 'None'}", description="Last detected alert", key="laalert")
 
         else:
             st.error(
@@ -73,8 +75,7 @@ try:
             )
 
 except Exception as e:
+    st.html(e)
     st.error(
         "Failed to communicate with the web server. This may be caused by an invalid configuration, network issue, or server unavailability. Please verify your settings and retry."
     )
-
-

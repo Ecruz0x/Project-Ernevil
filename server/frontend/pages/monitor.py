@@ -5,6 +5,13 @@ from code_editor import code_editor
 import requests, time
 from st_aggrid import AgGrid
 
+
+def mapComputers(computers):
+    computer_map = {}
+    for computer in computers:
+        computer_map[computer["computername"]] = computer["computer_id"]
+    return computer_map
+
 rcmp = requests.get("http://127.0.0.1:8000/api/computers/live")
 if rcmp.status_code == 200:
     computers = rcmp.json()
@@ -16,10 +23,8 @@ st.header("Monitor your infrastructure")
 
 if computers:
     st.html("<h2>Select a device (only online devices are displayed)</h2>")
-    computer_map = {}
-    for computer in computers:
-        computer_map[computer["computername"]] = computer["computer_id"]
-
+    computer_map = mapComputers(computers)
+    
     choice = ui.select(options=computer_map.keys())
 
 
@@ -41,8 +46,10 @@ if computers:
         os = rcmpb.json()["os"]
     else:
         boottime = "Unavailable"
+
+
     @st.fragment(run_every="5s")
-    def live_metrics():
+    def live_metrics(choice):
         cols = st.columns(3)
         rmem = requests.get(f"http://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}")
         if rmem.status_code == 200:
@@ -65,7 +72,7 @@ if computers:
         with cols[2]:
             ui.metric_card(title="Boot time", content=boottime, description=f"When {choice} was last started", key="ladev")
 
-    live_metrics()
+    live_metrics(choice)
 
 
     ps_count = len(requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}").json())
@@ -158,15 +165,20 @@ if computers:
     # Commands execution
     st.html(f"<h2>Execute shell commands on {choice}</h2>")
     response = code_editor("# Write You commands here", response_mode="debounce")
-
+    computers = requests.get("http://127.0.0.1:8000/api/computers/live").json()
     if st.button("Execute"):
-        rcmds = requests.post("http://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text']})
-        result = rcmds.json()["result"]
-        if result:
-            output = str(result)
-            st.code(output)
+        computer_map = mapComputers(computers)
+        if choice in computer_map.keys():
+            rcmds = requests.post("http://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text']})
+            try:
+                result = rcmds.json()["result"]
+                output = str(result)
+                st.code(output)
+            except Exception as e:
+                st.code("Execution error, please check your agents and try again.")
         else:
-            st.code("Execution error, please check your command and try again.")
+            st.code("Execution error, please check your agents and try again.")
+            st.rerun()
 
     st.html(f"<h2>Open a remote session on {choice}</h2>")
 

@@ -29,16 +29,17 @@ async def websocket_endpoint(websocket: WebSocket, computer_id: int):
 
 @router.post("/commands")
 async def execCommands(commandBody: CommandRequest):
+    websocket = agent_ws.active_connections[commandBody.computer_id]
+    await agent_ws.send_specific_message(commandBody.command, websocket)
     try:
-        websocket = agent_ws.active_connections[commandBody.computer_id]
-        await agent_ws.send_specific_message(commandBody.command, websocket)
-        response = await websocket.receive_text()
+        response = await asyncio.wait_for(
+            websocket.receive_text(),
+            timeout=5
+        )
         return {"result": response}
-    except KeyError as e:
-        raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="websocket not found",
-        ) 
+    except asyncio.TimeoutError:
+        return {"result": "Execution timed out"}
+
 
 @router.post("/screenshot")
 def captureSc(computer_id: int):
