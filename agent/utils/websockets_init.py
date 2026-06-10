@@ -59,10 +59,10 @@ class agentWebsocket:
 				else:
 					await self.ws.send("Command Failed!")
 
-	async def send_alert(self, type, category, message, **kwargs):
+	async def send_alert(self, type, category, event, **kwargs):
 		await self.ws.send(json.dumps({
 			"type": type,
 			"category": category,
-			"message": message,
+			"event": event,
 			**kwargs
 		}))

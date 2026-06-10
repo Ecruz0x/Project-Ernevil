@@ -2,12 +2,20 @@ from fastapi import APIRouter, WebSocket, HTTPException, status, WebSocketDiscon
 from ..utils import connection_manager
 import asyncio
 from ..schemas.executors_schemas import CommandRequest, RestartComputer, ShutdownComputer
-import math
+import math, os, json
+from datetime import datetime, timedelta
+from tinydb import TinyDB, Query
 
 
 router = APIRouter()
 agent_ws = connection_manager.ConnectionManager()
-frontend_ws = connection_manager.ConnectionManager()
+
+
+ndb_path = './database/notifications.json'
+os.makedirs(os.path.dirname(ndb_path), exist_ok=True)
+db = TinyDB(ndb_path)
+UserQuery = Query()
+
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, computer_id: int):
@@ -64,20 +72,29 @@ async def restartComputer(computer: RestartComputer):
 
 
 @router.websocket("/ws/alert")
-async def websocket_endpoint(websocket: WebSocket, computer_id: int):
-    if computer_id == 9619:
-        await frontend_ws.connect(websocket, computer_id)
-        try:
-            await websocket.receive_text()
-        except WebSocketDisconnect:
-            pass
-    else:
-        await agent_ws.connect(websocket, computer_id)
+async def websocket_endpoint(websocket: WebSocket, computer_id: int, status_code=status.HTTP_201_CREATED):
+    
+    await agent_ws.connect(websocket, computer_id)
 
-        try:
-            while True:
-                alert = await websocket.receive_text()
-                #await frontend_ws.broadcast(alert)
+    try:
+        while True:
+            alert = await websocket.receive_text()
+            alertd = json.loads(alert)
+            expire_time = datetime.now() + timedelta(hours=1)
+            alertd['expires_at'] = expire_time.isoformat()
+            db.insert(alertd)
+    except WebSocketDisconnect as e:
+        print(e)
 
-        except WebSocketDisconnect as e:
-            print(e)
+
+@router.get("/get_alerts")
+async def getAlerts():
+    try:
+        now_str = datetime.now().isoformat()
+        active_notifications = db.search(lambda doc: doc['expires_at'] > now_str)
+        return active_notifications
+    except Exception as e:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=e,
+        )

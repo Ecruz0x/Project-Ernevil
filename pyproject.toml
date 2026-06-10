@@ -22,6 +22,8 @@ dependencies = [
     "streamlit-code-editor>=0.1.22",
     "streamlit-extras>=1.5.0",
     "streamlit-shadcn-ui>=0.1.19",
+    "tinydb>=4.8.2",
     "usb-monitor>=1.23",
+    "uvicorn>=0.46.0",
     "websockets>=16.0",
 ]
