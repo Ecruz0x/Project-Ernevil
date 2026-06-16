@@ -16,14 +16,14 @@ model = joblib.load("utils/ml_ids/models/bestmodel.pkl")
 now = datetime.now()
 sql_format = now.strftime('%Y-%m-%d %H:%M:%S')
 
-alerts = Queue()
 
 def flow_verify(details):
     prediction = model.predict([details])
-
+    print(details)
     if prediction[0] != "Benign":
-        alerts.put_nowait({
-            "src_port": details["src_port"],
-            "protocol": details["protocol"],
+        print(prediction)
+        return {
+            "src_port": details[0],
+            "protocol": details[2],
             "event": prediction[0]
-        })
+        }

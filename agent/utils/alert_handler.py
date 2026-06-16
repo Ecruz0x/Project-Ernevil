@@ -1,7 +1,8 @@
 from .usb_monitor import launchUsbMon
 from .websockets_init import agentWebsocket
 import asyncio
-from .ml_ids.start_ids import alerts
+from .ml_ids.start_ids import flow_verify
+from .ml_ids.netsniffer import capture_and_flow_control as capture
 
 
 async def send_usb_alerts(computer_id: int, is_unix: bool):
@@ -16,19 +17,14 @@ async def send_usb_alerts(computer_id: int, is_unix: bool):
 
 async def send_traffic_alerts(computer_id: int, active_int: str, is_unix: bool):
 	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}"
-	try:
-		while True:
-			details = await alerts.get()
-			print(details)
-			details = details + {"type": "Network Alert"}
-			await websocket.send_json(details)
-	except Exception as e:
-		ws = agentWebsocket(computer_id, is_unix, uri)
-		await ws.initializeSocket()
-		while True:
-			details = await alerts.get()
-			details = details + {"type": "Network Alert"}
-			await websocket.send_json(details)
+	print("started ids")
+	ws = agentWebsocket(computer_id, is_unix, uri)
+	while True:
+		alerts = capture(active_int, flow_verify)
+		if alerts:
+			alerts["type"] = "Network Alert"
+			print(alerts)
+			await ws.send_alert(alerts)
 
 
 def start_usb_alerts(computer_id: int, is_unix: bool):
