@@ -2,6 +2,7 @@ from utils.initializer import initializeComputerInfo
 from utils.updater import sendFullUpdates
 from utils.heart import sendBeat
 from utils.alert_handler import start_usb_alerts
+from utils.alert_handler import start_ids
 from collectors.computer_info import Computer
 from utils.fingerprint import fingerprint as fp
 import sys, time, json, requests, copy, multiprocessing
@@ -68,11 +69,14 @@ def main():
 	commands_websocket = multiprocessing.Process(target=launchCmdWS, args=(computer_id, currentAgentInfo["is_unix"]))
 	usbalerts = multiprocessing.Process(target=start_usb_alerts, args=(computer_id, currentAgentInfo["is_unix"], ))
 	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
+	ids = multiprocessing.Process(target=start_ids, args=(computer_id, "Loopback Pseudo-Interface 1", currentAgentInfo["is_unix"]))
+	#ids = multiprocessing.Process(target=start_ids, args=(computer_id, localComputer.getActiveInterface(), currentAgentInfo["is_unix"]))
 	try:
 		commands_websocket.start()
 		usbalerts.start()
 		beat.start()
 		updates.start()
+		ids.start()
 	except KeyboardInterrupt:
 		exit(1)
 

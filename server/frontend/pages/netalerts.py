@@ -8,7 +8,7 @@ from streamlit_autorefresh import st_autorefresh
 count = st_autorefresh(interval=10000, key="bootstraptimer")
 
 st.header("Detected Alerts")
-st.html("<h3>ASystem-generated alerts appear here in real time.</h3>")
+st.html("<h3>System-generated alerts appear here in real time.</h3>")
 st.html("<h5>Review, track, and manage security events and agent notifications.</h5>")
 
 
@@ -31,6 +31,21 @@ try:
 
                     with col2:
                         st.caption(f"Product: {alerts[i]['product']}")
+                        st.caption(f"Expires: {alerts[i]['expires_at']}")
+            elif alerts[i]["type"] == "Network Alert":
+                with st.container(border=True):
+                    st.markdown(f"##### {alerts[i]['type']}")
+                    st.write("Suspected network attack detected")
+
+                    col1, col2 = st.columns(2)
+                    idx = alerts[i]["computer_id"]
+
+                    with col1:
+                        st.caption(f"Source Port: {alerts[i]['src_port']}")
+                        st.caption(f"Protocol: {alerts[i]['protocol']}")
+
+                    with col2:
+                        st.caption(f"Suspected Attack type: {alerts[i]['event']}")
                         st.caption(f"Expires: {alerts[i]['expires_at']}")
 
                     

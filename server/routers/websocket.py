@@ -80,6 +80,7 @@ async def websocket_endpoint(websocket: WebSocket, computer_id: int, status_code
     try:
         while True:
             alert = await websocket.receive_text()
+            print(alert)
             alertd = json.loads(alert)
             expire_time = datetime.now() + timedelta(hours=1)
             alertd["computer_id"] = computer_id

@@ -122,14 +122,15 @@ class Computer:
 
 		return usb_devices
 
-import usb.core
-import usb.util
+	@staticmethod
+	def getActiveInterface() -> str:
+		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		s.connect(("8.8.8.8", 80))
+		local_ip = s.getsockname()[0]
+		s.close()
+		for iface, addrs in psutil.net_if_addrs().items():
+			for addr in addrs:
+				if addr.family == socket.AF_INET and addr.address == local_ip:
+					return iface
 
-for device in usb.core.find(find_all=True):
-    try:
-        manufacturer = usb.util.get_string(device, device.iManufacturer)
-        product = usb.util.get_string(device, device.iProduct)
-
-        print(f"{manufacturer} - {product}")
-    except Exception as e:
-        print(f"Unknown device: {e}")
+		return None
