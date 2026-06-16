@@ -5,7 +5,7 @@ from .ml_ids.start_ids import alerts
 
 
 async def send_usb_alerts(computer_id: int, is_unix: bool):
-	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}"
+	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=alert_ws"
 
 	ws = agentWebsocket(computer_id, is_unix, uri)
 	await ws.initializeSocket()

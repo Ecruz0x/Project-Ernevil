@@ -1,6 +1,5 @@
-import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, platform, getmac
+import psutil, ifaddr, ipaddress, requests, os, json, socket, machineid, uuid, platform, getmac, pwd
 from datetime import datetime
-import wmi
 import usb.core
 import usb.util
 
@@ -16,6 +15,7 @@ class Computer:
 			import pwd
 			self.is_unix = True
 		else:
+			import wmi
 			self.is_unix = False
 
 	def getActiveUsers(self) -> list[str]:

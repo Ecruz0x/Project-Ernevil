@@ -28,7 +28,6 @@ class agentWebsocket:
 	async def receiveCommands(self):
 		while True:
 			msg = await self.ws.recv()
-
 			if self.is_unix:
 				result = subprocess.run(
 					msg.split(),

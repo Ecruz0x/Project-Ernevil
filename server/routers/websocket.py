@@ -18,25 +18,35 @@ UserQuery = Query()
 
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, computer_id: int):
-    await agent_ws.connect(websocket, computer_id)
+async def websocket_endpoint(websocket: WebSocket, computer_id: int, wstype: str):
+    
+    await agent_ws.connect(websocket, computer_id, wstype)
     while True:
-        try:
-            await asyncio.sleep(float("inf"))
-        except KeyboardInterrupt:
-            break
+        message = await agent_ws.recv_text(websocket)
+
+        future = agent_ws.pending_responses.get(computer_id)
+
+        if future and not future.done():
+            future.set_result(message)
+
 
 
 @router.post("/commands")
 async def execCommands(commandBody: CommandRequest):
-    websocket = agent_ws.active_connections[commandBody.computer_id]
-    await agent_ws.send_specific_message(commandBody.command, websocket)
+    websocket = agent_ws.command_connections[commandBody.computer_id]
+    future = asyncio.Future()
+    agent_ws.pending_responses[commandBody.computer_id] = future
+#    print(f"Sending command: {commandBody.command}")
+    await websocket.send_text(commandBody.command)
+#    print("Command sent successfully")
     try:
-        response = await asyncio.wait_for(
-            websocket.receive_text(),
+        result = await asyncio.wait_for(
+            future,
             timeout=5
         )
-        return {"result": response}
+
+        return {"result": result}
+
     except asyncio.TimeoutError:
         return {"result": "Execution timed out"}
 
@@ -73,14 +83,15 @@ async def restartComputer(computer: RestartComputer):
 
 
 @router.websocket("/ws/alert")
-async def websocket_endpoint(websocket: WebSocket, computer_id: int, status_code=status.HTTP_201_CREATED):
-    
-    await agent_ws.connect(websocket, computer_id)
+async def alert_endpoint(websocket: WebSocket, computer_id: int, wstype: str):
+    await websocket.accept()
+
+    agent_ws.alert_connections[computer_id] = websocket
 
     try:
         while True:
-            alert = await websocket.receive_text()
-            print(alert)
+            ws = agent_ws.alert_connections[computer_id]
+            alert = await ws.receive_text()
             alertd = json.loads(alert)
             expire_time = datetime.now() + timedelta(hours=1)
             alertd["computer_id"] = computer_id

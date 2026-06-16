@@ -69,7 +69,7 @@ def main():
 	commands_websocket = multiprocessing.Process(target=launchCmdWS, args=(computer_id, currentAgentInfo["is_unix"]))
 	usbalerts = multiprocessing.Process(target=start_usb_alerts, args=(computer_id, currentAgentInfo["is_unix"], ))
 	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"]))
-	ids = multiprocessing.Process(target=start_ids, args=(computer_id, "Loopback Pseudo-Interface 1", currentAgentInfo["is_unix"]))
+	ids = multiprocessing.Process(target=start_ids, args=(computer_id, "lo", currentAgentInfo["is_unix"]))
 	#ids = multiprocessing.Process(target=start_ids, args=(computer_id, localComputer.getActiveInterface(), currentAgentInfo["is_unix"]))
 	try:
 		commands_websocket.start()

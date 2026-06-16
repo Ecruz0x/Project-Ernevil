@@ -3,26 +3,35 @@ from fastapi.responses import HTMLResponse
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: dict = {}
+        self.command_connections = {}
+        self.alert_connections = {}
+        self.pending_responses = {}
 
-    async def connect(self, websocket: WebSocket, computer_id: int):
+    async def connect(self, websocket: WebSocket, computer_id: int, wstype: str):
         await websocket.accept()
-        self.active_connections[computer_id] = websocket
+        if wstype == "cmd_ws":
+            self.command_connections[computer_id] = websocket
+        elif wstype == "alert_ws":
+            self.alert_connections[computer_id] = websocket
 
-    def disconnect(self, computer_id: int):
-        if websocket in self.active_connections.values():
-            del self.active_connections[computer_id]
+        print(f"CONNECTED: {computer_id}")
+
+    def disconnect(self, computer_id: int, websocket: WebSocket):
+        if websocket in self.alert_connections.values():
+            del self.alert_connections[computer_id]
+        elif websocket in self.command_connections.values():
+            del self.command_connections[computer_id]
         else:
             raise ValueError("Websocket not found error.")
 
     async def send_specific_message(self, message: str, websocket: WebSocket):
-        if websocket in self.active_connections.values():
+        if websocket in self.alert_connections.values() or websocket in self.command_connections.values():
             await websocket.send_text(message)
         else:
             raise ValueError("Websocket not found error.")
 
     async def recv_text(self, websocket):
-        if websocket in self.active_connections.values():
+        if websocket in self.alert_connections.values() or websocket in self.command_connections.values():
             return await websocket.receive_text()
         else:
             raise ValueError("Websocket not found error.")
