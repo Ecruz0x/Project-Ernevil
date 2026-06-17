@@ -1,8 +1,15 @@
-import time
+import time, threading
 from scapy.all import sniff, IP, TCP, UDP
 
 flows = {}
-FLOW_TIMEOUT = 0.2
+FLOW_TIMEOUT = 0.4
+
+cleaner_started = False
+
+def flow_cleaner(flow_check):
+    while True:
+        expire_flows(time.time(), flow_check)
+        time.sleep(0.1)
 
 
 def capture_and_flow_control(iface, flow_check):
@@ -21,13 +28,13 @@ def capture_and_flow_control(iface, flow_check):
             sport = pkt[TCP].sport
             dport = pkt[TCP].dport
             flags = pkt[TCP].flags
-            proto = "0"
+            proto = 0
             payload_len = len(pkt[TCP].payload)
 
         elif UDP in pkt:
             sport = pkt[UDP].sport
             dport = pkt[UDP].dport
-            proto = "1"
+            proto = 1
             payload_len = len(pkt[UDP].payload)
 
         else:
@@ -89,23 +96,38 @@ def capture_and_flow_control(iface, flow_check):
         if flags & 0x40: f["ece"] += 1
         if flags & 0x80: f["cwr"] += 1
 
-        return expire_flows(ts, flow_check)
+
+    global cleaner_started
+
+    if not cleaner_started:
+        threading.Thread(
+            target=flow_cleaner,
+            args=(flow_check,),
+            daemon=True
+        ).start()
+
+        cleaner_started = True
+
     sniff(iface=iface, prn=process_packet, store=False)
 
+
+flows_lock = threading.Lock()
 
 def expire_flows(now, flow_check):
     expired = []
 
-    for key, f in flows.items():
+    for key, f in list(flows.items()):
         if now - f["last"] > FLOW_TIMEOUT:
             expired.append(key)
 
     for key in expired:
-        f = flows[key]
+        f = flows.pop(key, None)
+        if f is None:
+            continue
         duration = f["last"] - f["start"]
 
         details = (f["src_port"], f["dst_port"], f["protocol"], round(duration, 5), f["packets"], f["fwd"],
                 f["bwd"], f["total_payload_bytes"], f["fwd_total_payload_bytes"], f["total_header_bytes"], f["fin"], f["psh"],
                 f["urg"], f["ece"], f["syn"], f["ack"], f["cwr"], f["rst"])
         flow_check(details)
-        del flows[key]
+
