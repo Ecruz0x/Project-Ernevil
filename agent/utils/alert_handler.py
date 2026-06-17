@@ -26,18 +26,13 @@ alert_queue = Queue()
 def flow_verify(details):
 	try:
 		prediction = model.predict([details])
-		if prediction[0] != "Benign":
+		if prediction[0] != "Benign" and prediction[0] != "Botnet_ARES":
 			alert_queue.put({
 				"src_port": details[0],
-				"protocol": details[2],
+				"protocol": "TCP" if details[2] == 0 else "UDP",
 				"event": prediction[0]
             })
-		else:
-			alert_queue.put({
-				"src_port": details[0],
-				"protocol": details[2],
-				"event": prediction[0]
-            })
+  
 
 	except Exception as e:
 		import traceback
@@ -57,7 +52,7 @@ async def send_usb_alerts(computer_id: int, is_unix: bool):
 
 
 async def send_traffic_alerts(computer_id: int, active_int: str, is_unix: bool):
-	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}"
+	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=alert_ws"
 	Thread(
         target=capture,
         args=(active_int, flow_verify),
@@ -65,12 +60,12 @@ async def send_traffic_alerts(computer_id: int, active_int: str, is_unix: bool):
     ).start()
 	print("Started AI-Based IDS...")
 	ws = agentWebsocket(computer_id, is_unix, uri)
-
+	await ws.initializeSocket()
 	while True:
 		alert = await asyncio.to_thread(alert_queue.get)
 		alert["type"] = "Network Alert"
 		print(alert)
-		#await ws.send_alert(alert)
+		await ws.send_alert(**alert)
 
 
 def start_usb_alerts(computer_id: int, is_unix: bool):

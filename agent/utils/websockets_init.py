@@ -24,7 +24,7 @@ class agentWebsocket:
 			except Exception as e:
 				curr_retries += 1
 				print("Websockets Error, Retrying connection...")
-
+	
 	async def receiveCommands(self):
 		while True:
 			msg = await self.ws.recv()
