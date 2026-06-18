@@ -42,7 +42,7 @@ def flow_verify(details):
 
 
 async def send_usb_alerts(computer_id: int, is_unix: bool):
-	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=alert_ws"
+	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=usb_alert_ws"
 
 	ws = agentWebsocket(computer_id, is_unix, uri)
 	await ws.initializeSocket()
@@ -52,7 +52,7 @@ async def send_usb_alerts(computer_id: int, is_unix: bool):
 
 
 async def send_traffic_alerts(computer_id: int, active_int: str, is_unix: bool):
-	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=alert_ws"
+	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=ids_alert_ws"
 	Thread(
         target=capture,
         args=(active_int, flow_verify),

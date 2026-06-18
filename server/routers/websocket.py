@@ -86,17 +86,27 @@ async def restartComputer(computer: RestartComputer):
 async def alert_endpoint(websocket: WebSocket, computer_id: int, wstype: str):
     await websocket.accept()
 
-    agent_ws.alert_connections[computer_id] = websocket
 
     try:
         while True:
-            ws = agent_ws.alert_connections[computer_id]
-            alert = await ws.receive_text()
-            alertd = json.loads(alert)
-            expire_time = datetime.now() + timedelta(hours=1)
-            alertd["computer_id"] = computer_id
-            alertd['expires_at'] = expire_time.isoformat()
-            db.insert(alertd)
+            if wstype == "usb_alert_ws":
+                agent_ws.usb_alert_connections[computer_id] = websocket
+                wsu = agent_ws.usb_alert_connections[computer_id]
+                alert = await wsu.receive_text()
+                alertd = json.loads(alert)
+                expire_time = datetime.now() + timedelta(hours=1)
+                alertd["computer_id"] = computer_id
+                alertd['expires_at'] = expire_time.isoformat()
+                db.insert(alertd)
+            elif wstype == "ids_alert_ws":
+                agent_ws.ids_alert_connections[computer_id] = websocket
+                wsids = agent_ws.ids_alert_connections[computer_id]
+                alert = await wsids.receive_text()
+                alertd = json.loads(alert)
+                expire_time = datetime.now() + timedelta(hours=1)
+                alertd["computer_id"] = computer_id
+                alertd['expires_at'] = expire_time.isoformat()
+
     except WebSocketDisconnect as e:
         print(e)
 
