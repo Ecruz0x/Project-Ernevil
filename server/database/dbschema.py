@@ -49,6 +49,7 @@ class ComputerInfo(Base):
 	disksinfo = relationship("disksInfo", back_populates="computer")
 	computerusers = relationship("computerUsers", back_populates="computer")
 	usb_devices = relationship("usbInfo", back_populates="computer")
+	keys = relationship("Keys", back_populates="computer")
 
 
 class MemoryInfo(Base):
@@ -120,3 +121,13 @@ class usbInfo(Base):
 	product: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)
 	vendor_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
 	product_id: Mapped[str] = mapped_column(String(200), unique=False, nullable=False)
+
+class Keys(Base):
+	__tablename__ = "keys"
+	computer_id = mapped_column(
+			ForeignKey("computerInfo.computer_id")
+	)
+	key_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="keys")
+	key: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+	length: Mapped[int] = mapped_column(Integer)

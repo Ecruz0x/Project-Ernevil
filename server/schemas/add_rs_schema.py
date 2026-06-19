@@ -85,3 +85,8 @@ class usbInfo(BaseModel):
 	product: Optional[str] = "Unknown"
 	vendor_id: str
 	product_id: str
+
+class addKey(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	length: int
+	key: str

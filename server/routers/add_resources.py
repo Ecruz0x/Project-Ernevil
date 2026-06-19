@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
-from ..schemas.add_rs_schema import ComputerCreated, CreateComputer
+from ..schemas.add_rs_schema import ComputerCreated, CreateComputer, addKey
 from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo, usbInfo
 from datetime import datetime
 from sqlalchemy import select, text
@@ -97,8 +97,26 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
     added_info = {"computer_id": newComputer.computer_id, "computername" : newComputer.computername, "added_on": datetime.now()}
     return added_info
 
+@router.post("/keys", response_model = bool, status_code = status.HTTP_201_CREATED)
+def addKey(key: addKey, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(
+                text(f"SELECT 1 FROM keys WHERE key = '{key.key}'")
+            )
+    existing_key = result.scalars().first()
+    if existing_key:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="key already exists",
+        )
+    
+    newKey = dbschema.Keys(
+        key = key.key,
+        length = key.length
+    )
 
-
+    db.add(newKey)
+    db.commit()
+    return True
 
 """CPUInfo = dbschema.CPUInfo(
         computer=newComputer,

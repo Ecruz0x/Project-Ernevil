@@ -12,6 +12,10 @@ overviewPage = st.Page(
 	"pages/overviewpage.py", title="Overview", default=True, icon=":material/dashboard:"
 )
 
+KeyComputersPage = st.Page(
+    "pages/keygen.py", title="Generate a secret key", icon=":material/lock:"
+)
+
 
 AvComputersPage = st.Page(
     "pages/listdev.py", title="Available Devices", icon=":material/devices:"
@@ -49,6 +53,7 @@ pg = st.navigation(
 
     {
     	"": [overviewPage],
+        "IAM": [KeyComputersPage],
         "Computers & Reports": [AvComputersPage, monitorComputersPage, blacklistComputersPage, generateComputerReports],
         "Locations": [locations, addLocations], 
         "Alerts": [networkAlerts]
