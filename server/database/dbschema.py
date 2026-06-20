@@ -21,7 +21,7 @@ class Locations(Base):
 	__tablename__ = "locations"
 	id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 	name: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
-	severity Mapped[str] = mapped_column(String(15), unique=False, nullable=True)
+	severity: Mapped[str] = mapped_column(String(15), unique=False, nullable=True)
 	computers = relationship("ComputerInfo", back_populates="location")
 
 class ComputerInfo(Base):

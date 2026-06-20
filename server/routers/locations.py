@@ -2,6 +2,8 @@ from ..schemas.locations import Location, CreateLocation, CreatedLocation, GetLo
 from ..database.db import Base, engine, get_db
 from ..database import dbschema
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
+from typing import Annotated
+from sqlalchemy.orm import Session
 
 
 router = APIRouter()
