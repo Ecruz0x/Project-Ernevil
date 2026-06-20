@@ -15,10 +15,14 @@ router = APIRouter()
 
 
 
-def authenticateComputer(computer_auth: AuthenticateComputer, db: Annotated[Session, Depends(get_db)]):
+def authenticateComputer(computer_auth, db):
     result = db.execute(
-                text(f"SELECT 1 FROM computerInfo WHERE computer_id = {computer_auth['computer_id']} AND fingerprint = '{computer_auth['fingerprint']}'")
-            )
+        select(dbschema.ComputerInfo).where(
+            dbschema.ComputerInfo.computer_id == computer_auth["computer_id"],
+            dbschema.ComputerInfo.fingerprint == computer_auth["fingerprint"]
+        )
+    )
+
     existing_computer = result.scalars().first()
 
     if existing_computer:
@@ -63,7 +67,6 @@ def updateMemoryInfo(newMemInfo: UpdateMemoryInfo, db: Annotated[Session, Depend
         )
 
 
-## Needs DELETE endpoint
 @router.patch("/net", response_model = bool)
 def updateNetInfo(newNetInfo: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newNetInfo.computer_id, "fingerprint": newNetInfo.fingerprint}

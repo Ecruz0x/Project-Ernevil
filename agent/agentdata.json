@@ -1,9 +1,8 @@
 {
     "agentid": 1,
-    "agent_ip": "127.0.0.1",
     "is_alive": true,
     "heartbeat_interval": 15,
     "updates_interval": 30,
-    "expiration_interval": 150,
-    "retries": 5
+    "retries": 5,
+    "key": "6o4PJxEy"
 }

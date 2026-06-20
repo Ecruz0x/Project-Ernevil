@@ -23,7 +23,7 @@ class Computer(BaseModel):
 
 
 class CreateComputer(Computer):
-	pass
+	key: str
 
 
 

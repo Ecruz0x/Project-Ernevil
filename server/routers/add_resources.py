@@ -15,15 +15,22 @@ router = APIRouter()
 @router.post("", response_model = ComputerCreated, status_code = status.HTTP_201_CREATED)
 def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
-                text(f"SELECT 1 FROM computerInfo WHERE fingerprint = '{computer.fingerprint}'")
-            )
+        select(dbschema.ComputerInfo).where(
+            dbschema.ComputerInfo.fingerprint == computer.fingerprint
+        )
+    )
     existing_computer = result.scalars().first()
+    existing_key = (
+        db.query(dbschema.Keys)
+        .filter(dbschema.Keys.key == computer.key)
+        .first()
+    )
 
 ##ADD CPU COUNT
-    if existing_computer:
+    if existing_computer or not existing_key:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Computer already exists",
+            detail="Adding error, please check your key and try again",
         )
 
     newComputer = dbschema.ComputerInfo(

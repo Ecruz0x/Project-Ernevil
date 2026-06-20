@@ -18,6 +18,11 @@ server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
 localComputer = Computer()
 
 
+# Update interval, Retry time, HB intervals
+agentdata = open("./agentdata.json", "r+")
+agent_data = json.load(agentdata)
+
+
 currentAgentInfo = {
 	"is_unix": localComputer.is_unix,
 	"computer_name": localComputer.computer_name,
@@ -32,18 +37,9 @@ currentAgentInfo = {
 	"boot_time": localComputer.getBootTime(),
 	"node_machineid": localComputer.getMachineId(),
 	"fingerprint": fp(localComputer.getMachineId()),
-	"usb_devices": localComputer.getUSBDevices()
+	"usb_devices": localComputer.getUSBDevices(),
+	"key": agent_data["key"]
 }
-
-
-
-
-# Update interval, Retry time, HB intervals
-agentdata = open("./agentdata.json", "r+")
-agent_data = json.load(agentdata)
-
-
-#Alerts handler
 
 
 
