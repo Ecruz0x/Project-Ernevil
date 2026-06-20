@@ -12,7 +12,7 @@ def mapComputers(computers):
         computer_map[computer["computername"]] = computer["computer_id"]
     return computer_map
 
-rcmp = requests.get("http://127.0.0.1:8000/api/computers/live")
+rcmp = requests.get("https://127.0.0.1:8000/api/computers/live", verify="cert.pem")
 if rcmp.status_code == 200:
     computers = rcmp.json()
 else:
@@ -32,7 +32,7 @@ if computers:
 
     v = 5
     # Memory Usage
-    rmem = requests.get(f"http://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}")
+    rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify="cert.pem")
     if rmem.status_code == 200:
         memdata = rmem.json()["usage"]
         memdata = str(memdata) + "%"
@@ -40,7 +40,7 @@ if computers:
         memdata = "Unavailable"
 
     # Boottime
-    rcmpb = requests.get(f"http://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}")
+    rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify="cert.pem")
     if rcmpb.status_code == 200:
         boottime = rcmpb.json()["boottime"]
         os = rcmpb.json()["os"]
@@ -51,14 +51,14 @@ if computers:
     @st.fragment(run_every="5s")
     def live_metrics(choice):
         cols = st.columns(3)
-        rmem = requests.get(f"http://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}")
+        rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify="cert.pem")
         if rmem.status_code == 200:
             memdata = rmem.json()["usage"]
             memdata = str(memdata) + "%"
         else:
             memdata = "Unavailable"
 
-        rcmpb = requests.get(f"http://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}")
+        rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify="cert.pem")
         if rcmpb.status_code == 200:
             boottime = rcmpb.json()["boottime"]
             os = rcmpb.json()["os"]
@@ -75,12 +75,12 @@ if computers:
     live_metrics(choice)
 
 
-    ps_count = len(requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}").json())
+    ps_count = len(requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify="cert.pem").json())
     @st.fragment(run_every="15s")
     def processes_scraper():
         # Processes scraper
         try:
-            rps = requests.get(f"http://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}")
+            rps = requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify="cert.pem")
             if rps.status_code == 200:
                 ps_data = rps.json()
             data_ps = []
@@ -101,7 +101,7 @@ if computers:
             return st.write("Unknown Error, please refresh the page and try again.")
     # Users scraper
     try:
-        rusers = requests.get(f"http://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}")
+        rusers = requests.get(f"https://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}", verify="cert.pem")
         if rusers.status_code == 200:
             users = rusers.json()
     except Exception as e:
@@ -109,7 +109,7 @@ if computers:
         
     # Disks scraper
     try:
-        rdsk = requests.get(f"http://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}")
+        rdsk = requests.get(f"https://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}", verify="cert.pem")
         if rdsk.status_code == 200:
             dsk_data = rdsk.json()
     except Exception as e:
@@ -117,7 +117,7 @@ if computers:
 
     # NetIF scraper
     try:
-        rnet = requests.get(f"http://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}")
+        rnet = requests.get(f"https://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}", verify="cert.pem")
         if rnet.status_code == 200:
             net_data = rnet.json()
     except Exception as e:

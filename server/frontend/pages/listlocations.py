@@ -1,8 +1,8 @@
 import requests
 import streamlit as st
 
-r = requests.get("http://127.0.0.1:8000/api/locations")
-rcmp = requests.get("http://127.0.0.1:8000/api/computers")
+r = requests.get("https://127.0.0.1:8000/api/locations", verify="cert.pem")
+rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify="cert.pem")
 
 if r.status_code != 200 or rcmp.status_code != 200:
     st.error("Failed to load data.")
@@ -98,7 +98,8 @@ if "selected_location" in st.session_state:
                 help="Remove computer from this location"
             ):
                 requests.post(
-                    "http://127.0.0.1:8000/api/locations/remove",
+                    "https://127.0.0.1:8000/api/locations/remove",
+                    verify="cert.pem",
                     json={
                         "computer_id": computer
                     }
@@ -143,7 +144,7 @@ else:
                 help="Delete location"
             ):
                 requests.delete(
-                    f"http://127.0.0.1:8000/api/locations/{location['id']}"
+                    f"https://127.0.0.1:8000/api/locations/{location['id']}", verify="cert.pem"
                 )
                 st.rerun()
 

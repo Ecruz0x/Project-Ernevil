@@ -12,7 +12,7 @@ if "generated_key" not in st.session_state:
     st.session_state.generated_key = None
 
 def add_key(key, length):
-    r = requests.post("http://127.0.0.1:8000/api/computers/keys", json = {"key": key, "length": length})
+    r = requests.post("https://127.0.0.1:8000/api/computers/keys", json = {"key": key, "length": length})
     return r.status_code
 
 

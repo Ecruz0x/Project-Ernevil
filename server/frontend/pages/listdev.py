@@ -8,7 +8,7 @@ import requests
 
 st.header("Available Devices")
 
-rcmp = requests.get("http://127.0.0.1:8000/api/computers")
+rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify="cert.pem")
 if rcmp.status_code == 200:
     computers = rcmp.json()
 

@@ -13,7 +13,7 @@ st.html("<h5>Review, track, and manage security events and agent notifications.<
 
 
 try:
-    r = requests.get("http://127.0.0.1:8000/api/get_alerts")
+    r = requests.get("https://127.0.0.1:8000/api/get_alerts", verify="cert.pem")
     alerts = r.json()
     if alerts:
         for i in range(len(alerts)):

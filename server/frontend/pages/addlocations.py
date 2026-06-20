@@ -4,7 +4,7 @@ import requests
 
 
 def addLoc(loc_name, sev):
-	r = requests.post("http://127.0.0.1:8000/api/locations", json = {"location_name": loc_name, "severity": sev})
+	r = requests.post("https://127.0.0.1:8000/api/locations", json = {"location_name": loc_name, "severity": sev}, verify="cert.pem")
 	if r.status_code == 200:
 		st.success("Location has been saved successfully!")
 	else:

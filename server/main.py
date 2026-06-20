@@ -7,6 +7,7 @@ from typing import Annotated
 import asyncio
 from .routers import add_resources, update_resources, get_resources, delete_resources, heartbeats, locations, websocket
 from .utils.heartbeat_utils import expireHeartBeat
+import uvicorn
 
 
 
@@ -33,3 +34,13 @@ async def main():
         asyncio.create_task(expireHeartBeat())
     except KeyboardInterrupt:
         exit(1)
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        ssl_keyfile="cert/key.pem",
+        ssl_certfile="cert/cert.pem",
+    )

@@ -43,9 +43,9 @@ selected = card_selector(
 st.header("Current metrics")
 
 try:
-    rcmp = requests.get("http://127.0.0.1:8000/api/computers")
-    rloc = requests.get("http://127.0.0.1:8000/api/locations")
-    ralerts = requests.get("http://127.0.0.1:8000/api/get_alerts")
+    rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify="cert.pem")
+    rloc = requests.get("https://127.0.0.1:8000/api/locations", verify="cert.pem")
+    ralerts = requests.get("https://127.0.0.1:8000/api/get_alerts", verify="cert.pem")
     alerts = ralerts.json()
     if rcmp.status_code == 200 and rloc.status_code == 200:
         cmps = rcmp.json()
