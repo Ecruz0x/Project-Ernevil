@@ -5,6 +5,7 @@ from code_editor import code_editor
 import requests, time
 from st_aggrid import AgGrid
 
+cert = "server.crt"
 
 def mapComputers(computers):
     computer_map = {}
@@ -12,7 +13,7 @@ def mapComputers(computers):
         computer_map[computer["computername"]] = computer["computer_id"]
     return computer_map
 
-rcmp = requests.get("https://127.0.0.1:8000/api/computers/live", verify="cert.pem")
+rcmp = requests.get("https://127.0.0.1:8000/api/computers/live", verify=cert)
 if rcmp.status_code == 200:
     computers = rcmp.json()
 else:
@@ -32,7 +33,7 @@ if computers:
 
     v = 5
     # Memory Usage
-    rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify="cert.pem")
+    rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify=cert)
     if rmem.status_code == 200:
         memdata = rmem.json()["usage"]
         memdata = str(memdata) + "%"
@@ -40,7 +41,7 @@ if computers:
         memdata = "Unavailable"
 
     # Boottime
-    rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify="cert.pem")
+    rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify=cert)
     if rcmpb.status_code == 200:
         boottime = rcmpb.json()["boottime"]
         os = rcmpb.json()["os"]
@@ -51,14 +52,14 @@ if computers:
     @st.fragment(run_every="5s")
     def live_metrics(choice):
         cols = st.columns(3)
-        rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify="cert.pem")
+        rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify=cert)
         if rmem.status_code == 200:
             memdata = rmem.json()["usage"]
             memdata = str(memdata) + "%"
         else:
             memdata = "Unavailable"
 
-        rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify="cert.pem")
+        rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify=cert)
         if rcmpb.status_code == 200:
             boottime = rcmpb.json()["boottime"]
             os = rcmpb.json()["os"]
@@ -75,12 +76,12 @@ if computers:
     live_metrics(choice)
 
 
-    ps_count = len(requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify="cert.pem").json())
+    ps_count = len(requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify=cert).json())
     @st.fragment(run_every="15s")
     def processes_scraper():
         # Processes scraper
         try:
-            rps = requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify="cert.pem")
+            rps = requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify=cert)
             if rps.status_code == 200:
                 ps_data = rps.json()
             data_ps = []
@@ -101,7 +102,7 @@ if computers:
             return st.write("Unknown Error, please refresh the page and try again.")
     # Users scraper
     try:
-        rusers = requests.get(f"https://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}", verify="cert.pem")
+        rusers = requests.get(f"https://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}", verify=cert)
         if rusers.status_code == 200:
             users = rusers.json()
     except Exception as e:
@@ -109,7 +110,7 @@ if computers:
         
     # Disks scraper
     try:
-        rdsk = requests.get(f"https://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}", verify="cert.pem")
+        rdsk = requests.get(f"https://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}", verify=cert)
         if rdsk.status_code == 200:
             dsk_data = rdsk.json()
     except Exception as e:
@@ -117,7 +118,7 @@ if computers:
 
     # NetIF scraper
     try:
-        rnet = requests.get(f"https://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}", verify="cert.pem")
+        rnet = requests.get(f"https://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}", verify=cert)
         if rnet.status_code == 200:
             net_data = rnet.json()
     except Exception as e:
@@ -165,11 +166,11 @@ if computers:
     # Commands execution
     st.html(f"<h2>Execute shell commands on {choice}</h2>")
     response = code_editor("# Write You commands here", response_mode="debounce")
-    computers = requests.get("http://127.0.0.1:8000/api/computers/live").json()
+    computers = requests.get("https://127.0.0.1:8000/api/computers/live", verify = cert).json()
     if st.button("Execute"):
         computer_map = mapComputers(computers)
         if choice in computer_map.keys():
-            rcmds = requests.post("http://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text']})
+            rcmds = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text']}, verify = cert)
             try:
                 result = rcmds.json()["result"]
                 output = str(result)
@@ -191,10 +192,10 @@ if computers:
     left, right = st.columns(2)
 
     if left.button(f"Shutdown", width="stretch", key="left_btn"):
-        requests.post("http://127.0.0.1:8000/api/shutdown", json = {"computer_id": computer_map[choice]})
+        requests.post("https://127.0.0.1:8000/api/shutdown", json = {"computer_id": computer_map[choice]}, verify = cert)
 
     if right.button(f"Restart", width="stretch", key="right_btn"):
-        requests.post("http://127.0.0.1:8000/api/restart", json = {"computer_id": computer_map[choice]})
+        requests.post("https://127.0.0.1:8000/api/restart", json = {"computer_id": computer_map[choice]}, verify = cert)
 
         
 

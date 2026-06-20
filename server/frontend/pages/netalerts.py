@@ -11,9 +11,11 @@ st.header("Detected Alerts")
 st.html("<h3>System-generated alerts appear here in real time.</h3>")
 st.html("<h5>Review, track, and manage security events and agent notifications.</h5>")
 
+cert = "server.crt"
+
 
 try:
-    r = requests.get("https://127.0.0.1:8000/api/get_alerts", verify="cert.pem")
+    r = requests.get("https://127.0.0.1:8000/api/get_alerts", verify=cert)
     alerts = r.json()
     if alerts:
         for i in range(len(alerts)):

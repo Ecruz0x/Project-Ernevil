@@ -1,8 +1,11 @@
 import requests
 import streamlit as st
 
-r = requests.get("https://127.0.0.1:8000/api/locations", verify="cert.pem")
-rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify="cert.pem")
+
+cert = "server.crt"
+
+r = requests.get("https://127.0.0.1:8000/api/locations", verify=cert)
+rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert)
 
 if r.status_code != 200 or rcmp.status_code != 200:
     st.error("Failed to load data.")
@@ -51,7 +54,7 @@ if "selected_location" in st.session_state:
         if st.button("Add"):
 
             requests.post(
-                "http://127.0.0.1:8000/api/locations/set",
+                "https://127.0.0.1:8000/api/locations/set", verify = cert,
                 json={
                     "location_id": location["id"],
                     "computer_id": [
@@ -79,7 +82,7 @@ if "selected_location" in st.session_state:
     st.divider()
 
     location_computers = requests.get(
-        f"http://127.0.0.1:8000/api/computers/location?location_id={location['id']}"
+        f"https://127.0.0.1:8000/api/computers/location?location_id={location['id']}", verify = cert
     ).json()
 
     st.html("<h2>Assigned Computers:</h2><p>Add existing computers to this location or remove them when no longer needed.</p>")
@@ -99,7 +102,7 @@ if "selected_location" in st.session_state:
             ):
                 requests.post(
                     "https://127.0.0.1:8000/api/locations/remove",
-                    verify="cert.pem",
+                    verify=cert,
                     json={
                         "computer_id": computer
                     }
@@ -144,7 +147,7 @@ else:
                 help="Delete location"
             ):
                 requests.delete(
-                    f"https://127.0.0.1:8000/api/locations/{location['id']}", verify="cert.pem"
+                    f"https://127.0.0.1:8000/api/locations/{location['id']}", verify=cert
                 )
                 st.rerun()
 

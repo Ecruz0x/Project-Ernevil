@@ -3,6 +3,8 @@ import websockets
 import subprocess
 import time
 import json
+import ssl
+
 
 class agentWebsocket:
 	def __init__(self, computer_id: int, is_unix: bool, uri: str):
@@ -11,13 +13,15 @@ class agentWebsocket:
 		self.uri = uri
 		self.ws = None
 
-	async def initializeSocket(self):
+	async def initializeSocket(self, cert):
 		max_retries = 5
 		curr_retries = 0
-
+		ssl_context = ssl.create_default_context(
+    	cafile=cert
+		)
 		while curr_retries < max_retries:
 			try:
-				self.ws = await websockets.connect(self.uri)
+				self.ws = await websockets.connect(self.uri, ssl=ssl_context)
 				print("Websocket established!")
 				return
 

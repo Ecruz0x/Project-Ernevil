@@ -4,11 +4,11 @@ import streamlit_shadcn_ui as ui
 import requests
 
 
-
+cert = "server.crt"
 
 st.header("Available Devices")
 
-rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify="cert.pem")
+rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert)
 if rcmp.status_code == 200:
     computers = rcmp.json()
 

@@ -8,6 +8,7 @@ st.header("General Overview")
 st.text("""
 Ernevil is an open-source monitoring platform designed to help administrators manage and monitor devices across a Local Area Network, with cloud support planned for future releases. It focuses on simplicity, automation, and centralized system management while remaining fully transparent and community-driven.""")
 
+cert = "server.crt"
 
 ui.link_button(text="Github", url="https://github.com/Ecruz0x/Project-Ernevil/", key="link_btn")
 
@@ -43,9 +44,9 @@ selected = card_selector(
 st.header("Current metrics")
 
 try:
-    rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify="cert.pem")
-    rloc = requests.get("https://127.0.0.1:8000/api/locations", verify="cert.pem")
-    ralerts = requests.get("https://127.0.0.1:8000/api/get_alerts", verify="cert.pem")
+    rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert)
+    rloc = requests.get("https://127.0.0.1:8000/api/locations", verify=cert)
+    ralerts = requests.get("https://127.0.0.1:8000/api/get_alerts", verify=cert)
     alerts = ralerts.json()
     if rcmp.status_code == 200 and rloc.status_code == 200:
         cmps = rcmp.json()

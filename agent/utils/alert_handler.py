@@ -7,12 +7,16 @@ from collections import Counter
 from datetime import datetime
 from threading import Lock
 from threading import Thread
+import json
 
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
 model = joblib.load("utils/ml_ids/models/bestmodel.pkl")
+
+with open("serverdata.json", "r") as data:
+    server_data = json.load(data)
 
 
 now = datetime.now()
@@ -41,18 +45,18 @@ def flow_verify(details):
 
 
 
-async def send_usb_alerts(computer_id: int, is_unix: bool):
-	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=usb_alert_ws"
+async def send_usb_alerts(computer_id: int, is_unix: bool, cert: str):
+	uri = f"wss://{server_data['server_ip']}:{server_data['server_port']}/api/ws/alert?computer_id={computer_id}&wstype=usb_alert_ws"
 
 	ws = agentWebsocket(computer_id, is_unix, uri)
-	await ws.initializeSocket()
+	await ws.initializeSocket(cert)
 	while True:
 		async for event_type, device_info in launchUsbMon():
 			await ws.send_alert(type = "USB alert", category = "USB device event", manufacturer = device_info['manufacturer'], product = device_info['product'], event = f"USB device {event_type}ed")
 
 
-async def send_traffic_alerts(computer_id: int, active_int: str, is_unix: bool):
-	uri = f"ws://127.0.0.1:8000/api/ws/alert?computer_id={computer_id}&wstype=ids_alert_ws"
+async def send_traffic_alerts(computer_id: int, active_int: str, is_unix: bool, cert: str):
+	uri = f"wss://{server_data['server_ip']}:{server_data['server_port']}/api/ws/alert?computer_id={computer_id}&wstype=ids_alert_ws"
 	Thread(
         target=capture,
         args=(active_int, flow_verify),
@@ -60,16 +64,15 @@ async def send_traffic_alerts(computer_id: int, active_int: str, is_unix: bool):
     ).start()
 	print("Started AI-Based IDS...")
 	ws = agentWebsocket(computer_id, is_unix, uri)
-	await ws.initializeSocket()
+	await ws.initializeSocket(cert)
 	while True:
 		alert = await asyncio.to_thread(alert_queue.get)
 		alert["type"] = "Network Alert"
-		print(alert)
 		await ws.send_alert(**alert)
 
 
-def start_usb_alerts(computer_id: int, is_unix: bool):
-	asyncio.run(send_usb_alerts(computer_id, is_unix))
+def start_usb_alerts(computer_id: int, is_unix: bool, cert: str):
+	asyncio.run(send_usb_alerts(computer_id, is_unix, cert))
 
-def start_ids(computer_id: int, active_int: str, is_unix: bool):
-	asyncio.run(send_traffic_alerts(computer_id, active_int, is_unix))
+def start_ids(computer_id: int, active_int: str, is_unix: bool, cert: str):
+	asyncio.run(send_traffic_alerts(computer_id, active_int, is_unix, cert))

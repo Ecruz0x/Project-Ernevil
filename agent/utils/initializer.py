@@ -8,14 +8,14 @@ logger = logging.getLogger(__name__)
 with open("serverdata.json", "r") as data:
 	server_data = json.load(data)
 
-server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
+server = "https://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
 localComputer = Computer()
 
 
 
-def sendData(json: dict, url: str) -> dict:
-	res = requests.post(url, json = json)
+def sendData(json: dict, url: str, cert: str) -> dict:
+	res = requests.post(url, json = json, verify=cert)
 	if res.status_code == 201:
 		return res.json()
 	else:

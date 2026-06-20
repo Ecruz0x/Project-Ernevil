@@ -7,13 +7,13 @@ currentComputer = Computer()
 with open("serverdata.json", "r") as data:
 	server_data = json.load(data)
 
-server = "http://" + server_data["server_ip"] + ":" + server_data["server_port"]
+server = "https://" + server_data["server_ip"] + ":" + server_data["server_port"]
 
 
 def subReqFCheck(computer_id):
 	pass
 
-def updateComputerName(computer_id: int, fingerprint: str, oldData: dict):
+def updateComputerName(computer_id: int, fingerprint: str, oldData: dict, cert: str):
 	storedName = oldData["computer_name"]
 	refURL = f"{server}/api/computers/name?computer_id={computer_id}"
 	currentName = currentComputer.computer_name
@@ -23,14 +23,14 @@ def updateComputerName(computer_id: int, fingerprint: str, oldData: dict):
 
 	if currentName != storedName:
 		oldData["computer_name"] = currentName
-		updateR = requests.put(refURL, data = sent_data)
+		updateR = requests.put(refURL, data = sent_data, verify = cert)
 		if updateR.status_code <= 201:
 			yield True
 		else:
 			yield sent_data
 
 
-def updateMemInfo(computer_id: int, fingerprint: str, oldData: dict):
+def updateMemInfo(computer_id: int, fingerprint: str, oldData: dict, cert: str):
 	storedMemInfo = oldData["memory"]
 	refURL = f"{server}/api/computers/mem?computer_id={computer_id}"
 	currentMemInfo = currentComputer.getMemoryInfo()
@@ -41,13 +41,13 @@ def updateMemInfo(computer_id: int, fingerprint: str, oldData: dict):
 				"totalMemory": currentMemInfo["totalMemory"],
 				"available_memory": currentMemInfo["availableMemory"],
 				"usage": currentMemInfo["usage"]}
-		updateR = requests.put(refURL, json = to_send_data)
+		updateR = requests.put(refURL, json = to_send_data, verify = cert)
 		if updateR.status_code <= 201:
 			return True
 		else:
 			return to_send_data
 
-def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
+def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict, cert: str):
 	
 	storedNetInfo = oldData["ip_addr"]
 	currentNetInfo = currentComputer.getIfAddr()
@@ -86,7 +86,7 @@ def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			payload = copy.deepcopy(CrData)
 			payload["ifname"] = k
 			payload["ipaddr"] = v
-			r = requests.patch(refURL, json = payload)
+			r = requests.patch(refURL, json = payload, verify=cert)
 			storedNetInfo[k] = v
 			if r.status_code == 200:
 				storedNetInfo[k] = copy.deepcopy(v)
@@ -99,7 +99,7 @@ def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			payload = copy.deepcopy(CrData)
 			payload["ifname"] = k
 			payload["ipaddr"] = None
-			r = requests.delete(refURL, json = payload)
+			r = requests.delete(refURL, json = payload, verify=cert)
 			if r.status_code == 200:
 				del storedNetInfo[k]
 			else:
@@ -111,7 +111,7 @@ def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 			payload = copy.deepcopy(CrData)
 			payload["ifname"] = k
 			payload["ipaddr"] = v
-			r = requests.patch(refURL, json = payload)
+			r = requests.patch(refURL, json = payload, verify=cert)
 			if r.status_code == 200:
 				storedNetInfo[k] = copy.deepcopy(v)
 			else:
@@ -122,7 +122,7 @@ def updateNetInfo(computer_id: int, fingerprint: str, oldData: dict):
 	return success_
 
 
-def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
+def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict, cert: str):
 	storedDiskInfo = oldData["disks"]
 	currentDiskInfo = currentComputer.getAvailablePartitions()
 
@@ -152,7 +152,7 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 			payload["partitionname"] = k
 			payload["mountpoint"] = v["mountpoint"]
 			payload["fstype"] = v["fstype"]
-			r = requests.patch(refURL, json = payload)
+			r = requests.patch(refURL, json = payload, verify=cert)
 			if r.status_code == 200:
 				storedDiskInfo[k] = copy.deepcopy(v)
 			else:
@@ -162,7 +162,7 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 		for k, v in removed.items():
 			payload = copy.deepcopy(CrData)
 			payload["partitionname"] = k
-			r = requests.delete(refURL, json = payload)
+			r = requests.delete(refURL, json = payload, verify=cert)
 			if r.status_code == 200:
 				pass
 			else:
@@ -174,7 +174,7 @@ def updateDiskInfo(computer_id: int, fingerprint: str, oldData: dict):
 	return success_
 
 
-def updateProcessesInfo(computer_id: int, fingerprint: str, oldData: dict):
+def updateProcessesInfo(computer_id: int, fingerprint: str, oldData: dict, cert: str):
 	refURL = f"{server}/api/computers/ps?computer_id={computer_id}"
 
 	current_ps = currentComputer.getProcesses()
@@ -188,7 +188,7 @@ def updateProcessesInfo(computer_id: int, fingerprint: str, oldData: dict):
 		d["fingerprint"] = fingerprint
 
 	json_payload = json.dumps(payload)
-	r = requests.put(refURL, json = payload)
+	r = requests.put(refURL, json = payload, verify=cert)
 	if r.status_code == 200:
 		pass
 	else:
@@ -198,7 +198,7 @@ def updateProcessesInfo(computer_id: int, fingerprint: str, oldData: dict):
 	return success_
 
 
-def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
+def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict, cert: str):
 	storedUserInfo = oldData["users"]
 	currentUserInfo = currentComputer.getActiveUsers()
 
@@ -222,21 +222,21 @@ def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict):
 	for k in stored_keys - current_keys:
 		removed[k] = None
 	
-def updateBootTime(computer_id: int, fingerprint: str):
-	reqCheck = requests.get(f"{server}/api/computers?computer_id={computer_id}")
+def updateBootTime(computer_id: int, fingerprint: str, cert: str):
+	reqCheck = requests.get(f"{server}/api/computers?computer_id={computer_id}", verify=cert)
 	storedBT = reqCheck.json()[0]["boottime"]
 	currentBT = currentComputer.getBootTime()
 	if currentBT != storedBT:
-		requests.patch(f"{server}/api/computers/bt", json={"computer_id": computer_id, "fingerprint": fingerprint, "boottime": currentBT})
+		requests.patch(f"{server}/api/computers/bt", json={"computer_id": computer_id, "fingerprint": fingerprint, "boottime": currentBT}, verify=cert)
 
 def updateUSBInfo(computer_id: int, fingerprint: str):
 	pass
 
-def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int):
+def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int, cert: str):
 	while True:
-		uMem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		uNet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		uD = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		uPs = updateProcessesInfo(computer_id, cagentdata["fingerprint"], cagentdata)
-		uBt = updateBootTime(computer_id, cagentdata["fingerprint"])
+		uMem = updateMemInfo(computer_id, cagentdata["fingerprint"], cagentdata, cert)
+		uNet = updateNetInfo(computer_id, cagentdata["fingerprint"], cagentdata, cert)
+		uD = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata, cert)
+		uPs = updateProcessesInfo(computer_id, cagentdata["fingerprint"], cagentdata, cert)
+		uBt = updateBootTime(computer_id, cagentdata["fingerprint"], cert)
 		time.sleep(update_interval)
