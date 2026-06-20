@@ -82,11 +82,7 @@ if "selected_location" in st.session_state:
         f"http://127.0.0.1:8000/api/computers/location?location_id={location['id']}"
     ).json()
 
-    st.html("<h2>Assigned Computers:</h2>")
-
-    st.caption(
-        "Add existing computers to this location or remove them when no longer needed."
-    )
+    st.html("<h2>Assigned Computers:</h2><p>Add existing computers to this location or remove them when no longer needed.</p>")
 
     for computer in location_computers:
 
@@ -118,10 +114,8 @@ if "selected_location" in st.session_state:
 
 else:
 
-    st.title("Locations")
-
-    st.caption(
-        "Organize computers into logical groups for easier administration."
+    st.html(
+        "<h1>Locations</h1><p>Organize computers into logical groups for easier administration.</p>"
     )
 
     if not locations:
