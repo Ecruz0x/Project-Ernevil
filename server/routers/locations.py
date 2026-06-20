@@ -3,6 +3,7 @@ from ..database.db import Base, engine, get_db
 from ..database import dbschema
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
 from typing import Annotated
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 
@@ -16,7 +17,7 @@ def getLocations():  #### Database management Here
 def createLocation(location: CreateLocation, db: Annotated[Session, Depends(get_db)]):
     result = db.execute(
         select(dbschema.Locations).where(
-            dbschema.Locations.name == location.name
+            dbschema.Locations.name == location.location_name
         )
     )
     existing_computer = result.scalars().first()

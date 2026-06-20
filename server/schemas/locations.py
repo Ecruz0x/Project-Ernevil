@@ -12,7 +12,7 @@ class Location(BaseModel):
 class CreateLocation(Location):
 	pass
 
-class CreatedLocation(Location):
+class CreatedLocation(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	location_id: int
 
