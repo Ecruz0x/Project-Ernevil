@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
-from .add_rs_schema import Computer
+from .add_rs_schema import ComputerInfo
 
 
 
@@ -17,5 +17,10 @@ class CreatedLocation(BaseModel):
 	location_id: int
 
 class GetLocations(BaseModel):
-	location_name: str
+	id: int
+	name: str
 	severity: Optional[str] = None
+
+class setLocation(BaseModel):
+	computer_id: list[int]
+	location_id: int

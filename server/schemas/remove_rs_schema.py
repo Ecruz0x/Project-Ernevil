@@ -14,3 +14,7 @@ class RemoveDisksInfo(AuthenticateComputer):
 
 class RCUsersInfo(UCUsersInfo, AuthenticateComputer):
 	pass
+
+class removeLocation(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	location_name: str

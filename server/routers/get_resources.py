@@ -3,7 +3,7 @@ from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, Pr
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
 from typing import Annotated
-from sqlalchemy import text
+from sqlalchemy import text, select
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -37,6 +37,17 @@ def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerIn
     result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive"))
     liveComputers = result.mappings().all()
     return liveComputers
+
+@router.get("/location", response_model = list[str])
+def getCmpLoc(location_id: int, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(
+        select(dbschema.ComputerInfo.computername).where(
+            dbschema.ComputerInfo.location_id == location_id
+        )
+    )
+
+    computers = result.scalars().all()
+    return computers
 
 @router.get("/c", response_model = ComputerInfo)
 def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):

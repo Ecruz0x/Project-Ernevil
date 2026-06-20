@@ -44,7 +44,7 @@ st.header("Current metrics")
 
 try:
     rcmp = requests.get("http://127.0.0.1:8000/api/computers")
-    rloc = requests.get("http://127.0.0.1:8000/api/locations/get_locations")
+    rloc = requests.get("http://127.0.0.1:8000/api/locations")
     ralerts = requests.get("http://127.0.0.1:8000/api/get_alerts")
     alerts = ralerts.json()
     if rcmp.status_code == 200 and rloc.status_code == 200:

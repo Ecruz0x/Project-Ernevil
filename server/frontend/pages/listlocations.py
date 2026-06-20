@@ -1,0 +1,158 @@
+import requests
+import streamlit as st
+
+r = requests.get("http://127.0.0.1:8000/api/locations")
+rcmp = requests.get("http://127.0.0.1:8000/api/computers")
+
+if r.status_code != 200 or rcmp.status_code != 200:
+    st.error("Failed to load data.")
+    st.stop()
+
+locations = r.json()
+computers = rcmp.json()
+
+if "selected_location" in st.session_state:
+
+    location = next(
+        (
+            loc
+            for loc in locations
+            if loc["id"] == st.session_state.selected_location
+        ),
+        None
+    )
+
+    if location is None:
+        del st.session_state["selected_location"]
+        st.rerun()
+
+    @st.dialog("Add Computers")
+    def add_computers_dialog():
+
+        st.write(
+            "Select one or more computers to add to this location."
+        )
+
+        available = [
+            c for c in computers
+            if c.get("location_id") != location["id"]
+        ]
+
+        selected = st.multiselect(
+            "Available Computers",
+            options=available,
+            format_func=lambda c: c["computername"]
+        )
+
+        st.caption(
+            "Only selected computers will be assigned to this location."
+        )
+
+        if st.button("Add"):
+
+            requests.post(
+                "http://127.0.0.1:8000/api/locations/set",
+                json={
+                    "location_id": location["id"],
+                    "computer_id": [
+                        c["computer_id"]
+                        for c in selected
+                    ]
+                }
+            )
+
+            st.rerun()
+
+    st.button(
+        "Back",
+        on_click=lambda: st.session_state.pop(
+            "selected_location", None
+        )
+    )
+
+    st.html(f"<h2>{location['name']}</h2>")
+
+    st.html(
+        "<p>Browse, monitor, and manage all computers associated with this location.</p>"
+    )
+
+    st.divider()
+
+    location_computers = requests.get(
+        f"http://127.0.0.1:8000/api/computers/location?location_id={location['id']}"
+    ).json()
+
+    st.html("<h2>Assigned Computers:</h2>")
+
+    st.caption(
+        "Add existing computers to this location or remove them when no longer needed."
+    )
+
+    for computer in location_computers:
+
+        cols = st.columns([8, 1])
+
+        with cols[0]:
+            st.write(computer)
+
+        with cols[1]:
+            if st.button(
+                "...",
+                key=f"remove_{computer}",
+                help="Remove computer from this location"
+            ):
+                requests.post(
+                    "http://127.0.0.1:8000/api/locations/remove",
+                    json={
+                        "computer_id": computer
+                    }
+                )
+                st.rerun()
+
+    if not location_computers:
+        st.info(
+            "No computers are currently assigned to this location."
+        )
+    if st.button("Add Computer"):
+        add_computers_dialog()
+
+else:
+
+    st.title("Locations")
+
+    st.caption(
+        "Organize computers into logical groups for easier administration."
+    )
+
+    if not locations:
+        st.info("No locations available.")
+    else:
+        st.caption(f"{len(locations)} location(s)")
+
+    for location in locations:
+
+        cols = st.columns([8, 1])
+
+        with cols[0]:
+            if st.button(
+                location["name"],
+                key=f"location_{location['id']}",
+                use_container_width=True
+            ):
+                st.session_state.selected_location = location["id"]
+                st.rerun()
+
+        with cols[1]:
+            if st.button(
+                "...",
+                key=f"menu_{location['id']}",
+                help="Delete location"
+            ):
+                requests.delete(
+                    f"http://127.0.0.1:8000/api/locations/{location['id']}"
+                )
+                st.rerun()
+
+        st.caption(
+            f"Severity: {location['severity']}"
+        )
