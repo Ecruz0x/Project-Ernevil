@@ -20,3 +20,6 @@ changes.log
 
 # ignore DB
 *.db
+
+# ignore key.pem
+key.pem
