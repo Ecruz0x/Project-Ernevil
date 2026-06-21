@@ -229,8 +229,26 @@ def updateBootTime(computer_id: int, fingerprint: str, cert: str):
 	if currentBT != storedBT:
 		requests.patch(f"{server}/api/computers/bt", json={"computer_id": computer_id, "fingerprint": fingerprint, "boottime": currentBT}, verify=cert)
 
+
+def updateCPUInfo(computer_id: int, fingerprint: str, oldData: dict, cert: str):
+	storedCInfo = oldData["cpu_usage"]
+	refURL = f"{server}/api/computers/cpu?computer_id={computer_id}"
+	currentCInfo = round(currentComputer.getCpuUsage(), 2)
+	if storedCInfo != currentCInfo:
+		oldData["cpu_usage"] = currentCInfo
+		to_send_data = {"computer_id": computer_id,
+				"fingerprint":fingerprint,
+				"usage": currentCInfo}
+		updateR = requests.put(refURL, json = to_send_data, verify = cert)
+		if updateR.status_code <= 201:
+			return True
+		else:
+			return to_send_data
+
+
 def updateUSBInfo(computer_id: int, fingerprint: str):
 	pass
+
 
 def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int, cert: str):
 	while True:
@@ -239,4 +257,5 @@ def sendFullUpdates(computer_id: int, cagentdata: dict, update_interval: int, ce
 		uD = updateDiskInfo(computer_id, cagentdata["fingerprint"], cagentdata, cert)
 		uPs = updateProcessesInfo(computer_id, cagentdata["fingerprint"], cagentdata, cert)
 		uBt = updateBootTime(computer_id, cagentdata["fingerprint"], cert)
+		uCPUinf = updateCPUInfo(computer_id, cagentdata["fingerprint"], cagentdata, cert)
 		time.sleep(update_interval)

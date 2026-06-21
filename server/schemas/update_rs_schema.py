@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 from datetime import datetime
-from .add_rs_schema import MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
+from .add_rs_schema import MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo, CPUInfo
 
 
 class AuthenticateComputer(BaseModel):
@@ -36,3 +36,6 @@ class UCUsersInfo(CUsersInfo, AuthenticateComputer):
 
 class UpdateBootTime(AuthenticateComputer):
 	boottime: datetime
+
+class UpdateCpuUsage(AuthenticateComputer, CPUInfo):
+	pass

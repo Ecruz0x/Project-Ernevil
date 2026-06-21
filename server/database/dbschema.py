@@ -45,6 +45,7 @@ class ComputerInfo(Base):
 	location = relationship("Locations", back_populates="computers")
 	processes = relationship("processesInfo", back_populates="computer")
 	memoryinfo = relationship("MemoryInfo", back_populates="computer")
+	cpuinfo = relationship("CPUInfo", back_populates="computer")
 	netinfo = relationship("networkingInfo", back_populates="computer")
 	disksinfo = relationship("disksInfo", back_populates="computer")
 	computerusers = relationship("computerUsers", back_populates="computer")
@@ -63,6 +64,15 @@ class MemoryInfo(Base):
 	totalMemory: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
 	available_memory: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
 	usage: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
+
+class CPUInfo(Base):
+	__tablename__ = "cpuinfo"
+	computer_id = mapped_column(
+        ForeignKey("computerInfo.computer_id")
+    )
+	computer: Mapped[ComputerInfo] = relationship("ComputerInfo",back_populates="cpuinfo")
+	entryid: Mapped[int] = mapped_column(Integer, primary_key=True)
+	cpu_usage: Mapped[float] = mapped_column(Float, unique=False, nullable=False)
 
 class networkingInfo(Base):
 	__tablename__ = "netinfo"

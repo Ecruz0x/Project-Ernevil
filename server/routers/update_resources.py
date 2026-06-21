@@ -1,4 +1,4 @@
-from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, UCUsersInfo, UpdateBootTime
+from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, UCUsersInfo, UpdateBootTime, UpdateCpuUsage
 from ..schemas.authentication import AuthenticateComputer
 import time, asyncio, json
 from datetime import datetime
@@ -66,6 +66,23 @@ def updateMemoryInfo(newMemInfo: UpdateMemoryInfo, db: Annotated[Session, Depend
             detail="Authentication Error",
         )
 
+@router.put("/cpu", response_model = bool)
+def updateCpuUsage(newdata: UpdateCpuUsage, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": newdata.computer_id, "fingerprint": newdata.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
+    if is_auth:
+        result = db.execute(select(dbschema.CPUInfo).where(dbschema.CPUInfo.computer_id == newdata.computer_id))
+        computer = result.scalars().first()
+        if computer:
+            computer.cpu_usage = newdata.usage
+        db.commit()
+        db.refresh(computer)
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
 
 @router.patch("/net", response_model = bool)
 def updateNetInfo(newNetInfo: UpdateNetworkingInfo, db: Annotated[Session, Depends(get_db)]):
@@ -112,7 +129,6 @@ def updateProcessesInfo(newPsInfo: list[UpdateProcessesInfo], db: Annotated[Sess
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Authentication Error",
         )
-
 
 
 ## Needs DELETE endpoint

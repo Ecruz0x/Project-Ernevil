@@ -40,7 +40,7 @@ currentAgentInfo = {
 	"node_machineid": localComputer.getMachineId(),
 	"fingerprint": fp(localComputer.getMachineId()),
 	"usb_devices": localComputer.getUSBDevices(),
-	"key": agent_data["key"]
+	"key": agent_data["key"],
 }
 
 

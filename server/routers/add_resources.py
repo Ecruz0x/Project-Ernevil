@@ -49,6 +49,10 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         available_memory = computer.memory['availableMemory'],
         usage=computer.memory['usage']
         )
+    CpuInfo = dbschema.CPUInfo(
+        computer = newComputer,
+        cpu_usage = computer.cpu_usage
+        )
     interfaces = []
     for netinterface in computer.ip_addr.keys():
         interface = dbschema.networkingInfo(
