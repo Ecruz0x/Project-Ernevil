@@ -106,6 +106,7 @@ async def alert_endpoint(websocket: WebSocket, computer_id: int, wstype: str):
                 expire_time = datetime.now() + timedelta(hours=1)
                 alertd["computer_id"] = computer_id
                 alertd['expires_at'] = expire_time.isoformat()
+                db.insert(alertd)
 
     except WebSocketDisconnect as e:
         print(e)
