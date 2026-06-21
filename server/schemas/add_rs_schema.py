@@ -90,3 +90,7 @@ class addKey(BaseModel):
 	model_config = ConfigDict(from_attributes = True)
 	length: int
 	key: str
+
+class getCPUInfo(BaseModel):
+	model_config = ConfigDict(from_attributes = True)
+	cpu_usage: float

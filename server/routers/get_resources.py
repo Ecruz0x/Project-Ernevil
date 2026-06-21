@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
-from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo
+from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo, getCPUInfo
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
 from typing import Annotated
@@ -74,6 +74,23 @@ def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> 
         detail="Computer is offline or unreachable.",
         )
 
+@router.get("/cpu", response_model = getCPUInfo)
+def getCpuInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> MemoryInfo:
+    result = db.execute(
+        select(
+            dbschema.CPUInfo.cpu_usage
+        ).where(
+            dbschema.CPUInfo.computer_id == computer_id
+        )
+    )
+    targetdetails = result.mappings().all()
+    if targetdetails:
+        return targetdetails[0]
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer is offline or unreachable.",
+        )
 
 @router.get("/net", response_model = list[NetworkingInfo])
 def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[NetworkingInfo]:

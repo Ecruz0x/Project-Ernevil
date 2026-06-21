@@ -59,15 +59,21 @@ if computers:
         else:
             memdata = "Unavailable"
 
+        rcpu = requests.get(f"https://127.0.0.1:8000/api/computers/cpu?computer_id={computer_map[choice]}", verify=cert)
+        if rcpu.status_code == 200:
+            cpu_usage = rcpu.json()["cpu_usage"]
+        else:
+            cpu_usage = "Unavailable"
+
         rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify=cert)
         if rcmpb.status_code == 200:
             boottime = rcmpb.json()["boottime"]
             os = rcmpb.json()["os"]
         else:
             boottime = "Unavailable"
-
+            os = "Unavailable"
         with cols[0]:
-            ui.metric_card(title="CPU Usage", content=v, description="Current CPU usage", key="cpu")
+            ui.metric_card(title="CPU Usage", content=str(cpu_usage) + "%", description="Current CPU usage", key="cpu")
         with cols[1]:
             ui.metric_card(title="Memory Usage", content=memdata, description="Current memory usage", key="ram")
         with cols[2]:
@@ -125,7 +131,7 @@ if computers:
         st.write("Unknown Error, please refresh the page and try again.")
 
     data = [
-        {"Users count": str(len(users)), "Disks count": str(len(dsk_data)), "Processes Count": str(ps_count), "OS": os},
+        {"Users count": str(len(users)), "Partition count": str(len(dsk_data)), "Processes Count": str(ps_count), "OS": os},
     ]
 
     df_general = pd.DataFrame(data)
@@ -134,7 +140,7 @@ if computers:
 
     st.html(f"<h3>Processes</h3><p style='font-size: 17px;'>Visualize and analyze processes on <strong>{choice}</strong></p>")
     processes_scraper()
-    st.html(f"<h3>Disks</h3>")
+    st.html(f"<h3>Partitions</h3>")
     disk_data = []
 
     for disk in dsk_data:
