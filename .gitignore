@@ -21,5 +21,6 @@ changes.log
 # ignore DB
 *.db
 
-# ignore key.pem
-key.pem
+# ignore certs
+*.pem
+*.crt
