@@ -198,13 +198,28 @@ if computers:
     left, right = st.columns(2)
 
     if left.button(f"Shutdown", width="stretch", key="left_btn"):
-        requests.post("https://127.0.0.1:8000/api/shutdown", json = {"computer_id": computer_map[choice]}, verify = cert)
+        rrsht = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "shutdown now"}, verify = cert)
+        try:
+                result = rrsht.json()["result"]
+                output = str(result)
+                st.code(output)
+            except Exception as e:
+                st.code("Execution error, please check your agents and try again.")
+        else:
+            st.code("Execution error, please check your agents and try again.")
+            st.rerun()
 
     if right.button(f"Restart", width="stretch", key="right_btn"):
-        requests.post("https://127.0.0.1:8000/api/restart", json = {"computer_id": computer_map[choice]}, verify = cert)
-
-        
-
+        rrstrt = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "reboot now"}, verify = cert)
+        try:
+                result = rrstrt.json()["result"]
+                output = str(result)
+                st.code(output)
+            except Exception as e:
+                st.code("Execution error, please check your agents and try again.")
+        else:
+            st.code("Execution error, please check your agents and try again.")
+            st.rerun()
 
 
 else:

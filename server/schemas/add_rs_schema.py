@@ -41,6 +41,7 @@ class ComputerInfo(BaseModel):
 	computername: str
 	is_unix: bool
 	os: str
+	blacklisted: Optional[bool] = True
 	boottime: datetime
 	is_alive: bool
 	node_machineid: str

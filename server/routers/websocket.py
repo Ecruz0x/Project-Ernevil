@@ -58,10 +58,9 @@ def captureSc(computer_id: int):
 @router.post("/shutdown")
 async def shutDownComputer(computer: ShutdownComputer):
     try:
-        websocket = agent_ws.command_connections[computer.computer_id]
-        await agent_ws.send_specific_message("shutdown now", websocket)
-        response = await websocket.receive_text()
-        return {"result": response}
+        info = {"command": "pwd", "computer_id": computer.computer_id}
+        response = await execCommands(info)
+        return response
     except KeyError as e:
         raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
