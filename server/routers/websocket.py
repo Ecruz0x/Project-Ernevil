@@ -51,35 +51,6 @@ async def execCommands(commandBody: CommandRequest):
         return {"result": "Execution timed out"}
 
 
-@router.post("/screenshot")
-def captureSc(computer_id: int):
-    pass
-
-@router.post("/shutdown")
-async def shutDownComputer(computer: ShutdownComputer):
-    try:
-        info = {"command": "pwd", "computer_id": computer.computer_id}
-        response = await execCommands(info)
-        return response
-    except KeyError as e:
-        raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="websocket not found",
-        ) 
-
-@router.post("/restart")
-async def restartComputer(computer: RestartComputer):
-    try:
-        websocket = agent_ws.command_connections[computer.computer_id]
-        await agent_ws.send_specific_message("sudo reboot", websocket)
-        response = await websocket.receive_text()
-        return {"result": response}
-    except KeyError as e:
-        raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="websocket not found",
-        )
-
 
 @router.websocket("/ws/alert")
 async def alert_endpoint(websocket: WebSocket, computer_id: int, wstype: str):
