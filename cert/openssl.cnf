@@ -7,7 +7,7 @@ distinguished_name = dn
 x509_extensions = v3_req
 
 [dn]
-CN = 172.16.1.173
+CN = 192.168.104.1
 
 [v3_req]
 subjectAltName = @alt_names
@@ -16,3 +16,4 @@ subjectAltName = @alt_names
 DNS.1 = localhost
 IP.1 = 127.0.0.1
 IP.2 = 172.16.1.173
+IP.3 = 192.168.104.1

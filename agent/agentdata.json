@@ -1,8 +1,8 @@
 {
-    "agentid": 1,
+    "agentid": 2,
     "is_alive": true,
     "heartbeat_interval": 15,
     "updates_interval": 30,
     "retries": 5,
-    "key": "tnZxAtV3"
+    "key": "v4soZg1t"
 }

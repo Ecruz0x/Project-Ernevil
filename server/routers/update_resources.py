@@ -1,4 +1,5 @@
-from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo, UpdateDisksInfo, UCUsersInfo, UpdateBootTime, UpdateCpuUsage
+from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo
+from ..schemas.update_rs_schema import UCUsersInfo, UpdateBootTime, UpdateCpuUsage, UpdateDisksInfo, updateBlacklistState
 from ..schemas.authentication import AuthenticateComputer
 import time, asyncio, json
 from datetime import datetime
@@ -59,6 +60,23 @@ def updateMemoryInfo(newMemInfo: UpdateMemoryInfo, db: Annotated[Session, Depend
             computer.usage = newMemInfo.usage
         db.commit()
         db.refresh(computer)
+        return True
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Authentication Error",
+        )
+@router.patch("/blacklist", response_model = bool)
+def setCBlacklist(BSInfo: updateBlacklistState, db: Annotated[Session, Depends(get_db)]):
+    auth_data = {"computer_id": BSInfo.computer_id, "fingerprint": BSInfo.fingerprint}
+    is_auth = authenticateComputer(auth_data, db)
+    if is_auth:
+        result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == BSInfo.computer_id))
+        computer = result.scalars().first()
+        if computer:
+            computer.blacklisted = BSInfo.blacklist_state
+            db.commit()
+            db.refresh(computer)
         return True
     else:
         raise HTTPException(
@@ -131,7 +149,6 @@ def updateProcessesInfo(newPsInfo: list[UpdateProcessesInfo], db: Annotated[Sess
         )
 
 
-## Needs DELETE endpoint
 @router.patch("/hd", response_model = bool)
 def updateDisksInfo(newHdInfo: UpdateDisksInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newHdInfo.computer_id, "fingerprint": newHdInfo.fingerprint}
@@ -151,7 +168,6 @@ def updateDisksInfo(newHdInfo: UpdateDisksInfo, db: Annotated[Session, Depends(g
         )
 
 
-## Needs DELETE endpoint
 @router.patch("/cusers", response_model = bool)
 def updateUserInfo(newUserInfo: UCUsersInfo, db: Annotated[Session, Depends(get_db)]):
     auth_data = {"computer_id": newUserInfo.computer_id, "fingerprint": newUserInfo.fingerprint}

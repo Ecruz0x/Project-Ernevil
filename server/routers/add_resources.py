@@ -42,6 +42,7 @@ def addComputer(computer: CreateComputer, db: Annotated[Session, Depends(get_db)
         fingerprint= computer.fingerprint,
         added_on=datetime.now(),
         os=computer.os,
+        blacklisted = False
         )
     MemInfo = dbschema.MemoryInfo(
         computer=newComputer,
