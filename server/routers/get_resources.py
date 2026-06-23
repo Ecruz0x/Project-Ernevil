@@ -16,11 +16,18 @@ router = APIRouter()
 #### Key auth
 @router.get("/is_added", response_model = bool)
 def isAddedComputer(k: AuthUpdates, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT 1 FROM computerInfo WHERE computer_id = {k.computer_id}"))
-    existing_computer = result.scalars().first()
-    result_k = db.execute(text(f"SELECT 1 FROM keys WHERE key = {k.key}"))
-    existing_computer = result.scalars().first()
-    if existing_computer:
+    existing_computer = (
+        db.query(dbschema.ComputerInfo)
+        .filter(dbschema.ComputerInfo.computer_id == k.computer_id)
+        .first()
+    )
+
+    existing_key = (
+        db.query(dbschema.Keys)
+        .filter(dbschema.Keys.key == k.key)
+        .first()
+    )
+    if existing_computer and existing_computer:
         return True
     else:
         raise HTTPException(

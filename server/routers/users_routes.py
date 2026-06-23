@@ -38,6 +38,11 @@ def create_user(user: UserCreate, db: Annotated[Session, Depends(get_db)]):
 	return user
 
 
+@router.get("/count")
+def get_user_count(db: Annotated[Session, Depends(get_db)]):
+    count = db.scalar(select(func.count()).select_from(dbschema.Users))
+    return {"count": count}
+
 
 @router.post("/token", response_model=Token)
 def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[Session, Depends(get_db)]):

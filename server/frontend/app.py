@@ -1,9 +1,12 @@
 import streamlit as st
 
+
+
+
 st.set_page_config(
     page_title="Ernevil",
     page_icon=":material/info:",
-    layout="wide",
+    layout="centered",
 )
 
 # Login page
@@ -58,11 +61,6 @@ addLocations = st.Page(
     icon=":material/add_location:",
 )
 
-generateComputerReports = st.Page(
-    "pages/reports.py",
-    title="Computer Report",
-    icon=":material/description:",
-)
 
 networkAlerts = st.Page(
     "pages/netalerts.py",
@@ -70,20 +68,19 @@ networkAlerts = st.Page(
     icon=":material/notification_important:",
 )
 
-if "token" not in st.session_state:
+if not st.session_state.get("token"):
     pg = st.navigation([login_page])
 else:
     pg = st.navigation(
         {
             "": [overviewPage],
-            "IAM": [KeyComputersPage],
-            "Computers & Reports": [
+            "Auth Keys": [KeyComputersPage],
+            "Manage Agents": [
                 AvComputersPage,
                 monitorComputersPage,
                 blacklistComputersPage,
-                generateComputerReports,
             ],
-            "Locations": [locations, addLocations],
+            "Manage Locations": [locations, addLocations],
             "Alerts": [networkAlerts],
         }
     )
