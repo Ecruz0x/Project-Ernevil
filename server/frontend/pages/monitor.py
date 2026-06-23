@@ -177,7 +177,7 @@ try:
         # Commands execution
         st.html(f"<h2>Execute shell commands on {choice}</h2>")
         response = code_editor("# Write You commands here", response_mode="debounce")
-        computers = requests.get("https://127.0.0.1:8000/api/computers/live", verify = cert).json()
+        computers = requests.get("https://127.0.0.1:8000/api/computers/live", verify = cert, headers = headers).json()
         if st.button("Execute"):
             computer_map = mapComputers(computers)
             if choice in computer_map.keys():

@@ -18,7 +18,7 @@ try:
 
 	for computer in computers:
 		if computer["location_id"]:
-			r = requests.get(f"https://127.0.0.1:8000/api/locations/getlocbyid?location_id={computer['location_id']}", verify=cert)
+			r = requests.get(f"https://127.0.0.1:8000/api/locations/getlocbyid?location_id={computer['location_id']}", verify=cert, headers=headers)
 			loc = r.json()
 			data.append({"Computer Name": computer["computername"], "Location": loc, "OS": computer["os"], "Status": "Online" if computer["is_alive"] else "Offline"})
 		else:

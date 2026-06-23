@@ -51,7 +51,7 @@ def main():
 	isInitialized = False
 	if agent_data["agentid"]:
 		agid = agent_data["agentid"]
-		isAddedComputer = requests.get(f"{server}/api/computers/is_added", json = {"computer_id": agid, "key": cagentdata["key"]}, verify=cert)
+		isAddedComputer = requests.get(f"{server}/api/computers/is_added?computer_id={agid}", verify=cert)
 		if isAddedComputer.status_code == 200:
 			isInitialized = True
 			computer_id = agid
@@ -66,7 +66,7 @@ def main():
 	beat = multiprocessing.Process(target=sendBeat, args = (computer_id, cagentdata["fingerprint"], agent_data["heartbeat_interval"], server, cert))
 	commands_websocket = multiprocessing.Process(target=launchCmdWS, args=(computer_id, currentAgentInfo["is_unix"]))
 	usbalerts = multiprocessing.Process(target=start_usb_alerts, args=(computer_id, currentAgentInfo["is_unix"], cert))
-	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"], cert,))
+	updates = multiprocessing.Process(target=sendFullUpdates, args = (computer_id, cagentdata, agent_data["updates_interval"], cert))
 	ids = multiprocessing.Process(target=start_ids, args=(computer_id, "lo", currentAgentInfo["is_unix"], cert))
 	#ids = multiprocessing.Process(target=start_ids, args=(computer_id, localComputer.getActiveInterface(), currentAgentInfo["is_unix"]))
 	try:

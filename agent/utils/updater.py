@@ -223,8 +223,8 @@ def updateUsersInfo(computer_id: int, fingerprint: str, oldData: dict, cert: str
 		removed[k] = None
 	
 def updateBootTime(computer_id: int, fingerprint: str, cert: str):
-	reqCheck = requests.get(f"{server}/api/computers?computer_id={computer_id}", verify=cert)
-	storedBT = reqCheck.json()[0]["boottime"]
+	reqCheck = requests.get(f"{server}/api/computers/get_bt?computer_id={computer_id}",verify=cert)
+	storedBT = reqCheck.json()
 	currentBT = currentComputer.getBootTime()
 	if currentBT != storedBT:
 		requests.patch(f"{server}/api/computers/bt", json={"computer_id": computer_id, "fingerprint": fingerprint, "boottime": currentBT}, verify=cert)

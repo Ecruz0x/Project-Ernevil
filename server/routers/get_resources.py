@@ -7,6 +7,7 @@ from typing import Annotated
 from sqlalchemy import text, select
 from sqlalchemy.orm import Session
 from ..auth import ValidUser
+from datetime import datetime
 
 
 
@@ -18,19 +19,14 @@ router = APIRouter()
 
 #### Key auth
 @router.get("/is_added", response_model = bool)
-def isAddedComputer(k: AuthUpdates, db: Annotated[Session, Depends(get_db)]):
+def isAddedComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     existing_computer = (
         db.query(dbschema.ComputerInfo)
-        .filter(dbschema.ComputerInfo.computer_id == k.computer_id)
+        .filter(dbschema.ComputerInfo.computer_id == computer_id)
         .first()
     )
 
-    existing_key = (
-        db.query(dbschema.Keys)
-        .filter(dbschema.Keys.key == k.key)
-        .first()
-    )
-    if existing_computer and existing_computer:
+    if existing_computer:
         return True
     else:
         raise HTTPException(
@@ -38,6 +34,20 @@ def isAddedComputer(k: AuthUpdates, db: Annotated[Session, Depends(get_db)]):
         detail="Computer unavailable or unauthorized",
         )
 
+@router.get("/get_bt")
+def getBootTime(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    computer = (
+        db.query(dbschema.ComputerInfo)
+        .filter(dbschema.ComputerInfo.computer_id == computer_id)
+        .first()
+    )
+    if computer:
+        return computer.boottime
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer unavailable or unauthorized",
+        )
 
 @router.get("", response_model = list[ComputerInfo])
 def getComputers(db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
