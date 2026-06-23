@@ -198,29 +198,23 @@ if computers:
     left, right = st.columns(2)
 
     if left.button(f"Shutdown", width="stretch", key="left_btn"):
-        rrsht = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "shutdown now"}, verify = cert)
+        rrsht = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "systemctl poweroff -i"}, verify = cert)
         try:
-                result = rrsht.json()["result"]
-                output = str(result)
-                st.code(output)
-            except Exception as e:
-                st.code("Execution error, please check your agents and try again.")
-        else:
+            result = rrsht.json()["result"]
+            output = str(result)
+            st.code(output)
+        except Exception as e:
             st.code("Execution error, please check your agents and try again.")
             st.rerun()
 
     if right.button(f"Restart", width="stretch", key="right_btn"):
-        rrstrt = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "reboot now"}, verify = cert)
+        rrstrt = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "systemctl reboot --check-inhibitors=no"}, verify = cert)
         try:
-                result = rrstrt.json()["result"]
-                output = str(result)
-                st.code(output)
-            except Exception as e:
-                st.code("Execution error, please check your agents and try again.")
-        else:
+            result = rrstrt.json()["result"]
+            output = str(result)
+            st.code(output)
+        except Exception as e:
             st.code("Execution error, please check your agents and try again.")
-            st.rerun()
-
 
 else:
     st.html("<h2>No devices are currently detected. Please verify that your agents are running and that the credentials are configured correctly.</h2>")
