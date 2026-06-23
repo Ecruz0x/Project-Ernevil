@@ -17,9 +17,13 @@ cert = "server.crt"
 users_exist = False
 
 try:
+    headers = {
+        "Authorization": f"Bearer {st.session_state.token}"
+    }
     r = requests.get(
         "https://127.0.0.1:8000/api/users/count",
-        verify=cert
+        verify=cert,
+        headers=headers
     )
 
     if r.ok:
@@ -45,7 +49,7 @@ if not users_exist:
 
             if submitted:
                 r = requests.post(
-                    "https://127.0.0.1:8000/api/users/token",
+                    "https://127.0.0.1:8000/api/users/token", headers=headers,
                     data={
                         "username": username,
                         "password": password
@@ -82,7 +86,7 @@ if not users_exist:
 
                 else:
                     r = requests.post(
-                        "https://127.0.0.1:8000/api/users",
+                        "https://127.0.0.1:8000/api/users", headers=headers,
                         json={
                             "username": new_username,
                             "email": new_email,
@@ -99,6 +103,9 @@ if not users_exist:
                         except:
                             st.error("Failed to create account")
 else:
+    headers = {
+        "Authorization": f"Bearer {st.session_state.token}"
+    }
     login_tab = st.container(border=True)
     with login_tab:
         with st.form("login"):
@@ -109,7 +116,7 @@ else:
 
             if submitted:
                 r = requests.post(
-                    "https://127.0.0.1:8000/api/users/token",
+                    "https://127.0.0.1:8000/api/users/token", headers=headers,
                     data={
                         "username": username,
                         "password": password

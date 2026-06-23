@@ -5,12 +5,12 @@ from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
 from typing import Annotated
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
-
+from ..auth import ValidUser
 
 router = APIRouter()
 
 @router.get("", response_model = list[GetLocations])
-def getLocations(db: Annotated[Session, Depends(get_db)]):  #### Database management Here
+def getLocations(db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):  #### Database management Here
     result = db.execute(
         select(
             dbschema.Locations.id,
@@ -23,7 +23,7 @@ def getLocations(db: Annotated[Session, Depends(get_db)]):  #### Database manage
     return locations
 
 @router.post("", response_model = CreatedLocation)
-def createLocation(location: CreateLocation, db: Annotated[Session, Depends(get_db)]):
+def createLocation(location: CreateLocation, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     result = db.execute(
         select(dbschema.Locations).where(
             dbschema.Locations.name == location.location_name
@@ -49,7 +49,7 @@ def createLocation(location: CreateLocation, db: Annotated[Session, Depends(get_
 
 
 @router.delete("/delete_loc", response_model = bool)
-def removeLocation(data: removeLocation, db: Annotated[Session, Depends(get_db)]):
+def removeLocation(data: removeLocation, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     location = (
         db.query(dbschema.Locations)
         .filter(dbschema.Locations.id == data.location_id)
@@ -68,7 +68,7 @@ def removeLocation(data: removeLocation, db: Annotated[Session, Depends(get_db)]
 
 
 @router.delete("/delete", response_model = bool)
-def removeDevLocation(data: removeDevLocation, db: Annotated[Session, Depends(get_db)]):
+def removeDevLocation(data: removeDevLocation, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     computer = (
         db.query(dbschema.ComputerInfo)
         .filter(dbschema.ComputerInfo.computername == data.computer)
@@ -80,7 +80,7 @@ def removeDevLocation(data: removeDevLocation, db: Annotated[Session, Depends(ge
         return True
 
 @router.post("/set", response_model = bool)
-def setDevLocation(data: setLocation, db: Annotated[Session, Depends(get_db)]):
+def setDevLocation(data: setLocation, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     for ids in data.computer_id:
         computer = (
             db.query(dbschema.ComputerInfo)
@@ -93,7 +93,7 @@ def setDevLocation(data: setLocation, db: Annotated[Session, Depends(get_db)]):
             return True
 
 @router.get("/getlocbyid", response_model = str)
-def getLocByID(location_id: int, db: Annotated[Session, Depends(get_db)]):
+def getLocByID(location_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     loc = (
         db.query(dbschema.Locations)
         .filter(dbschema.Locations.id == location_id)

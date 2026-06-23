@@ -7,7 +7,10 @@ cert = "server.crt"
 
 st.header("Available Devices")
 try:
-	rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert)
+	headers = {
+	    "Authorization": f"Bearer {st.session_state.token}"
+	}
+	rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert, headers=headers)
 	if rcmp.status_code == 200:
 	    computers = rcmp.json()
 

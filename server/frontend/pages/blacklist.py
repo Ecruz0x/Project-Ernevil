@@ -19,7 +19,10 @@ def mapComputers(computers):
     return computer_map
 
 try:
-    rcmp = requests.get("https://127.0.0.1:8000/api/computers/live", verify=cert)
+    headers = {
+        "Authorization": f"Bearer {st.session_state.token}"
+    }
+    rcmp = requests.get("https://127.0.0.1:8000/api/computers/live", verify=cert, headers=headers)
     if rcmp.status_code == 200:
         computers = rcmp.json()
     else:
@@ -32,7 +35,7 @@ try:
         choice = ui.select(options=computer_map.keys())
         reason = ui.input(type='text', placeholder="Reason", key="input1")
         if st.button("Blacklist", type="primary"):
-            r = requests.patch("https://127.0.0.1:8000/api/computers/blacklist", json={"computer_id": computer_map[choice], "blacklist_state": True, "blacklist_reason": reason}, verify=cert)
+            r = requests.patch("https://127.0.0.1:8000/api/computers/blacklist", headers=headers, json={"computer_id": computer_map[choice], "blacklist_state": True, "blacklist_reason": reason}, verify=cert)
             if r.status_code == 200:
                 st.success(f"Device blacklisted successfully !")
                 st.rerun()
@@ -54,7 +57,7 @@ try:
 
     st.html("<h3>Blacklisted Devices</h3>")
 
-    rcmp = requests.get("https://127.0.0.1:8000/api/computers/blacklisted", verify=cert)
+    rcmp = requests.get("https://127.0.0.1:8000/api/computers/blacklisted", verify=cert, headers=headers)
     if rcmp.status_code == 200:
         computers = rcmp.json()
 
@@ -62,7 +65,7 @@ try:
 
     for computer in computers:
         if computer["location_id"]:
-            r = requests.get(f"https://127.0.0.1:8000/api/locations/getlocbyid?location_id={computer['location_id']}", verify=cert)
+            r = requests.get(f"https://127.0.0.1:8000/api/locations/getlocbyid?location_id={computer['location_id']}", verify=cert, headers=headers)
             loc = r.json()
             data.append({"Computer ID": computer["computer_id"], "Computer Name": computer["computername"], "Location": loc, "OS": computer["os"], "Status": "Online" if computer["is_alive"] else "Offline"})
         else:
@@ -81,7 +84,7 @@ try:
             col4.write(device["Status"])
 
             if col5.button("Remove", key=f"connect_{device['Computer Name']}"):
-                r = requests.patch("https://127.0.0.1:8000/api/computers/blacklist", json={"computer_id": device["Computer ID"], "blacklist_state": False}, verify=cert)
+                r = requests.patch("https://127.0.0.1:8000/api/computers/blacklist", headers=headers, json={"computer_id": device["Computer ID"], "blacklist_state": False}, verify=cert)
                 print()
                 if r.status_code == 200:
                     st.success(f"Removed {device['Computer Name']} from blacklist")

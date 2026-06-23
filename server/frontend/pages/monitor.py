@@ -18,7 +18,10 @@ def mapComputers(computers):
         computer_map[computer["computername"]] = computer["computer_id"]
     return computer_map
 try:
-    rcmp = requests.get("https://127.0.0.1:8000/api/computers/live", verify=cert)
+    headers = {
+        "Authorization": f"Bearer {st.session_state.token}"
+    }
+    rcmp = requests.get("https://127.0.0.1:8000/api/computers/live", verify=cert, headers=headers)
     if rcmp.status_code == 200:
         computers = rcmp.json()
     else:
@@ -35,7 +38,7 @@ try:
         st.html(f"<h2>Current {choice} metrics </h2>")
 
         # Memory Usage
-        rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify=cert)
+        rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify=cert, headers=headers)
         if rmem.status_code == 200:
             memdata = rmem.json()["usage"]
             memdata = str(memdata) + "%"
@@ -43,7 +46,7 @@ try:
             memdata = "Unavailable"
 
         # Boottime
-        rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify=cert)
+        rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify=cert, headers=headers)
         if rcmpb.status_code == 200:
             boottime = rcmpb.json()["boottime"]
             os = rcmpb.json()["os"]
@@ -54,20 +57,20 @@ try:
         @st.fragment(run_every="5s")
         def live_metrics(choice):
             cols = st.columns(3)
-            rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify=cert)
+            rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify=cert, headers=headers)
             if rmem.status_code == 200:
                 memdata = rmem.json()["usage"]
                 memdata = str(memdata) + "%"
             else:
                 memdata = "Unavailable"
 
-            rcpu = requests.get(f"https://127.0.0.1:8000/api/computers/cpu?computer_id={computer_map[choice]}", verify=cert)
+            rcpu = requests.get(f"https://127.0.0.1:8000/api/computers/cpu?computer_id={computer_map[choice]}", verify=cert, headers=headers)
             if rcpu.status_code == 200:
                 cpu_usage = rcpu.json()["cpu_usage"]
             else:
                 cpu_usage = "Unavailable"
 
-            rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify=cert)
+            rcmpb = requests.get(f"https://127.0.0.1:8000/api/computers/c?computer_id={computer_map[choice]}", verify=cert, headers=headers)
             if rcmpb.status_code == 200:
                 boottime = rcmpb.json()["boottime"]
                 os = rcmpb.json()["os"]
@@ -84,12 +87,12 @@ try:
         live_metrics(choice)
 
 
-        ps_count = len(requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify=cert).json())
+        ps_count = len(requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify=cert, headers=headers).json())
         @st.fragment(run_every="15s")
         def processes_scraper():
             # Processes scraper
             try:
-                rps = requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify=cert)
+                rps = requests.get(f"https://127.0.0.1:8000/api/computers/ps?computer_id={computer_map[choice]}", verify=cert, headers=headers)
                 if rps.status_code == 200:
                     ps_data = rps.json()
                 data_ps = []
@@ -110,7 +113,7 @@ try:
                 return st.write("Unknown Error, please refresh the page and try again.")
         # Users scraper
         try:
-            rusers = requests.get(f"https://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}", verify=cert)
+            rusers = requests.get(f"https://127.0.0.1:8000/api/computers/cusers?computer_id={computer_map[choice]}", verify=cert, headers=headers)
             if rusers.status_code == 200:
                 users = rusers.json()
         except Exception as e:
@@ -118,7 +121,7 @@ try:
             
         # Disks scraper
         try:
-            rdsk = requests.get(f"https://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}", verify=cert)
+            rdsk = requests.get(f"https://127.0.0.1:8000/api/computers/hd?computer_id={computer_map[choice]}", verify=cert, headers=headers)
             if rdsk.status_code == 200:
                 dsk_data = rdsk.json()
         except Exception as e:
@@ -126,7 +129,7 @@ try:
 
         # NetIF scraper
         try:
-            rnet = requests.get(f"https://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}", verify=cert)
+            rnet = requests.get(f"https://127.0.0.1:8000/api/computers/net?computer_id={computer_map[choice]}", verify=cert, headers=headers)
             if rnet.status_code == 200:
                 net_data = rnet.json()
         except Exception as e:
@@ -178,7 +181,7 @@ try:
         if st.button("Execute"):
             computer_map = mapComputers(computers)
             if choice in computer_map.keys():
-                rcmds = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text'][25:]}, verify = cert)
+                rcmds = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text'][25:]}, headers=headers, verify = cert)
                 try:
                     result = rcmds.json()["result"]
                     output = str(result)
@@ -200,7 +203,7 @@ try:
         left, right = st.columns(2)
 
         if left.button(f"Shutdown", width="stretch", key="left_btn"):
-            rrsht = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "systemctl poweroff -i"}, verify = cert)
+            rrsht = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "systemctl poweroff -i"}, verify = cert, headers=headers)
             try:
                 result = rrsht.json()["result"]
                 output = str(result)
@@ -210,7 +213,7 @@ try:
                 st.rerun()
 
         if right.button(f"Restart", width="stretch", key="right_btn"):
-            rrstrt = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "systemctl reboot --check-inhibitors=no"}, verify = cert)
+            rrstrt = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": "systemctl reboot --check-inhibitors=no"}, verify = cert, headers=headers)
             try:
                 result = rrstrt.json()["result"]
                 output = str(result)

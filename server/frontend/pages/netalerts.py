@@ -17,7 +17,10 @@ cert = "server.crt"
 
 
 try:
-    r = requests.get("https://127.0.0.1:8000/api/get_alerts", verify=cert)
+    headers = {
+        "Authorization": f"Bearer {st.session_state.token}"
+    }
+    r = requests.get("https://127.0.0.1:8000/api/get_alerts", verify=cert, headers=headers)
     alerts = r.json()
     if alerts:
         for i in range(len(alerts)):

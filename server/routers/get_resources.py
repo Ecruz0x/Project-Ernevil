@@ -6,6 +6,9 @@ from ..database.db import Base, engine, get_db
 from typing import Annotated
 from sqlalchemy import text, select
 from sqlalchemy.orm import Session
+from ..auth import ValidUser
+
+
 
 router = APIRouter()
 
@@ -37,26 +40,26 @@ def isAddedComputer(k: AuthUpdates, db: Annotated[Session, Depends(get_db)]):
 
 
 @router.get("", response_model = list[ComputerInfo])
-def getComputers(db: Annotated[Session, Depends(get_db)]):
+def getComputers(db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     result = db.execute(text("SELECT * FROM computerInfo"))
     computers = result.mappings().all()
     return computers
 
 @router.get("/live", response_model = list[ComputerInfo])
-def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerInfo]:
+def getLiveComputers(db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> list[ComputerInfo]:
     result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive AND NOT blacklisted"))
     liveComputers = result.mappings().all()
     return liveComputers
 
 @router.get("/blacklisted", response_model = list[ComputerInfo])
-def getBSComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerInfo]:
+def getBSComputers(db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> list[ComputerInfo]:
     result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive AND blacklisted"))
     BSComputers = result.mappings().all()
     return BSComputers
 
 
 @router.get("/location", response_model = list[str])
-def getCmpLoc(location_id: int, db: Annotated[Session, Depends(get_db)]):
+def getCmpLoc(location_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     result = db.execute(
         select(dbschema.ComputerInfo.computername).where(
             dbschema.ComputerInfo.location_id == location_id
@@ -67,7 +70,7 @@ def getCmpLoc(location_id: int, db: Annotated[Session, Depends(get_db)]):
     return computers
 
 @router.get("/c", response_model = ComputerInfo)
-def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser):
     result = db.execute(text(f"SELECT * FROM computerInfo WHERE computer_id = {computer_id}"))
     targetComputer = result.mappings().all()
     if targetComputer:
@@ -80,7 +83,7 @@ def getComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
 
 
 @router.get("/mem", response_model = MemoryInfo)
-def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> MemoryInfo:
+def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> MemoryInfo:
     result = db.execute(text(f"SELECT totalMemory, available_memory, usage FROM memoryinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     if targetdetails:
@@ -92,7 +95,7 @@ def getMemoryInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> 
         )
 
 @router.get("/cpu", response_model = getCPUInfo)
-def getCpuInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> MemoryInfo:
+def getCpuInfo(computer_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> MemoryInfo:
     result = db.execute(
         select(
             dbschema.CPUInfo.cpu_usage
@@ -110,7 +113,7 @@ def getCpuInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> Mem
         )
 
 @router.get("/net", response_model = list[NetworkingInfo])
-def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[NetworkingInfo]:
+def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> list[NetworkingInfo]:
     result = db.execute(text(f"SELECT ifname, ipaddr FROM netinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     if targetdetails:
@@ -122,7 +125,7 @@ def getNetInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> lis
         )
 
 @router.get("/ps", response_model = list[ProcessesInfo])
-def getProcessInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[ProcessesInfo]:
+def getProcessInfo(computer_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> list[ProcessesInfo]:
     result = db.execute(text(f"SELECT pid, username, name FROM processesinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     if targetdetails:
@@ -134,7 +137,7 @@ def getProcessInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) ->
         )
 
 @router.get("/hd", response_model = list[DisksInfo])
-def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[DisksInfo]:
+def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> list[DisksInfo]:
     result = db.execute(text(f"SELECT partitionname, mountpoint, fstype FROM disksinfo WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     if targetdetails:
@@ -146,7 +149,7 @@ def getDisksInfo(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> l
         )
 
 @router.get("/cusers", response_model = list[CUsersInfo])
-def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]) -> list[CUsersInfo]:
+def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)], valid_user: ValidUser) -> list[CUsersInfo]:
     result = db.execute(text(f"SELECT username FROM computerusers WHERE computer_id = {computer_id}"))
     targetdetails = result.mappings().all()
     if targetdetails:
@@ -158,7 +161,7 @@ def getComputerUsers(computer_id: int, db: Annotated[Session, Depends(get_db)]) 
         )
 
 @router.get("/expired", response_model = list[ComputerInfo])
-def getExpiredComputers():
+def getExpiredComputers(valid_user: ValidUser):
     result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.is_alive == False))
     expired_computers = result.mappings().all()
     if expired_computers:

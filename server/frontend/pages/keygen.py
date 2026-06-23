@@ -13,8 +13,12 @@ st.set_page_config(
 if "generated_key" not in st.session_state:
     st.session_state.generated_key = None
 
+headers = {
+        "Authorization": f"Bearer {st.session_state.token}"
+}
+
 def add_key(key, length):
-    r = requests.post("https://127.0.0.1:8000/api/computers/keys", json = {"key": key, "length": length}, verify = cert)
+    r = requests.post("https://127.0.0.1:8000/api/computers/keys", json = {"key": key, "length": length}, verify = cert, headers=headers)
     return r.status_code
 
 

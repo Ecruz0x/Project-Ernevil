@@ -5,7 +5,7 @@ from ..schemas.executors_schemas import CommandRequest, RestartComputer, Shutdow
 import math, os, json
 from datetime import datetime, timedelta
 from tinydb import TinyDB, Query
-
+from ..auth import ValidUser
 
 router = APIRouter()
 agent_ws = connection_manager.ConnectionManager()
@@ -32,7 +32,7 @@ async def websocket_endpoint(websocket: WebSocket, computer_id: int, wstype: str
 
 
 @router.post("/commands")
-async def execCommands(commandBody: CommandRequest):
+async def execCommands(commandBody: CommandRequest, valid_user: ValidUser):
     websocket = agent_ws.command_connections[commandBody.computer_id]
     future = asyncio.Future()
     agent_ws.pending_responses[commandBody.computer_id] = future
@@ -83,7 +83,7 @@ async def alert_endpoint(websocket: WebSocket, computer_id: int, wstype: str):
 
 
 @router.get("/get_alerts")
-async def getAlerts():
+async def getAlerts(valid_user: ValidUser):
     try:
         now_str = datetime.now().isoformat()
         active_notifications = db.search(lambda doc: doc['expires_at'] > now_str)

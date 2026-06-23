@@ -9,8 +9,11 @@ st.html(
         )
 
 try:
-    r = requests.get("https://127.0.0.1:8000/api/locations", verify=cert)
-    rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert)
+    headers = {
+        "Authorization": f"Bearer {st.session_state.token}"
+    }
+    r = requests.get("https://127.0.0.1:8000/api/locations", verify=cert, headers=headers)
+    rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert, headers=headers)
 
     if r.status_code != 200 or rcmp.status_code != 200:
         st.error("Failed to load data.")
@@ -59,7 +62,7 @@ try:
             if st.button("Add"):
 
                 requests.post(
-                    "https://127.0.0.1:8000/api/locations/set", verify = cert,
+                    "https://127.0.0.1:8000/api/locations/set", verify = cert, headers=headers,
                     json={
                         "location_id": location["id"],
                         "computer_id": [
@@ -87,7 +90,7 @@ try:
         st.divider()
 
         location_computers = requests.get(
-            f"https://127.0.0.1:8000/api/computers/location?location_id={location['id']}", verify = cert
+            f"https://127.0.0.1:8000/api/computers/location?location_id={location['id']}", verify = cert, headers=headers
         ).json()
 
         st.html("<h2>Assigned Computers:</h2><p>Add existing computers to this location or remove them when no longer needed.</p>")
@@ -106,7 +109,7 @@ try:
                     help="Remove computer from this location"
                 ):
                     requests.delete(
-                        "https://127.0.0.1:8000/api/locations/delete",
+                        "https://127.0.0.1:8000/api/locations/delete", headers=headers,
                         verify=cert,
                         json={
                             "computer": computer
@@ -122,7 +125,9 @@ try:
             add_computers_dialog()
 
     else:
-
+        headers = {
+            "Authorization": f"Bearer {st.session_state.token}"
+        }
         st.html(
             "<h1>Locations</h1><p>Organize computers into logical groups for easier administration.</p>"
         )
@@ -152,7 +157,7 @@ try:
                     help="Delete location"
                 ):
                     requests.delete(
-                         f"https://127.0.0.1:8000/api/locations/delete_loc", verify=cert, json={"location_id":location['id']}
+                         f"https://127.0.0.1:8000/api/locations/delete_loc", verify=cert, json={"location_id":location['id']}, headers=headers
                     )
                     st.rerun()
 
