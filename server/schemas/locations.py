@@ -24,3 +24,9 @@ class GetLocations(BaseModel):
 class setLocation(BaseModel):
 	computer_id: list[int]
 	location_id: int
+
+class removeDevLocation(BaseModel):
+	computer: str
+
+class removeLocation(BaseModel):
+	location_id: int

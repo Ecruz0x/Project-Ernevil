@@ -100,11 +100,11 @@ if "selected_location" in st.session_state:
                 key=f"remove_{computer}",
                 help="Remove computer from this location"
             ):
-                requests.post(
-                    "https://127.0.0.1:8000/api/locations/remove",
+                requests.delete(
+                    "https://127.0.0.1:8000/api/locations/delete",
                     verify=cert,
                     json={
-                        "computer_id": computer
+                        "computer": computer
                     }
                 )
                 st.rerun()
@@ -147,7 +147,7 @@ else:
                 help="Delete location"
             ):
                 requests.delete(
-                    f"https://127.0.0.1:8000/api/locations/{location['id']}", verify=cert
+                     f"https://127.0.0.1:8000/api/locations/delete_loc", verify=cert, json={"location_id":location['id']}
                 )
                 st.rerun()
 

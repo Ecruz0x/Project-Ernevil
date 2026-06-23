@@ -1,4 +1,4 @@
-from ..schemas.locations import Location, CreateLocation, CreatedLocation, GetLocations, setLocation
+from ..schemas.locations import Location, CreateLocation, CreatedLocation, GetLocations, setLocation, removeLocation, removeDevLocation
 from ..database.db import Base, engine, get_db
 from ..database import dbschema
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
@@ -45,12 +45,42 @@ def createLocation(location: CreateLocation, db: Annotated[Session, Depends(get_
     db.commit()
     return {"location_id": newLocation.id}
 
-@router.delete("", response_model = bool)
-def removeLocation():
-    pass
+
+
+
+@router.delete("/delete_loc", response_model = bool)
+def removeLocation(data: removeLocation, db: Annotated[Session, Depends(get_db)]):
+    location = (
+        db.query(dbschema.Locations)
+        .filter(dbschema.Locations.id == data.location_id)
+        .first()
+    )
+    if location:
+        db.delete(location)
+        db.commit()
+        return True
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail="Location not found"
+        )
+
+
+
+@router.delete("/delete", response_model = bool)
+def removeDevLocation(data: removeDevLocation, db: Annotated[Session, Depends(get_db)]):
+    computer = (
+        db.query(dbschema.ComputerInfo)
+        .filter(dbschema.ComputerInfo.computername == data.computer)
+        .first()
+    )
+    if computer:
+        computer.location_id = None
+        db.commit()
+        return True
 
 @router.post("/set", response_model = bool)
-def setLocation(data: setLocation, db: Annotated[Session, Depends(get_db)]):
+def setDevLocation(data: setLocation, db: Annotated[Session, Depends(get_db)]):
     for ids in data.computer_id:
         computer = (
             db.query(dbschema.ComputerInfo)
@@ -61,3 +91,13 @@ def setLocation(data: setLocation, db: Annotated[Session, Depends(get_db)]):
             computer.location_id = data.location_id
             db.commit()
             return True
+
+@router.get("/getlocbyid", response_model = str)
+def getLocByID(location_id: int, db: Annotated[Session, Depends(get_db)]):
+    loc = (
+        db.query(dbschema.Locations)
+        .filter(dbschema.Locations.id == location_id)
+        .first()
+    )
+    loc_n = loc.name
+    return loc_n

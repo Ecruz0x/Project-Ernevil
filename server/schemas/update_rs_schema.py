@@ -40,5 +40,7 @@ class UpdateBootTime(AuthenticateComputer):
 class UpdateCpuUsage(AuthenticateComputer, CPUInfo):
 	pass
 
-class updateBlacklistState(AuthenticateComputer):
+class updateBlacklistState(BaseModel):
+	computer_id: int
 	blacklist_state: bool
+	blacklist_reason: Optional[str] = None

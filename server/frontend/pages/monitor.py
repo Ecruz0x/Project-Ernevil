@@ -31,7 +31,6 @@ if computers:
 
     st.html(f"<h2>Current {choice} metrics </h2>")
 
-    v = 5
     # Memory Usage
     rmem = requests.get(f"https://127.0.0.1:8000/api/computers/mem?computer_id={computer_map[choice]}", verify=cert)
     if rmem.status_code == 200:

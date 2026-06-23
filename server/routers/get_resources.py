@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException, status, Depends, APIRouter
 from ..schemas.add_rs_schema import ComputerInfo, MemoryInfo, NetworkingInfo, ProcessesInfo, DisksInfo, CUsersInfo, getCPUInfo
+from ..schemas.authentication import AuthUpdates
 from ..database import dbschema
 from ..database.db import Base, engine, get_db
 from typing import Annotated
@@ -12,17 +13,19 @@ router = APIRouter()
 
 #### TODO: Authentication Needed Here
 
-
+#### Key auth
 @router.get("/is_added", response_model = bool)
-def isAddedComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
-    result = db.execute(text(f"SELECT 1 FROM computerInfo WHERE computer_id = {computer_id}"))
+def isAddedComputer(k: AuthUpdates, db: Annotated[Session, Depends(get_db)]):
+    result = db.execute(text(f"SELECT 1 FROM computerInfo WHERE computer_id = {k.computer_id}"))
+    existing_computer = result.scalars().first()
+    result_k = db.execute(text(f"SELECT 1 FROM keys WHERE key = {k.key}"))
     existing_computer = result.scalars().first()
     if existing_computer:
         return True
     else:
         raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Computer unavailable Error",
+        detail="Computer unavailable or unauthorized",
         )
 
 
@@ -34,9 +37,16 @@ def getComputers(db: Annotated[Session, Depends(get_db)]):
 
 @router.get("/live", response_model = list[ComputerInfo])
 def getLiveComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerInfo]:
-    result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive"))
+    result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive AND NOT blacklisted"))
     liveComputers = result.mappings().all()
     return liveComputers
+
+@router.get("/blacklisted", response_model = list[ComputerInfo])
+def getBSComputers(db: Annotated[Session, Depends(get_db)]) -> list[ComputerInfo]:
+    result = db.execute(text("SELECT * FROM computerInfo WHERE is_alive AND blacklisted"))
+    BSComputers = result.mappings().all()
+    return BSComputers
+
 
 @router.get("/location", response_model = list[str])
 def getCmpLoc(location_id: int, db: Annotated[Session, Depends(get_db)]):

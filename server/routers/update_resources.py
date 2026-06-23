@@ -1,6 +1,7 @@
 from ..schemas.update_rs_schema import UpdateComputerName, UpdateMemoryInfo, UpdateNetworkingInfo, UpdateProcessesInfo
 from ..schemas.update_rs_schema import UCUsersInfo, UpdateBootTime, UpdateCpuUsage, UpdateDisksInfo, updateBlacklistState
 from ..schemas.authentication import AuthenticateComputer
+from ..schemas.authentication import AuthUpdates
 import time, asyncio, json
 from datetime import datetime
 from sqlalchemy import select, text, delete
@@ -68,15 +69,13 @@ def updateMemoryInfo(newMemInfo: UpdateMemoryInfo, db: Annotated[Session, Depend
         )
 @router.patch("/blacklist", response_model = bool)
 def setCBlacklist(BSInfo: updateBlacklistState, db: Annotated[Session, Depends(get_db)]):
-    auth_data = {"computer_id": BSInfo.computer_id, "fingerprint": BSInfo.fingerprint}
-    is_auth = authenticateComputer(auth_data, db)
-    if is_auth:
-        result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == BSInfo.computer_id))
-        computer = result.scalars().first()
-        if computer:
-            computer.blacklisted = BSInfo.blacklist_state
-            db.commit()
-            db.refresh(computer)
+    result = db.execute(select(dbschema.ComputerInfo).where(dbschema.ComputerInfo.computer_id == BSInfo.computer_id))
+    computer = result.scalars().first()
+    if computer:
+        computer.blacklisted = BSInfo.blacklist_state
+        computer.blacklist_reason = BSInfo.blacklist_reason
+        db.commit()
+        db.refresh(computer)
         return True
     else:
         raise HTTPException(

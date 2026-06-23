@@ -32,6 +32,7 @@ class ComputerInfo(Base):
 	is_unix: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
 	os: Mapped[str] = mapped_column(String(50), unique=False, nullable=True)  ## TODO : Fix this (nullable=False)
 	blacklisted: Mapped[bool] = mapped_column(Boolean, unique=False, nullable=False)
+	blacklist_reason: Mapped[str] = mapped_column(String(100), unique=False, nullable=True)
 	boottime: Mapped[datetime] = mapped_column(DateTime, unique = False, nullable=False)
 	node_machineid: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
 	fingerprint: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
