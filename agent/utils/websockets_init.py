@@ -32,38 +32,37 @@ class agentWebsocket:
 	async def receiveCommands(self):
 		while True:
 			msg = await self.ws.recv()
-			if len(msg.split()) > 5:
-				if self.is_unix:
-					result = subprocess.run(
-						msg.split()[5:],
-						capture_output=True,
-						text=True
-					)
-				else:
-					if msg == "shutdown now":
-						msg = "Stop-Computer -Force"
-					elif msg == "sudo reboot":
-						msg = "Restart-Computer -Force"
-
-					result = subprocess.run(
-						["powershell.exe", "-NoProfile", "-Command", msg],
-						capture_output=True,
-						text=True
-					)
-
-				if result.stdout:
-					await self.ws.send(result.stdout)
-				elif result.stderr:
-					await self.ws.send(result.stderr)
-				else:
-					status_code = result.returncode
-
-					if status_code == 0:
-						await self.ws.send("Command Executed!")
-					else:
-						await self.ws.send("Command Failed!")
+			if self.is_unix:
+				result = subprocess.run(
+					msg.split(),
+					capture_output=True,
+					text=True
+				)
 			else:
-				await self.ws.send("Execution error, check your command and try again!")
+				if msg == "shutdown now":
+					msg = "Stop-Computer -Force"
+				elif msg == "sudo reboot":
+					msg = "Restart-Computer -Force"
+
+				result = subprocess.run(
+					["powershell.exe", "-NoProfile", "-Command", msg],
+					capture_output=True,
+					text=True
+				)
+
+			if result.stdout:
+				await self.ws.send(result.stdout)
+			elif result.stderr:
+				await self.ws.send(result.stderr)
+			else:
+				status_code = result.returncode
+
+				if status_code == 0:
+					await self.ws.send("Command Executed!")
+				else:
+					await self.ws.send("Command Failed!")
+		else:
+			await self.ws.send("Execution error, check your command and try again!")
 
 	async def send_alert(self, **kwargs):
 		await self.ws.send(json.dumps({

@@ -176,7 +176,7 @@ if computers:
     if st.button("Execute"):
         computer_map = mapComputers(computers)
         if choice in computer_map.keys():
-            rcmds = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text']}, verify = cert)
+            rcmds = requests.post("https://127.0.0.1:8000/api/commands", json = {"computer_id": computer_map[choice], "command": response['text'][25:]}, verify = cert)
             try:
                 result = rcmds.json()["result"]
                 output = str(result)
