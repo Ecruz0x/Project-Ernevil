@@ -6,6 +6,7 @@ from .database.db import Base, engine, get_db, sessionlocal
 from typing import Annotated
 import asyncio
 from .routers import add_resources, update_resources, get_resources, delete_resources, heartbeats, locations, websocket
+from .routers import users_routes
 from .utils.heartbeat_utils import expireHeartBeat
 import uvicorn
 
@@ -24,6 +25,7 @@ app.include_router(delete_resources.router, prefix = "/api/computers", tags = ["
 app.include_router(heartbeats.router, prefix = "/api/computers", tags = ["Heartbeat Handler"])
 app.include_router(locations.router, prefix = "/api/locations", tags = ["Locations"])
 app.include_router(websocket.router, prefix = "/api", tags = ["Websocket and executors"])
+app.include_router(users_routes.router, prefix = "/api/users", tags = ["Users"])
 
 
 
@@ -37,10 +39,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        ssl_keyfile="cert/key.pem",
-        ssl_certfile="cert/cert.pem",
-    )
+    sys.exit(main())

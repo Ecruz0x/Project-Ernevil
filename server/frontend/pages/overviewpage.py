@@ -4,6 +4,8 @@ from streamlit_extras.card_selector import *
 import streamlit_shadcn_ui as ui
 import requests
 
+
+
 st.header("General Overview")
 st.text("""
 Ernevil is an open-source monitoring platform designed to help administrators manage and monitor devices across a Local Area Network, with cloud support planned for future releases. It focuses on simplicity, automation, and centralized system management while remaining fully transparent and community-driven.""")

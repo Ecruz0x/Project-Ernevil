@@ -8,13 +8,13 @@ from .db import Base, engine
 
 Base.metadata.create_all(bind=engine)
 
-class User(Base):
+class Users(Base):
 	__tablename__ = "users"
 
 	id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 	username: Mapped[str] = mapped_column(String(30), unique=True, nullable=False)
 	email: Mapped[str] = mapped_column(String(60), unique=True, nullable=False)
-	password: Mapped[str] = mapped_column(String(99), unique=False, nullable=False)
+	password_hash: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)
 
 
 class Locations(Base):

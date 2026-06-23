@@ -3,7 +3,6 @@ import pandas as pd
 import streamlit_shadcn_ui as ui
 import requests
 
-
 cert = "server.crt"
 
 st.header("Available Devices")

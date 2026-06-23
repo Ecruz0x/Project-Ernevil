@@ -5,6 +5,8 @@ import streamlit_shadcn_ui as ui
 import requests, random
 from streamlit_autorefresh import st_autorefresh
 
+
+
 count = st_autorefresh(interval=10000, key="bootstraptimer")
 
 st.header("Detected Alerts")

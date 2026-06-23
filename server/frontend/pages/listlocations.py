@@ -2,6 +2,7 @@ import requests
 import streamlit as st
 
 
+
 cert = "server.crt"
 st.html(
             "<h1>Locations</h1><p>Organize computers into logical groups for easier administration.</p>"
