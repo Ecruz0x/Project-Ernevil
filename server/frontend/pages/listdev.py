@@ -7,29 +7,30 @@ import requests
 cert = "server.crt"
 
 st.header("Available Devices")
+try:
+	rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert)
+	if rcmp.status_code == 200:
+	    computers = rcmp.json()
 
-rcmp = requests.get("https://127.0.0.1:8000/api/computers", verify=cert)
-if rcmp.status_code == 200:
-    computers = rcmp.json()
+	data = []
 
-data = []
+	for computer in computers:
+		if computer["location_id"]:
+			r = requests.get(f"https://127.0.0.1:8000/api/locations/getlocbyid?location_id={computer['location_id']}", verify=cert)
+			loc = r.json()
+			data.append({"Computer Name": computer["computername"], "Location": loc, "OS": computer["os"], "Status": "Online" if computer["is_alive"] else "Offline"})
+		else:
+			data.append({"Computer Name": computer["computername"], "Location": "NULL", "OS": computer["os"], "Status": "Online" if computer["is_alive"] else "Offline"})
 
-for computer in computers:
-	if computer["location_id"]:
-		r = requests.get(f"https://127.0.0.1:8000/api/locations/getlocbyid?location_id={computer['location_id']}", verify=cert)
-		loc = r.json()
-		data.append({"Computer Name": computer["computername"], "Location": loc, "OS": computer["os"], "Status": "Online" if computer["is_alive"] else "Offline"})
-	else:
-		data.append({"Computer Name": computer["computername"], "Location": "NULL", "OS": computer["os"], "Status": "Online" if computer["is_alive"] else "Offline"})
+	df = pd.DataFrame(data)
 
-df = pd.DataFrame(data)
+	ui.table(data=df, maxHeight=200)
 
-ui.table(data=df, maxHeight=200)
+	if st.button("Monitor your devices"):
+		st.switch_page("pages/monitor.py")
 
-if st.button("Monitor your devices"):
-	st.switch_page("pages/monitor.py")
-
-
+except Exception as e:
+    st.error("An unknown error occurred, check your agents and try again")
 
 st.html("""<h3>Note</h3>
 	<ul>

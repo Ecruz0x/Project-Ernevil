@@ -25,12 +25,12 @@ selected = card_selector(
         dict(
             icon=":material/security:",
             title="Account",
-            description="Create your administrator account",
+            description="Create your administrator account and generate authentication key",
         ),
         dict(
             icon=":material/hub:",
             title="Agents",
-            description="Deploy the agent software to your computers or servers and login using your administration credentials",
+            description="Deploy the agent software to your computers or servers and and type your authentication key into your json config file",
         ),
         dict(
             icon=":material/dns:",
@@ -76,7 +76,6 @@ try:
             )
 
 except Exception as e:
-    st.html(e)
     st.error(
         "Failed to communicate with the web server. This may be caused by an invalid configuration, network issue, or server unavailability. Please verify your settings and retry."
     )

@@ -52,7 +52,6 @@ try:
 
                     
 except Exception as e:
-    print(e)
     st.error(
         "Failed to communicate with the web server. This may be caused by an invalid configuration, network issue, or server unavailability. Please verify your settings and retry."
     )
