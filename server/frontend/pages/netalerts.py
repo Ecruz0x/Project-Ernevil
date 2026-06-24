@@ -29,8 +29,9 @@ try:
                     st.markdown(f"##### {alerts[i]['type']}")
                     st.write(alerts[i]["event"])
 
-                    col1, col2 = st.columns(2)
+                    col1, col2, col3 = st.columns(3)
                     idx = alerts[i]["computer_id"]
+                    requests.get(f"https://127.0.0.1:8000/api/computers/get_name?computer_id={idx}")
 
                     with col1:
                         st.caption(f"Category: {alerts[i]['category']}")
@@ -39,14 +40,17 @@ try:
                     with col2:
                         st.caption(f"Product: {alerts[i]['product']}")
                         st.caption(f"Expires: {alerts[i]['expires_at']}")
+                    with col3:
+                        st.caption(f"Agent: {agent.json()}")
+
             elif alerts[i]["type"] == "Network Alert":
                 with st.container(border=True):
                     st.markdown(f"##### {alerts[i]['type']}")
                     st.write("Suspected network attack detected")
 
-                    col1, col2 = st.columns(2)
+                    col1, col2, col3 = st.columns(3)
                     idx = alerts[i]["computer_id"]
-
+                    agent = requests.get(f"https://127.0.0.1:8000/api/computers/get_name?computer_id={idx}", verify=cert)
                     with col1:
                         st.caption(f"Source Port: {alerts[i]['src_port']}")
                         st.caption(f"Protocol: {alerts[i]['protocol']}")
@@ -54,9 +58,12 @@ try:
                     with col2:
                         st.caption(f"Suspected Attack type: {alerts[i]['event']}")
                         st.caption(f"Expires: {alerts[i]['expires_at']}")
+                    with col3:
+                        st.caption(f"Agent: {agent.json()}")
 
                     
 except Exception as e:
+    print(e)
     st.error(
         "Failed to communicate with the web server. This may be caused by an invalid configuration, network issue, or server unavailability. Please verify your settings and retry."
     )

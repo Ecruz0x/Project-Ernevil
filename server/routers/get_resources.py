@@ -13,11 +13,23 @@ from datetime import datetime
 
 router = APIRouter()
 
+@router.get("/get_name")
+def getComputerByID(computer_id: int, db: Annotated[Session, Depends(get_db)]):
+    computer = (
+        db.query(dbschema.ComputerInfo)
+        .filter(dbschema.ComputerInfo.computer_id == computer_id)
+        .first()
+    )
+    if computer:
+        return computer.computername
+    else:
+        raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Computer unavailable or unauthorized",
+        )
 
 
-#### TODO: Authentication Needed Here
 
-#### Key auth
 @router.get("/is_added", response_model = bool)
 def isAddedComputer(computer_id: int, db: Annotated[Session, Depends(get_db)]):
     existing_computer = (
